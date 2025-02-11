@@ -18,8 +18,8 @@ const features = [
 
 const KeyFeatures = () => {
   return (
-    <Box sx={{ py: 8, textAlign: "center", backgroundColor: "#f4f4f4" }}>
-      <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
+    <Box sx={{ py: 8, textAlign: "center", backgroundColor: "#f4f4f4", px: 2 }}>
+      <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>
         Key Features
       </Typography>
 
@@ -28,7 +28,9 @@ const KeyFeatures = () => {
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Card
               sx={{
-                p: 2,
+                maxWidth: 350,
+                mx: "auto",
+                p: 3,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -39,11 +41,11 @@ const KeyFeatures = () => {
               }}
             >
               <Box sx={{ color: "#1976d2", mb: 2 }}>{feature.icon}</Box>
-              <CardContent>
+              <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <Typography variant="h6" fontWeight="bold">
                   {feature.title}
                 </Typography>
-                <Typography variant="body2" sx={{ mt: 1, color: "gray" }}>
+                <Typography variant="body2" sx={{ mt: 2, color: "gray" }}>
                   {feature.desc}
                 </Typography>
               </CardContent>

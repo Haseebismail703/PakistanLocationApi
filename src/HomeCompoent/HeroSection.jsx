@@ -15,7 +15,6 @@ const HeroSection = () => {
     const interval = setInterval(() => {
       setCurrentImage((prevImage) => (prevImage + 1) % images.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 

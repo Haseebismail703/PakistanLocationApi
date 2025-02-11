@@ -35,9 +35,9 @@ const HowItWorks = () => {
         How It Works
       </Typography>
 
-      <Grid container spacing={2} justifyContent="center">
+      <Grid px={2} container spacing={2} justifyContent="center">
         {steps.map((step, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grid  item xs={12} sm={6} md={3} key={index}>
             <Card
               sx={{
                 p: 2,

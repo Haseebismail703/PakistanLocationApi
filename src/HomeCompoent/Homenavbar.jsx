@@ -37,7 +37,7 @@ const Navbar = () => {
           </Box>
 
           {/* Get Started Button */}
-          <Button variant="contained" color="secondary" sx={{ ml: 2 }} component={Link} to="register">
+          <Button style={{width : 100 , height : 50}}  variant="contained" color="secondary" sx={{ ml: 2 }} component={Link} to="/register">
             Get Started
           </Button>
 
