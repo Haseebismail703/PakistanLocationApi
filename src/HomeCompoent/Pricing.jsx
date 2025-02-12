@@ -5,14 +5,14 @@ const plans = [
   {
     name: "Free",
     price: "$0/month",
-    features: ["Basic API Access", "Limited Requests", "Community Support"],
+    features: ["Basic API Access", "1000 Requests per/day", "Community Support"],
     buttonText: "Get Started",
     color: "#1976d2",
   },
   {
     name: "Pro",
     price: "5000PKR /month",
-    features: ["Full API Access", "Higher Rate Limits", "Email Support"],
+    features: ["Full API Access", "5000 Requests per/day", "Email Support"],
     buttonText: "Choose Plan",
     color: "#388e3c",
   },

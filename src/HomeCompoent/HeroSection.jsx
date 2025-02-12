@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const images = [
   "https://images.travelandleisureasia.com/wp-content/uploads/sites/3/2023/11/27175431/tomb.jpg",
@@ -53,7 +54,7 @@ const HeroSection = () => {
         <Typography variant="h6" component="p" sx={{ mb: 3 }}>
           Access accurate real-time location data for cities, districts, and postal codes across Pakistan.
         </Typography>
-        <Button variant="contained" color="primary" size="large">
+        <Button component={Link} to="/register" variant="contained" color="primary" size="large">
           Get Started
         </Button>
       </Container>
