@@ -11,7 +11,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$29/month",
+    price: "5000PKR /month",
     features: ["Full API Access", "Higher Rate Limits", "Email Support"],
     buttonText: "Choose Plan",
     color: "#388e3c",
