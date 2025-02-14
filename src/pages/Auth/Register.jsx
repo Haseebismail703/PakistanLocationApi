@@ -1,24 +1,41 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import './Register.css'
 import axios from 'axios';
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Box, TextField, Button, Typography, Grid } from "@mui/material";
-
+import api from '../../Api/api';
 const Register = () => {
-
-  const emailInputRef = useRef(null)
-  const passwordInputRef = useRef(null)
-  const confirmPassword = useRef(null)
-
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+  const confirmPassword = useRef(null);
+  const nameInputRef = useRef(null);
   const navigate = useNavigate();
   const signupSubmitHandler = async (e) => {
-    e.preventDefault()
-    console.log(
-      emailInputRef.current?.value,
-      passwordInputRef.current?.value,
-      confirmPassword.current?.value,
-    );
+    e.preventDefault();
+    if (passwordInputRef.current?.value !== confirmPassword.current?.value) {
+      toast.error("Passwords do not match. Please try again.");
+      return;
+    }
+    try {
+      const response = await axios.post(`${api}/users/register`, {
+        name: nameInputRef.current?.value,
+        email: emailInputRef.current?.value,
+        password: passwordInputRef.current?.value,
+      });
+      if (response.status === 201) {
+        toast.success("Registration successful!");
+        localStorage.setItem("user", JSON.stringify(response.data));
+        emailInputRef.current.value = '';
+        passwordInputRef.current.value = '';
+        confirmPassword.current.value = '';
+        nameInputRef.current.value = '';
+        // navigate("/login");
+      }
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+      console.error("There was an error registering!", error);
+    }
   }
 
   return (
@@ -86,6 +103,16 @@ const Register = () => {
             autoComplete="off"
             style={{ width: "100%", maxWidth: "400px" }}
           >
+            <TextField
+              fullWidth
+              inputRef={nameInputRef}
+              label="Name"
+              type="text"
+              variant="outlined"
+              autoComplete="on"
+              required
+              margin="normal"
+            />
             <TextField
               fullWidth
               inputRef={emailInputRef}

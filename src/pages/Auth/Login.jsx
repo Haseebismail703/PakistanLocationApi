@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Box, TextField, Button, Typography,Grid } from "@mui/material";
+import api from '../../Api/api';
 
 const Login = () => {
   const emailInputRef = useRef(null)
@@ -14,6 +15,23 @@ const Login = () => {
   const loginSubmitHandler = async (e) => {
     e.preventDefault()
     console.log(emailInputRef.current.value, passwordInputRef.current.value);
+    try {
+      const response = await axios.post(`${api}/users/login`, {
+        email: emailInputRef.current.value,
+        password: passwordInputRef.current.value,
+      });
+      //  console.log(response)
+      if (response.status === 200) {
+        toast.success("Login successful!");
+        localStorage.setItem("user", JSON.stringify(response.data))
+        emailInputRef.current.value = '';
+        passwordInputRef.current.value = '';
+        // navigate("/login");
+      }
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+      console.error("There was an error registering!", error);
+    }
   }
   return (
     <div>

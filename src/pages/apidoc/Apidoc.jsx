@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from "@mui/material";
-import Navbar from "../../HomeCompoent/Homenavbar";
+import Navbar from "../../Component/HomeCompoent/Homenavbar";
 const apiEndpoints = [
   { method: "GET", endpoint: "/api/country", description: "Get country details (Pakistan)" },
   { method: "GET", endpoint: "/api/provinces", description: "List all provinces" },
