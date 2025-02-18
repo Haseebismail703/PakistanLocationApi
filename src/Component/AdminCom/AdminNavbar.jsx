@@ -27,6 +27,36 @@ function Admin_nav() {
     {
       label: <Link to="/admin/manage-admin">Manage Admin</Link>,
       key: 'Manage Admin',
+      icon: <UserAddOutlined />,
+    },
+    {
+      label: <Link to="/admin/manage-country">Manage Country</Link>,
+      key: 'Manage Country',
+      icon: <FormOutlined />,
+    },
+    {
+      label: <Link to="/admin/manage-province">Manage Province</Link>,
+      key: 'Manage Province',
+      icon: <FormOutlined />,
+    },
+    {
+      label: <Link to="/admin/manage-division">Manage Division</Link>,
+      key: 'Manage Division',
+      icon: <FormOutlined />,
+    },
+    {
+      label: <Link to="/admin/manage-district">Manage District</Link>,
+      key: 'Manage District',
+      icon: <FormOutlined />,
+    },
+    {
+      label: <Link to="/admin/manage-cities">Manage Cities</Link>,
+      key: 'Manage Cities',
+      icon: <FormOutlined />,
+    },
+    {
+      label: <Link to="/admin/manage-area">Manage Area</Link>,
+      key: 'Manage Area',
       icon: <FormOutlined />,
     },
   ];

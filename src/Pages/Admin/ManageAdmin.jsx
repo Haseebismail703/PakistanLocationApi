@@ -106,12 +106,13 @@ const ManageAdmin = () => {
       <AdminNavbar />
       <br /><br />
       <center>
-        <h1>Add admin</h1>
+        <h1 style={{ fontSize: "24px" }}>Add admin</h1>
       </center>
       <div style={{ padding: "20px" }}>
         {/* Button to open modal for adding user */}
         <Button type="primary" onClick={showModal}>
-          Create Admin</Button>
+          Create Admin
+        </Button>
 
         {/* Modal for adding user */}
         <Modal
@@ -121,8 +122,6 @@ const ManageAdmin = () => {
           footer={null}
         >
           <Form form={form} onFinish={handleSubmit} layout="vertical">
-
-
             <Form.Item
               label="Name"
               name="name"
@@ -152,9 +151,6 @@ const ManageAdmin = () => {
                 Submit
               </Button>
             </Form.Item>
-
-
-
           </Form>
         </Modal>
 
