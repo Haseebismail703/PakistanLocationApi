@@ -11,8 +11,8 @@ const ManageCountry = () => {
   const [countries, setCountries] = useState([
     {
       key: "1",
-      name: "Country 1",
-      details: "This is the default details for Country 1.",
+      name: "Pakistan",
+      details: "This is the pakistan",
       pictures: [],
     },
   ]);
@@ -114,7 +114,7 @@ const ManageCountry = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="primary" onClick={() => showEditModal(record)}>
+        <Button  type="primary" onClick={() => showEditModal(record)}>
           Edit
         </Button>
       ),
@@ -130,7 +130,7 @@ const ManageCountry = () => {
     </center>
     <div style={{ padding: "20px" }}>
       {/* Button to open modal for adding country */}
-      <Button type="primary" onClick={showModal}>
+      <Button disabled type="primary" onClick={showModal}>
         Create Country
       </Button>
 
