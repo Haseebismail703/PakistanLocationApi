@@ -14,9 +14,9 @@ const ManageDistrics = () => {
     const [updateImagesModalVisible, setUpdateImagesModalVisible] = useState(false);
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
-    const [division, setdivisions] = useState([]);
-    const [selectdivision, setselectdivision] = useState(null);
-    const [province, setprovince] = useState('');
+    const [districts, setdistricts] = useState([]);
+    const [selectdistrict, setselectdistrict] = useState(null);
+    const [divisions, setdivisions] = useState('');
     const [loading, setLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
@@ -24,28 +24,28 @@ const ManageDistrics = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
-        getProvince();
-        getAlldivisions();
+        getdivisions();
+        getAlldistricts();
     }, []);
 
-    const getProvince = async () => {
-        try {
-            const response = await axios.get(`${api}/admins/provinces`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
-            });
-            console.log(response.data?.data);
-            setprovince(response.data?.data);
-        } catch (error) {
-            message.error("Failed to fetch province!");
-        }
-    };
-
-    const getAlldivisions = async () => {
+    const getdivisions = async () => {
         try {
             const response = await axios.get(`${api}/admins/divisions`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            const divisionsData = response.data?.data?.map((data, index) => ({
+            console.log(response.data?.data);
+            setdivisions(response.data?.data);
+        } catch (error) {
+            message.error("Failed to fetch divisions!");
+        }
+    };
+
+    const getAlldistricts = async () => {
+        try {
+            const response = await axios.get(`${api}/admins/districts`, {
+                headers: { Authorization: `Bearer ${user?.accessToken}` },
+            });
+            const districtsData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
                 name: data.name,
@@ -54,9 +54,9 @@ const ManageDistrics = () => {
                 details: data.details,
                 countryId: data.countryId,
             }));
-            setdivisions(divisionsData);
+            setdistricts(districtsData);
         } catch (error) {
-            message.error("Failed to fetch divisions!");
+            message.error("Failed to fetch districts!");
         }
     };
 
@@ -72,19 +72,19 @@ const ManageDistrics = () => {
 
         formData.append("name", values.name);
         formData.append("details", values.details);
-        formData.append("provinceId", values.provinceId);
+        formData.append("divisionId", values.divisionId);
 
         try {
-            const response = await axios.post(`${api}/admins/divisions/create`, formData, {
+            const response = await axios.post(`${api}/admins/districts/create`, formData, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
 
             if (response.status === 201) {
-                message.success("Division added successfully!");
+                message.success("District added successfully!");
                 setCreateModalVisible(false);
-                getAlldivisions();
+                getAlldistricts();
             } else {
-                message.error("Failed to add Division!");
+                message.error("Failed to add District!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error submitting data. Please try again.");
@@ -94,21 +94,20 @@ const ManageDistrics = () => {
     };
 
     const handleUpdateDetails = async (values) => {
-        if (!selectdivision) return;
+        if (!selectdistrict) return;
         setLoading(true);
         try {
             const response = await axios.put(
-                `${api}/admins/divisions/update-details/${selectdivision.id}`,
+                `${api}/admins/districts/update-details/${selectdistrict.id}`,
                 { name: values.name, details: values.details },
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
-
             if (response.status === 200) {
-                message.success("Division details updated successfully!");
+                message.success("District updated successfully!");
                 setUpdateDetailsModalVisible(false);
-                getAlldivisions()
+                getAlldistricts();
             } else {
-                message.error("Failed to update Division details!");
+                message.error("Failed to update District details!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating data. Please try again.");
@@ -118,7 +117,7 @@ const ManageDistrics = () => {
     };
 
     const handleAddImage = async (values) => {
-        if (!selectdivision) return;
+        if (!selectdistrict) return;
 
         setLoading(true);
         const formData = new FormData();
@@ -131,17 +130,17 @@ const ManageDistrics = () => {
 
         try {
             const response = await axios.put(
-                `${api}/admins/divisions/add-pictures/${selectdivision.id}`,
+                `${api}/admins/districts/add-pictures/${selectdistrict.id}`,
                 formData,
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
 
             if (response.data) {
-                message.success("Division images updated successfully!");
+                message.success("District images updated successfully!");
                 setUpdateImagesModalVisible(false);
-                getAlldivisions();
+                getAlldistricts();
             } else {
-                message.error("Failed to update Division images!");
+                message.error("Failed to update District images!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating images. Please try again.");
@@ -153,7 +152,7 @@ const ManageDistrics = () => {
     const handleDelete = async (item) => {
         try {
             const response = await axios.put(
-                `${api}/admins/divisions/delete-pictures/${selectdivision.id}`,
+                `${api}/admins/districts/delete-pictures/${selectdistrict.id}`,
                 { picturesToDelete: [item] },
                 {
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
@@ -161,14 +160,14 @@ const ManageDistrics = () => {
             );
     
             if (response.status === 200) {
-                message.success("Division image deleted successfully!");
-                getAlldivisions();
+                message.success("District image deleted successfully!");
+                getAlldistricts();
                 setDeleteImagesModalVisible(false)
             } else {
-                message.error("Failed to delete Division image!");
+                message.error("Failed to delete District image!");
             }
         } catch (error) {
-            message.error(error.response?.data?.message || "Error deleting Division image. Please try again.");
+            message.error(error.response?.data?.message || "Error deleting District image. Please try again.");
         }
     };
     
@@ -180,10 +179,10 @@ const ManageDistrics = () => {
             key: "action",
             render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button icon={<EyeOutlined />} onClick={() => { setselectdivision(record); setViewModalVisible(true); }}>View</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectdivision(record); setDeleteImagesModalVisible(true); }}>
+                    <Button icon={<EyeOutlined />} onClick={() => { setselectdistrict(record); setViewModalVisible(true); }}>View</Button>
+                    <Button icon={<EditOutlined />} onClick={() => { setselectdistrict(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
+                    <Button icon={<EditOutlined />} onClick={() => { setselectdistrict(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectdistrict(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
                 </div>
@@ -197,7 +196,7 @@ const ManageDistrics = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
-                <Table columns={columns} dataSource={division} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table columns={columns} dataSource={districts} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
            { /* Create Districs Modal */}
@@ -214,9 +213,9 @@ const ManageDistrics = () => {
                                 <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
                                     <TextArea rows={4} />
                                 </Form.Item>
-                                <Form.Item label="Select a Province" name="provinceId" rules={[{ required: true, message: "Please select a country!" }]}>
-                                    <Select placeholder="Select a Province">
-                                        {province && province.map((data) => (
+                                <Form.Item label="Select a divisions" name="divisionId" rules={[{ required: true, message: "Please select a country!" }]}>
+                                    <Select placeholder="Select a divisions">
+                                        {divisions && divisions.map((data) => (
                                             <Option key={data._id} value={data._id}>{data.name}</Option>
                                         ))}
                                     </Select>
@@ -239,7 +238,7 @@ const ManageDistrics = () => {
 
                         {/* Update Details Modal */}
             <Modal
-                title="Update Division Details"
+                title="Update District"
                 open={updateDetailsModalVisible}
                 onCancel={() => setUpdateDetailsModalVisible(false)}
                 footer={null}
@@ -257,9 +256,9 @@ const ManageDistrics = () => {
                 </Form>
             </Modal>
 
-            {/* Update Images Modal */}
+            {/* Add Images Modal */}
             <Modal
-                title="Add Division Images"
+                title="Add District Images"
                 open={updateImagesModalVisible}
                 onCancel={() => setUpdateImagesModalVisible(false)}
                 footer={null}
@@ -283,19 +282,19 @@ const ManageDistrics = () => {
 
             {/* View Modal */}
             <Modal
-                title="Division Details"
+                title="District Details"
                 open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={null}
             >
-                {selectdivision && (
+                {selectdistrict && (
                     <div>
-                        <h3>Name: {selectdivision.name}</h3>
-                        <p><strong>Details:</strong> {selectdivision.details}</p>
+                        <h3>Name: {selectdistrict.name}</h3>
+                        <p><strong>Details:</strong> {selectdistrict.details}</p>
                         <h4>Images:</h4>
-                        {selectdivision.pictures?.length > 0 ? (
-                            selectdivision.pictures.map((pic, index) => (
-                                <Image key={index} width={200} src={pic} alt={`Division ${index}`} />
+                        {selectdistrict.pictures?.length > 0 ? (
+                            selectdistrict.pictures.map((pic, index) => (
+                                <Image key={index} width={200} src={pic} alt={`District ${index}`} />
                             ))
                         ) : (
                             <p>No images available</p>
@@ -307,14 +306,14 @@ const ManageDistrics = () => {
 
             {/* Delete model  */}
             <Modal
-                title="Delete Divsion Images"
+                title="Delete District Images"
                 open={deleteImagesModalVisible}
                 onCancel={() => setDeleteImagesModalVisible(false)}
                 footer={null}
             >
-                {selectdivision?.pictures?.length > 0 ? (
+                {selectdistrict?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                        {selectdivision.pictures.map((imgUrl, index) => (
+                        {selectdistrict.pictures.map((imgUrl, index) => (
                             <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button

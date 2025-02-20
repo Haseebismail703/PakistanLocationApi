@@ -8,14 +8,7 @@ const { TextArea } = Input;
 const ManageCountry = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [countries, setCountries] = useState([
-    {
-      key: "1",
-      name: "Pakistan",
-      details: "This is the pakistan",
-      pictures: [],
-    },
-  ]);
+  const [countries, setCountries] = useState([]);
   const [editingCountry, setEditingCountry] = useState(null);
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();

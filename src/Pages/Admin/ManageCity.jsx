@@ -14,9 +14,10 @@ const ManageCity = () => {
     const [updateImagesModalVisible, setUpdateImagesModalVisible] = useState(false);
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
+    const [areaTypeModalVisible, setAreaTypeModalVisible] = useState(false);
     const [division, setdivisions] = useState([]);
-    const [selectdivision, setselectdivision] = useState(null);
-    const [province, setprovince] = useState('');
+    const [selectCity, setselectCity] = useState(null);
+    const [districts, setDistricts] = useState('');
     const [loading, setLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
@@ -24,25 +25,25 @@ const ManageCity = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
-        getProvince();
-        getAlldivisions();
+        getDistricts();
+        getAllCities();
     }, []);
 
-    const getProvince = async () => {
+    const getDistricts = async () => {
         try {
-            const response = await axios.get(`${api}/admins/provinces`, {
+            const response = await axios.get(`${api}/admins/districts`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            console.log(response.data?.data);
-            setprovince(response.data?.data);
+            // console.log(response.data?.data);
+            setDistricts(response.data?.data);
         } catch (error) {
-            message.error("Failed to fetch province!");
+            message.error("Failed to fetch District!");
         }
     };
 
-    const getAlldivisions = async () => {
+    const getAllCities = async () => {
         try {
-            const response = await axios.get(`${api}/admins/divisions`, {
+            const response = await axios.get(`${api}/admins/cities`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
             const divisionsData = response.data?.data?.map((data, index) => ({
@@ -53,6 +54,7 @@ const ManageCity = () => {
                 pictures: data.pictures,
                 details: data.details,
                 countryId: data.countryId,
+                areaType: data.areaType
             }));
             setdivisions(divisionsData);
         } catch (error) {
@@ -61,6 +63,7 @@ const ManageCity = () => {
     };
 
     const handleCreate = async (values) => {
+        console.log(values)
         setLoading(true);
         const formData = new FormData();
 
@@ -69,22 +72,22 @@ const ManageCity = () => {
                 formData.append("pictures", file.originFileObj);
             });
         }
-
+        formData.append("districtId", values.districtId);
         formData.append("name", values.name);
         formData.append("details", values.details);
-        formData.append("provinceId", values.provinceId);
+        formData.append("areaType", values.areaType);
 
         try {
-            const response = await axios.post(`${api}/admins/divisions/create`, formData, {
+            const response = await axios.post(`${api}/admins/cities/create`, formData, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
 
             if (response.status === 201) {
-                message.success("Division added successfully!");
+                message.success("Cties added successfully!");
                 setCreateModalVisible(false);
-                getAlldivisions();
+                getAllCities();
             } else {
-                message.error("Failed to add Division!");
+                message.error("Failed to add Cties!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error submitting data. Please try again.");
@@ -94,21 +97,21 @@ const ManageCity = () => {
     };
 
     const handleUpdateDetails = async (values) => {
-        if (!selectdivision) return;
+        if (!selectCity) return;
         setLoading(true);
         try {
             const response = await axios.put(
-                `${api}/admins/divisions/update-details/${selectdivision.id}`,
-                { name: values.name, details: values.details },
+                `${api}/admins/cities/update-details/${selectCity.id}`,
+                { name: values.name, details: values.details},
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
 
             if (response.status === 200) {
-                message.success("Division details updated successfully!");
+                message.success("Cities updated successfully!");
                 setUpdateDetailsModalVisible(false);
-                getAlldivisions()
+                getAllCities();
             } else {
-                message.error("Failed to update Division details!");
+                message.error("Failed to update Cities");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating data. Please try again.");
@@ -118,30 +121,27 @@ const ManageCity = () => {
     };
 
     const handleAddImage = async (values) => {
-        if (!selectdivision) return;
-
+        if (!selectCity) return;
         setLoading(true);
         const formData = new FormData();
-
         if (values.pictures?.fileList) {
             values.pictures.fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
-
         try {
             const response = await axios.put(
-                `${api}/admins/divisions/add-pictures/${selectdivision.id}`,
+                `${api}/admins/cities/add-pictures/${selectCity.id}`,
                 formData,
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
 
             if (response.data) {
-                message.success("Division images updated successfully!");
+                message.success("Cities images updated successfully!");
                 setUpdateImagesModalVisible(false);
-                getAlldivisions();
+                getAllCities();
             } else {
-                message.error("Failed to update Division images!");
+                message.error("Failed to update Cities images!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating images. Please try again.");
@@ -153,93 +153,122 @@ const ManageCity = () => {
     const handleDelete = async (item) => {
         try {
             const response = await axios.put(
-                `${api}/admins/divisions/delete-pictures/${selectdivision.id}`,
+                `${api}/admins/cities/delete-pictures/${selectCity.id}`,
                 { picturesToDelete: [item] },
                 {
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
                 }
             );
-    
+
             if (response.status === 200) {
-                message.success("Division image deleted successfully!");
-                getAlldivisions();
+                message.success("Cities image deleted successfully!");
+                getAllCities();
                 setDeleteImagesModalVisible(false)
             } else {
-                message.error("Failed to delete Division image!");
+                message.error("Failed to delete Cities image!");
             }
         } catch (error) {
-            message.error(error.response?.data?.message || "Error deleting Division image. Please try again.");
+            message.error(error.response?.data?.message || "Error deleting Cities image. Please try again.");
         }
     };
-    
+
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
+        { title: "Area Type", dataIndex: "areaType", name: "areaType" },
         {
             title: "Actions",
             key: "action",
             render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button icon={<EyeOutlined />} onClick={() => { setselectdivision(record); setViewModalVisible(true); }}>View</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectdivision(record); setDeleteImagesModalVisible(true); }}>
+                    <Button icon={<EyeOutlined />} onClick={() => { setselectCity(record); setViewModalVisible(true); }}>View</Button>
+                    <Button icon={<EditOutlined />} onClick={() => { setselectCity(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
+                    <Button icon={<EditOutlined />} onClick={() => { setselectCity(record); setAreaTypeModalVisible(true); updateDetailsForm.setFieldsValue(record); }}>Update Area type</Button>
+                    <Button icon={<EditOutlined />} onClick={() => { setselectCity(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectCity(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
                 </div>
             ),
         },
     ];
+    const handleUpdateareaType = async (values) => {
+        if (!selectCity) return;
+        setLoading(true);
+        try {
+            const response = await axios.put(`${api}/admins/cities/update-area-type/${selectCity.id}`, { areaType: values.areaType }, {
+                headers: { Authorization: `Bearer ${user?.accessToken}` },
+            });
+            if (response.status === 200) {
+                message.success("Area Type updated successfully!");
+                setAreaTypeModalVisible(false);
+                getAllCities();
+            } else {
+                message.error("Failed to update Area Type!");
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || "Error submitting data. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <>
             <Admin_nav />
             <div style={{ padding: 20 }}>
-                <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
-                <Table columns={columns} dataSource={division} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
+                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
+                <Table columns={columns} dataSource={division} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
-           { /* Create Division Modal */}
-                        <Modal
-                            title="Create Division"
-                            open={createModalVisible}
-                            onCancel={() => setCreateModalVisible(false)}
-                            footer={null}
-                        >
-                            <Form form={createForm} layout="vertical" onFinish={handleCreate}>
-                                <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
-                                    <TextArea rows={4} />
-                                </Form.Item>
-                                <Form.Item label="Select a Province" name="provinceId" rules={[{ required: true, message: "Please select a country!" }]}>
-                                    <Select placeholder="Select a Province">
-                                        {province && province.map((data) => (
-                                            <Option key={data._id} value={data._id}>{data.name}</Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item label="Upload Images" name="pictures">
-                                    <Upload
-                                        multiple
-                                        listType="picture-card"
-                                        beforeUpload={() => false}
-                                        onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
-                                    >
-                                        <Button icon={<PlusOutlined />}>Upload</Button>
-                                    </Upload>
-                                </Form.Item>
-                                <Button type="primary" htmlType="submit" loading={loading}>
-                                    Submit
-                                </Button>
-                            </Form>
-                        </Modal>
-
-                        {/* Update Details Modal */}
+            { /* Create Division Modal */}
             <Modal
-                title="Update Division Details"
+                title="Create City"
+                open={createModalVisible}
+                onCancel={() => setCreateModalVisible(false)}
+                footer={null}
+            >
+                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
+                    <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
+                        <TextArea rows={4} />
+                    </Form.Item>
+
+                    <Form.Item label="Select a District" name="districtId" rules={[{ required: true, message: "Please select a country!" }]}>
+                        <Select placeholder="Select a Districts">
+                            {districts && districts.map((data) => (
+                                <Option key={data._id} value={data._id}>{data.name}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Select Area type" name="areaType" rules={[{ required: true, message: "Please select a area type" }]}>
+                        <Select placeholder="Select a Area Type">
+                            <Option key={1} value={"Urban"}>{"Urban"}</Option>
+                            <Option key={2} value={"Rural"}>{"Rural"}</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Upload Images" name="pictures">
+                        <Upload
+                            multiple
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
+                        >
+                            <Button icon={<PlusOutlined />}>Upload</Button>
+                        </Upload>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Submit
+                    </Button>
+                </Form>
+            </Modal>
+
+            {/* Update Modal */}
+            <Modal
+                title="Update Cities"
                 open={updateDetailsModalVisible}
                 onCancel={() => setUpdateDetailsModalVisible(false)}
                 footer={null}
@@ -259,7 +288,7 @@ const ManageCity = () => {
 
             {/* Update Images Modal */}
             <Modal
-                title="Add Division Images"
+                title="Add Cities Images"
                 open={updateImagesModalVisible}
                 onCancel={() => setUpdateImagesModalVisible(false)}
                 footer={null}
@@ -288,13 +317,15 @@ const ManageCity = () => {
                 onCancel={() => setViewModalVisible(false)}
                 footer={null}
             >
-                {selectdivision && (
+                {selectCity && (
                     <div>
-                        <h3>Name: {selectdivision.name}</h3>
-                        <p><strong>Details:</strong> {selectdivision.details}</p>
+                        <h3>Name: {selectCity.name}</h3>
+                        <p><strong>Details:</strong> {selectCity.details}</p>
+                        <p><strong>Area Type :</strong> {selectCity.areaType}</p>
+
                         <h4>Images:</h4>
-                        {selectdivision.pictures?.length > 0 ? (
-                            selectdivision.pictures.map((pic, index) => (
+                        {selectCity.pictures?.length > 0 ? (
+                            selectCity.pictures.map((pic, index) => (
                                 <Image key={index} width={200} src={pic} alt={`Division ${index}`} />
                             ))
                         ) : (
@@ -307,15 +338,15 @@ const ManageCity = () => {
 
             {/* Delete model  */}
             <Modal
-                title="Delete Divsion Images"
+                title="Delete Cities Images"
                 open={deleteImagesModalVisible}
                 onCancel={() => setDeleteImagesModalVisible(false)}
                 footer={null}
             >
-                {selectdivision?.pictures?.length > 0 ? (
+                {selectCity?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                        {selectdivision.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                        {selectCity.pictures.map((imgUrl, index) => (
+                            <div key={index} style={{ textAlign: "center", marginLeft: 20 }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger
@@ -331,8 +362,27 @@ const ManageCity = () => {
                 ) : (
                     <p>No images available.</p>
                 )}
-            </Modal>
 
+            </Modal>
+               {/* Create Area Type Modal */}
+               <Modal
+                title="Create Area Type"
+                open={areaTypeModalVisible}
+                onCancel={() => setAreaTypeModalVisible(false)}
+                footer={null}
+            >
+                <Form layout="vertical" onFinish={handleUpdateareaType}>
+                <Form.Item label="Select Area type" name="areaType" rules={[{ required: true, message: "Please select a area type" }]}>
+                        <Select placeholder="Select a Area Type">
+                            <Option key={1} value={"Urban"}>{"Urban"}</Option>
+                            <Option key={2} value={"Rural"}>{"Rural"}</Option>
+                        </Select>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Submit
+                    </Button>
+                </Form>
+            </Modal>
         </>
     );
 };

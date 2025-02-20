@@ -9,6 +9,7 @@ import ManageProvince from './Pages/Admin/ManageProvince';
 import ManageDivision from './Pages/Admin/ManageDivision';
 import ManageCity from './Pages/Admin/ManageCity';
 import ManageDistrics from './Pages/Admin/ManageDistrics';
+import ManageArea from './Pages/Admin/ManageArea';
 
 function App() {
   return (
@@ -26,8 +27,9 @@ function App() {
           <Route path="/admin/manage-division" element={<ManageDivision/>} />
           <Route path="/admin/manage-cities" element={<ManageCity/>} />
          <Route path='/admin/manage-district' element={<ManageDistrics/>}/>
+         <Route path='/admin/manage-area' element={<ManageArea/>}/>
           
-        </Routes>
+        </Routes> 
       </BrowserRouter>
     </div>
   )
