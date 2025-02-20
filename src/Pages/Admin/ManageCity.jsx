@@ -48,7 +48,7 @@ const ManageCity = () => {
             const response = await axios.get(`${api}/admins/cities`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            const divisionsData = response.data?.data?.map((data, index) => ({
+            const cityData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
                 name: data.name,
@@ -58,7 +58,7 @@ const ManageCity = () => {
                 countryId: data.countryId,
                 areaType: data.areaType
             }));
-            setdivisions(divisionsData);
+            setdivisions(cityData);
         } catch (error) {
             message.error("Failed to fetch divisions!");
         } finally{

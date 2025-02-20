@@ -1,232 +1,319 @@
-import React, { useState } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
+import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
 import Admin_nav from "../../Component/AdminCom/AdminNavbar";
+import api from "../../Api/api";
+import axios from "axios";
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 const ManageCountry = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [countries, setCountries] = useState([]);
-  const [editingCountry, setEditingCountry] = useState(null);
-  const [form] = Form.useForm();
-  const [editForm] = Form.useForm();
+    const [createModalVisible, setCreateModalVisible] = useState(false);
+    const [updateDetailsModalVisible, setUpdateDetailsModalVisible] = useState(false);
+    const [updateImagesModalVisible, setUpdateImagesModalVisible] = useState(false);
+    const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
+    const [viewModalVisible, setViewModalVisible] = useState(false);
+    const [country, setCountry] = useState([]);
+    const [selectCountry, setselectCountry] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
+    const [createForm] = Form.useForm();
+    const [updateDetailsForm] = Form.useForm();
+    const [updateImagesForm] = Form.useForm();
+    const user = JSON.parse(localStorage.getItem("user"));
 
-  // Open modal for adding country
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  // Handle form submission for adding country
-  const handleSubmit = (values) => {
-    const newCountry = {
-      key: Date.now().toString(),
-      name: values.name,
-      details: values.details,
-      pictures: values.pictures?.fileList || [],
+    useEffect(() => {
+      getAllCountry();
+    }, []);
+    const getAllCountry = async () => {
+        setTableLoading(true);
+        try {
+            const response = await axios.get(`${api}/admins/country`, {
+                headers: { Authorization: `Bearer ${user?.accessToken}` },
+            });
+            // console.log(response)
+            const countryData = response.data?.data?.map((data, index) => ({
+                key: index + 1,
+                id: data._id,
+                name: data.name,
+                createdAt: data.createdAt?.substring(0, 10),
+                pictures: data.pictures,
+                details: data.details,
+            }));
+            setCountry(countryData);
+        } catch (error) {
+            message.error("Failed to fetch country!");
+        }finally {
+            setTableLoading(false);
+        }
     };
-    setCountries([...countries, newCountry]);
-    setIsModalVisible(false);
-    form.resetFields();
-  };
 
-  // Close modal for adding country
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
+    const handleCreate = async (values) => {
+        setLoading(true);
+        const formData = new FormData();
 
-  // Open modal for editing country
-  const showEditModal = (country) => {
-    setEditingCountry(country);
-    setIsEditModalVisible(true);
-    editForm.setFieldsValue({
-      name: country.name,
-      details: country.details,
-      pictures: country.pictures,
-    });
-  };
+        if (values.pictures?.fileList) {
+            values.pictures.fileList.forEach((file) => {
+                formData.append("pictures", file.originFileObj);
+            });
+        }
 
-  // Handle form submission for editing country
-  const handleEditSubmit = (values) => {
-    const updatedCountries = countries.map((country) =>
-      country.key === editingCountry.key
-        ? {
-            ...country,
-            name: values.name,
-            details: values.details,
-            pictures: values.pictures?.fileList || [],
-          }
-        : country
+        formData.append("name", values.name);
+        formData.append("details", values.details);
+
+        try {
+            const response = await axios.post(`${api}/admins/country/create`, formData, {
+                headers: { Authorization: `Bearer ${user?.accessToken}` },
+            });
+
+            if (response.status === 201) {
+                message.success("country added successfully!");
+                setCreateModalVisible(false);
+                getAllCountry();
+            } else {
+                message.error("Failed to add country!");
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || "Error submitting data. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateDetails = async (values) => {
+        if (!selectCountry) return;
+        setLoading(true);
+        try {
+            const response = await axios.put(
+                `${api}/admins/country/update-details/${selectCountry.id}`,
+                { name: values.name, details: values.details },
+                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+            );
+            if (response.status === 200) {
+                message.success("Country details updated successfully!");
+                setUpdateDetailsModalVisible(false);
+                getAllCountry();
+            } else {
+                message.error("Failed to update Country details!");
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || "Error updating data. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateImages = async (values) => {
+        if (!selectCountry) return;
+
+        setLoading(true);
+        const formData = new FormData();
+
+        if (values.pictures?.fileList) {
+            values.pictures.fileList.forEach((file) => {
+                formData.append("pictures", file.originFileObj);
+            });
+        }
+        try {
+            const response = await axios.put(
+                `${api}/admins/country/add-pictures/${selectCountry.id}`,
+                formData,
+                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+            );
+
+            if (response.data) {
+                message.success("Country images add successfully!");
+                setUpdateImagesModalVisible(false);
+                getAllCountry();
+            } else {
+                message.error("Failed to update country images!");
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || "Error updating images. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (item) => {
+        try {
+            const response = await axios.put(
+                `${api}/admins/country/delete-pictures/${selectCountry.id}`,
+                { picturesToDelete: [item] },
+                {
+                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                }
+            );
+    
+            if (response.status === 200) {
+                message.success("Country image deleted successfully!");
+                getAllCountry();
+                setDeleteImagesModalVisible(false)
+            } else {
+                message.error("Failed to delete country image!");
+            }
+        } catch (error) {
+            message.error(error.response?.data?.message || "Error deleting country image. Please try again.");
+        }
+    };
+    
+    const columns = [
+        { title: "No", dataIndex: "key", key: "key" },
+        { title: "Name", dataIndex: "name", key: "name" },
+        {
+            title: "Actions",
+            key: "action",
+            render: (_, record) => (
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <Button icon={<EyeOutlined />} onClick={() => { setselectCountry(record); setViewModalVisible(true); }}>View</Button>
+                    <Button icon={<EditOutlined />} onClick={() => { setselectCountry(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
+                    <Button icon={<PlusOutlined />} onClick={() => { setselectCountry(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectCountry(record); setDeleteImagesModalVisible(true); }}>
+                        Delete
+                    </Button>
+                </div>
+            ),
+        },
+    ];
+
+    return (
+        <>
+            <Admin_nav />
+            <div style={{ padding: 20 }}>
+                <center><h1 style={{ fontSize: 30 }}>Manage Country</h1></center>
+                <Button disabled={country ? true : false} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Country</Button>
+                <Table loading={tableLoading}  columns={columns} dataSource={country} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+            </div>
+
+            {/* Create Country Modal */}
+            <Modal
+                title="Create Country"
+                open={createModalVisible}
+                onCancel={() => setCreateModalVisible(false)}
+                footer={null}
+            >
+                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
+                    <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
+                        <TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item label="Upload Images" name="pictures">
+                        <Upload
+                            multiple
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
+                        >
+                            <Button icon={<PlusOutlined />}>Upload</Button>
+                        </Upload>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Submit
+                    </Button>
+                </Form>
+            </Modal>
+
+            {/* Update Details Modal */}
+            <Modal
+                title="Update Country Details"
+                open={updateDetailsModalVisible}
+                onCancel={() => setUpdateDetailsModalVisible(false)}
+                footer={null}
+            >
+                <Form form={updateDetailsForm} layout="vertical" onFinish={handleUpdateDetails}>
+                    <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
+                        <TextArea rows={4} />
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Update
+                    </Button>
+                </Form>
+            </Modal>
+
+            {/* Add Images Modal */}
+            <Modal
+                title="Add Country Images"
+                open={updateImagesModalVisible}
+                onCancel={() => setUpdateImagesModalVisible(false)}
+                footer={null}
+            >
+                <Form form={updateImagesForm} layout="vertical" onFinish={handleUpdateImages}>
+                    <Form.Item label="Upload Images" name="pictures">
+                        <Upload
+                            multiple
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            onChange={({ fileList }) => updateImagesForm.setFieldsValue({ pictures: { fileList } })}
+                        >
+                            <Button icon={<PlusOutlined />}>Upload</Button>
+                        </Upload>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Update
+                    </Button>
+                </Form>
+            </Modal>
+
+            {/* View Modal */}
+            <Modal
+                title="Country Details"
+                open={viewModalVisible}
+                onCancel={() => setViewModalVisible(false)}
+                footer={null}
+            >
+                {selectCountry && (
+                    <div>
+                        <h3>Name: {selectCountry.name}</h3>
+                        <p><strong>Details:</strong> {selectCountry.details}</p>
+                        <h4>Images:</h4>
+                        {selectCountry.pictures?.length > 0 ? (
+                            selectCountry.pictures.map((pic, index) => (
+                                <Image key={index} width={200} src={pic} alt={`Country ${index}`} />
+                            ))
+                        ) : (
+                            <p>No images available</p>
+                        )}
+                    </div>
+                )}
+            </Modal>
+
+
+            {/* Delete model  */}
+            <Modal
+                title="Delete Country Images"
+                open={deleteImagesModalVisible}
+                onCancel={() => setDeleteImagesModalVisible(false)}
+                footer={null}
+            >
+                {selectCountry?.pictures?.length > 0 ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                        {selectCountry.pictures.map((imgUrl, index) => (
+                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                                <Image src={imgUrl} width={100} height={100} />
+                                <Button
+                                    danger
+                                    size="small"
+                                    style={{ marginTop: 5 }}
+                                    onClick={() => handleDelete(imgUrl)}
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p>No images available.</p>
+                )}
+            </Modal>
+
+        </>
     );
-    setCountries(updatedCountries);
-    setIsEditModalVisible(false);
-    editForm.resetFields();
-  };
-
-  // Close modal for editing country
-  const handleEditCancel = () => {
-    setIsEditModalVisible(false);
-  };
-
-  // Handle file upload
-  const handleFileUpload = ({ fileList }) => {
-    return fileList;
-  };
-
-  // Table columns
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Details",
-      dataIndex: "details",
-      key: "details",
-    },
-    {
-      title: "Pictures",
-      dataIndex: "pictures",
-      key: "pictures",
-      render: (pictures) => (
-        <div>
-          {pictures.map((pic, index) => (
-            <img
-              key={index}
-              src={pic.thumbUrl}
-              alt={`pic-${index}`}
-              style={{ width: 50, marginRight: 5 }}
-            />
-          ))}
-        </div>
-      ),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Button  type="primary" onClick={() => showEditModal(record)}>
-          Edit
-        </Button>
-      ),
-    },
-  ];
-
-  return (
-    <>
-    <Admin_nav/>
-    <br /><br />
-    <center>
-        <h1 style={{ fontSize: "24px" }}>Create country</h1>
-    </center>
-    <div style={{ padding: "20px" }}>
-      {/* Button to open modal for adding country */}
-      <Button disabled type="primary" onClick={showModal}>
-        Create Country
-      </Button>
-
-      {/* Modal for adding country */}
-      <Modal
-        title="Create Country"
-        open={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Form layout="vertical" form={form} onFinish={handleSubmit}>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please enter the name" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Details"
-            name="details"
-            rules={[{ required: true, message: "Please enter the details" }]}
-          >
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item
-            label="Pictures"
-            name="pictures"
-            rules={[{ required: true, message: "Please upload pictures" }]}
-          >
-            <Upload
-              multiple
-              listType="picture"
-              beforeUpload={() => false} // Prevent auto-upload
-              onChange={handleFileUpload}
-            >
-              <Button icon={<UploadOutlined />}>Upload Pictures</Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Modal for editing country */}
-      <Modal
-        title="Edit Country"
-        open={isEditModalVisible}
-        onCancel={handleEditCancel}
-        footer={null}
-      >
-        <Form layout="vertical" form={editForm} onFinish={handleEditSubmit}>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please enter the name" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Details"
-            name="details"
-            rules={[{ required: true, message: "Please enter the details" }]}
-          >
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item
-            label="Pictures"
-            name="pictures"
-            rules={[{ required: true, message: "Please upload pictures" }]}
-          >
-            <Upload
-              multiple
-              listType="picture"
-              beforeUpload={() => false} // Prevent auto-upload
-              onChange={handleFileUpload}
-              defaultFileList={editingCountry?.pictures}
-            >
-              <Button icon={<UploadOutlined />}>Upload Pictures</Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Table to display countries */}
-      <Table
-        columns={columns}
-        dataSource={countries}
-        pagination={{ pageSize: 5 }}
-        style={{ marginTop: "20px" }}
-        scroll={{ x: true }} // Make table responsive
-      />
-    </div>
-    </>
-  );
 };
 
 export default ManageCountry;

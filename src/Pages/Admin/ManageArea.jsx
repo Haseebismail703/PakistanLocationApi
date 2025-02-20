@@ -47,7 +47,7 @@ const ManageArea = () => {
             const response = await axios.get(`${api}/admins/areas`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            const districtsData = response.data?.data?.map((data, index) => ({
+            const areaData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
                 name: data.name,
@@ -56,7 +56,7 @@ const ManageArea = () => {
                 details: data.details,
                 countryId: data.countryId,
             }));
-            setArea(districtsData);
+            setArea(areaData);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {
@@ -258,7 +258,7 @@ const ManageArea = () => {
 
             {/* Add Images Modal */}
             <Modal
-                title="Add District Images"
+                title="Add Area Images"
                 open={updateImagesModalVisible}
                 onCancel={() => setUpdateImagesModalVisible(false)}
                 footer={null}
@@ -282,7 +282,7 @@ const ManageArea = () => {
 
             {/* View Modal */}
             <Modal
-                title="District Details"
+                title="Area Details"
                 open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={null}
@@ -306,7 +306,7 @@ const ManageArea = () => {
 
             {/* Delete model  */}
             <Modal
-                title="Delete District Images"
+                title="Delete Area Images"
                 open={deleteImagesModalVisible}
                 onCancel={() => setDeleteImagesModalVisible(false)}
                 footer={null}
