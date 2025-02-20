@@ -18,6 +18,7 @@ const ManageDivision = () => {
     const [selectdivision, setselectdivision] = useState(null);
     const [province, setprovince] = useState('');
     const [loading, setLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
@@ -41,6 +42,7 @@ const ManageDivision = () => {
     };
 
     const getAlldivisions = async () => {
+        setTableLoading(true)
         try {
             const response = await axios.get(`${api}/admins/divisions`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
@@ -57,6 +59,8 @@ const ManageDivision = () => {
             setdivisions(divisionsData);
         } catch (error) {
             message.error("Failed to fetch divisions!");
+        }finally{
+            setTableLoading(false)
         }
     };
 
@@ -182,7 +186,7 @@ const ManageDivision = () => {
                 <div style={{ display: "flex", gap: "8px" }}>
                     <Button icon={<EyeOutlined />} onClick={() => { setselectdivision(record); setViewModalVisible(true); }}>View</Button>
                     <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button icon={<PlusOutlined />} onClick={() => { setselectdivision(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
                     <Button icon={<DeleteOutlined />} danger onClick={() => { setselectdivision(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
@@ -197,7 +201,7 @@ const ManageDivision = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
-                <Table columns={columns} dataSource={division} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={division} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
            { /* Create Division Modal */}

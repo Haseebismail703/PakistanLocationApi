@@ -19,6 +19,7 @@ const ManageCity = () => {
     const [selectCity, setselectCity] = useState(null);
     const [districts, setDistricts] = useState('');
     const [loading, setLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
@@ -42,6 +43,7 @@ const ManageCity = () => {
     };
 
     const getAllCities = async () => {
+        setTableLoading(true)
         try {
             const response = await axios.get(`${api}/admins/cities`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
@@ -59,6 +61,8 @@ const ManageCity = () => {
             setdivisions(divisionsData);
         } catch (error) {
             message.error("Failed to fetch divisions!");
+        } finally{
+            setTableLoading(false)
         }
     };
 
@@ -184,7 +188,7 @@ const ManageCity = () => {
                     <Button icon={<EyeOutlined />} onClick={() => { setselectCity(record); setViewModalVisible(true); }}>View</Button>
                     <Button icon={<EditOutlined />} onClick={() => { setselectCity(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
                     <Button icon={<EditOutlined />} onClick={() => { setselectCity(record); setAreaTypeModalVisible(true); updateDetailsForm.setFieldsValue(record); }}>Update Area type</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectCity(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button icon={<PlusOutlined />} onClick={() => { setselectCity(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
                     <Button icon={<DeleteOutlined />} danger onClick={() => { setselectCity(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
@@ -219,7 +223,7 @@ const ManageCity = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
-                <Table columns={columns} dataSource={division} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={division} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
             { /* Create Division Modal */}

@@ -18,6 +18,7 @@ const ManageProvince = () => {
     const [selectedProvince, setSelectedProvince] = useState(null);
     const [countries, setCountries] = useState('');
     const [loading, setLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
@@ -40,6 +41,7 @@ const ManageProvince = () => {
     };
 
     const getAllProvinces = async () => {
+        setTableLoading(true);
         try {
             const response = await axios.get(`${api}/admins/provinces`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
@@ -56,6 +58,8 @@ const ManageProvince = () => {
             setProvinces(provincesData);
         } catch (error) {
             message.error("Failed to fetch provinces!");
+        }finally {
+            setTableLoading(false);
         }
     };
 
@@ -197,7 +201,7 @@ const ManageProvince = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Provinces</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Province</Button>
-                <Table columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading}  columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
             {/* Create Province Modal */}

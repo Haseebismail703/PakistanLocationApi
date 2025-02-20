@@ -18,6 +18,7 @@ const ManageDistrics = () => {
     const [selectdistrict, setselectdistrict] = useState(null);
     const [divisions, setdivisions] = useState('');
     const [loading, setLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
@@ -41,6 +42,7 @@ const ManageDistrics = () => {
     };
 
     const getAlldistricts = async () => {
+        setTableLoading(true)
         try {
             const response = await axios.get(`${api}/admins/districts`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
@@ -57,6 +59,8 @@ const ManageDistrics = () => {
             setdistricts(districtsData);
         } catch (error) {
             message.error("Failed to fetch districts!");
+        }finally{
+            setTableLoading(false)
         }
     };
 
@@ -181,7 +185,7 @@ const ManageDistrics = () => {
                 <div style={{ display: "flex", gap: "8px" }}>
                     <Button icon={<EyeOutlined />} onClick={() => { setselectdistrict(record); setViewModalVisible(true); }}>View</Button>
                     <Button icon={<EditOutlined />} onClick={() => { setselectdistrict(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdistrict(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button icon={<PlusOutlined />} onClick={() => { setselectdistrict(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
                     <Button icon={<DeleteOutlined />} danger onClick={() => { setselectdistrict(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
@@ -196,7 +200,7 @@ const ManageDistrics = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
-                <Table columns={columns} dataSource={districts} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={districts} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
            { /* Create Districs Modal */}
