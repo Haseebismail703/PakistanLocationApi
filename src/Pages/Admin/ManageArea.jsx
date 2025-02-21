@@ -23,7 +23,7 @@ const ManageArea = () => {
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("admin"));
 
     useEffect(() => {
         getCity();

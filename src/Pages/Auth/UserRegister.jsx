@@ -1,86 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Card, Form, Input, Button, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import api from "../../Api/api";
+const UserRegister = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
 
-function UserRegister() {
-  // Get theme from local storage or default to light
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-let navigate = useNavigate()
+  // Form Submit Function
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${api}/users/register`, values);
+      message.success("Registration successful!");
+      form.resetFields();
+    } catch (error) {
+      message.error(error.response?.data?.message || "Registration failed!");
+    }
+    setLoading(false);
+  };
+
   return (
-    <div className={`min-h-screen p-3 flex justify-center items-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <div className={`max-w-md w-full mx-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-lg p-8 rounded-xl`}>
-        
-        {/* Registration Heading */}
-        <h1 className={`text-center text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-          Register Your Account
-        </h1>
+    <div className="flex h-screen justify-center items-center bg-gray-100">
+      <Card className="w-96 shadow-lg rounded-xl">
+        <h2 className="text-center text-2xl font-semibold mb-4">Register</h2>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
 
-        <form>
-          <div className="space-y-6">
-            {/* name Input */}
-            <div>
-              <label className={`block text-sm mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>Enter your name</label>
-              <input
-                type="text"
-                className={`w-full px-4 py-3 text-sm ${theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600 outline-none' : 'text-gray-800 bg-white border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                placeholder="Enter your name"
-              />
-            </div>
-            {/* Email Input */}
-            <div>
-              <label className={`block text-sm mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>Email Address</label>
-              <input
-                type="email"
-                className={`w-full px-4 py-3 text-sm ${theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600 outline-none' : 'text-gray-800 bg-white border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                placeholder="Enter your email"
-              />
-            </div>
-
-            {/* Password Input */}
-            <div>
-              <label className={`block text-sm mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>Password</label>
-              <input
-                type="password"
-                className={`w-full px-4 py-3 text-sm ${theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600 outline-none' : 'text-gray-800 bg-white border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                placeholder="Enter your password"
-              />
-            </div>
-
-            {/* Confirm Password Input */}
-            <div>
-              <label className={`block text-sm mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>Confirm Password</label>
-              <input
-                type="password"
-                className={`w-full px-4 py-3 text-sm ${theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600 outline-none' : 'text-gray-800 bg-white border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                placeholder="Confirm your password"
-              />
-            </div>
-
-            {/* Submit Button */}
-            <div className="mt-6">
-              <button
-                type="submit"
-                className="w-full py-3 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
-              >
-                Create an Account
-              </button>
-            </div>
-          </div>
-        </form>
-
-        {/* Login Link */}
-        <p className={`text-center text-sm mt-6 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
-          Already have an account?{' '}
-          <button
-          onClick={() => navigate('/login')}
-            href="javascript:void(0);"
-            className="text-blue-600 dark:text-blue-400 font-semibold hover:underline ml-1"
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Name is required!" }]}
           >
-            Login here
-          </button>
-        </p>
-      </div>
+            <Input placeholder="Enter your name" />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, type: "email", message: "Enter a valid email!" }]}
+          >
+            <Input placeholder="Enter your email" />
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Password is required!" }]}
+          >
+            <Input.Password placeholder="Enter your password" />
+          </Form.Item>
+
+          <Form.Item
+            label="Confirm Password"
+            name="confirmPassword"
+            dependencies={["password"]}
+            rules={[
+              { required: true, message: "Please confirm your password!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Passwords do not match!"));
+                },
+              }),
+            ]}
+          >
+            <Input.Password placeholder="Confirm your password" />
+          </Form.Item>
+
+          <Button type="primary" htmlType="submit" className="w-full" loading={loading}>
+            Register
+          </Button>
+
+          <p className="text-center text-sm mt-4">
+            Already have an account?{" "}
+            <span className="text-blue-600 font-semibold cursor-pointer" onClick={() => navigate("/login")}>
+              Login here
+            </span>
+          </p>
+        </Form>
+      </Card>
     </div>
   );
-}
+};
 
 export default UserRegister;

@@ -12,6 +12,7 @@ import ManageDistrics from './Pages/Admin/ManageDistrics';
 import ManageArea from './Pages/Admin/ManageArea';
 import AdminDashboard from './Pages/Admin/AdminDashboard';
 import LayoutWrapper from './Component/AdminCom/WrapperLayout'; // Import LayoutWrapper
+import AdminLogin from './Pages/Auth/AdminLogin';
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<UserRegister />} />
         <Route path="/login" element={<UserLogin />} />
-
+        <Route path="/admin/login" element={<AdminLogin />} />
+    
         {/* Admin Routes (Wrapped in Layout) */}
         <Route path="/admin/*" element={<LayoutWrapper> 
           <Routes>

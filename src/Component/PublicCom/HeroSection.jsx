@@ -14,7 +14,7 @@ function HeroSection() {
           <p className=" mt-6 text-sm leading-relaxed max-sm:text-center">
             Our Pakistan Location API provides real-time and accurate location data for users across Pakistan. Whether you need city names, regions, postal codes, or latitude and longitude details, our API delivers fast and reliable results.
           </p>
-          <div className="grid sm:grid-cols-3 gap-6 items-center mt-12">
+          {/* <div className="grid sm:grid-cols-3 gap-6 items-center mt-12">
             <div className="flex flex-col items-center text-center">
               <h5 className="font-bold text-2xl text-blue-600 mb-2">10+</h5>
               <p className=" text-sm font-semibold">
@@ -31,8 +31,8 @@ function HeroSection() {
                 Business Partners
               </p>
             </div>
-          </div>
-          <div className="mt-12 flex gap-x-6 gap-y-4 justify-center max-sm:flex-col max-sm:mx-4">
+          </div> */}
+          <div className="mt-20 flex gap-x-6 gap-y-4 justify-center max-sm:flex-col max-sm:mx-4">
             <button
               onClick={() => navigate('/register')}
               type="button"
