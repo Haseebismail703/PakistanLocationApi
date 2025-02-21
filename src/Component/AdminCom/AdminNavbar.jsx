@@ -47,21 +47,11 @@ function Admin_nav() {
     <div>
       <Header className="bg-base-100 shadow-lg fixed w-full z-10 flex justify-between items-center px-4">
         <div className="flex items-center">
-          <Button type="primary" onClick={showDrawer} icon={<BarChartOutlined />} className="mr-4" />
           <div className="text-xl text-primary">Admin Dashboard</div>
         </div>
         {/* Dark Mode Toggle Button */}
         <Switch checked={theme === "dark"} onChange={toggleTheme} checkedChildren="🌙" unCheckedChildren="☀️" />
       </Header>
-
-      <Drawer  width={240} title="Menu" placement="left" closable onClose={closeDrawer} open={drawerVisible}>
-        <Menu mode="vertical" items={items} />
-        <div className="absolute bottom-4 left-4">
-          <Button type="primary" icon={<LogoutOutlined />} danger onClick={logout}>
-            Logout
-          </Button>
-        </div>
-      </Drawer>
       <div className="h-16" />
     </div>
   );

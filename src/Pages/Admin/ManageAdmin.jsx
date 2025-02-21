@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button, Modal, Form, Input, Table, Switch, Space, Select } from "antd";
-import AdminNavbar from "../../Component/AdminCom/AdminNavbar";
 const ManageAdmin = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
@@ -103,7 +102,6 @@ const ManageAdmin = () => {
 
   return (
     <>
-      <AdminNavbar />
       <br /><br />
       <center>
         <h1 style={{ fontSize: "24px" }}>Add admin</h1>

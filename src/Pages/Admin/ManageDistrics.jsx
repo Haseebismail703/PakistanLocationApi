@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import Admin_nav from "../../Component/AdminCom/AdminNavbar";
 import api from "../../Api/api";
 import axios from "axios";
 
@@ -17,6 +16,7 @@ const ManageDistrics = () => {
     const [districts, setdistricts] = useState([]);
     const [selectdistrict, setselectdistrict] = useState(null);
     const [divisions, setdivisions] = useState('');
+    const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
@@ -59,7 +59,7 @@ const ManageDistrics = () => {
             setdistricts(districtsData);
         } catch (error) {
             message.error("Failed to fetch districts!");
-        }finally{
+        } finally {
             setTableLoading(false)
         }
     };
@@ -68,8 +68,8 @@ const ManageDistrics = () => {
         setLoading(true);
         const formData = new FormData();
 
-        if (values.pictures?.fileList) {
-            values.pictures.fileList.forEach((file) => {
+        if (fileList) {
+           fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
@@ -162,7 +162,7 @@ const ManageDistrics = () => {
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
                 }
             );
-    
+
             if (response.status === 200) {
                 message.success("District image deleted successfully!");
                 getAlldistricts();
@@ -174,7 +174,7 @@ const ManageDistrics = () => {
             message.error(error.response?.data?.message || "Error deleting District image. Please try again.");
         }
     };
-    
+
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
@@ -196,51 +196,51 @@ const ManageDistrics = () => {
 
     return (
         <>
-            <Admin_nav />
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
-                <Table loading={tableLoading} columns={columns} dataSource={districts} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={districts} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
-           { /* Create Districs Modal */}
-                        <Modal
-                            title="Create Districs"
-                            open={createModalVisible}
-                            onCancel={() => setCreateModalVisible(false)}
-                            footer={null}
+            { /* Create Districs Modal */}
+            <Modal
+                title="Create Districs"
+                open={createModalVisible}
+                onCancel={() => setCreateModalVisible(false)}
+                footer={null}
+            >
+                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
+                    <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
+                        <TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item label="Select a divisions" name="divisionId" rules={[{ required: true, message: "Please select a country!" }]}>
+                        <Select placeholder="Select a divisions">
+                            {divisions && divisions.map((data) => (
+                                <Option key={data._id} value={data._id}>{data.name}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Upload Images" name="pictures">
+                        <Upload
+                            multiple
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
-                            <Form form={createForm} layout="vertical" onFinish={handleCreate}>
-                                <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
-                                    <TextArea rows={4} />
-                                </Form.Item>
-                                <Form.Item label="Select a divisions" name="divisionId" rules={[{ required: true, message: "Please select a country!" }]}>
-                                    <Select placeholder="Select a divisions">
-                                        {divisions && divisions.map((data) => (
-                                            <Option key={data._id} value={data._id}>{data.name}</Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item label="Upload Images" name="pictures">
-                                    <Upload
-                                        multiple
-                                        listType="picture-card"
-                                        beforeUpload={() => false}
-                                        onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
-                                    >
-                                        <Button icon={<PlusOutlined />}>Upload</Button>
-                                    </Upload>
-                                </Form.Item>
-                                <Button type="primary" htmlType="submit" loading={loading}>
-                                    Submit
-                                </Button>
-                            </Form>
-                        </Modal>
+                            <Button icon={<PlusOutlined />}>Upload</Button>
+                        </Upload>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Submit
+                    </Button>
+                </Form>
+            </Modal>
 
-                        {/* Update Details Modal */}
+            {/* Update Details Modal */}
             <Modal
                 title="Update District"
                 open={updateDetailsModalVisible}
@@ -273,7 +273,8 @@ const ManageDistrics = () => {
                             multiple
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => updateImagesForm.setFieldsValue({ pictures: { fileList } })}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
@@ -318,7 +319,7 @@ const ManageDistrics = () => {
                 {selectdistrict?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                         {selectdistrict.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                            <div key={index} style={{ textAlign: "center", marginLeft: 20 }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger

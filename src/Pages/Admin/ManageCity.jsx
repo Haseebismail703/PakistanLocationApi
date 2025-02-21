@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import Admin_nav from "../../Component/AdminCom/AdminNavbar";
 import api from "../../Api/api";
 import axios from "axios";
 
@@ -18,13 +17,14 @@ const ManageCity = () => {
     const [division, setdivisions] = useState([]);
     const [selectCity, setselectCity] = useState(null);
     const [districts, setDistricts] = useState('');
+    const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
+    const [form] = Form.useForm();
     const user = JSON.parse(localStorage.getItem("user"));
-
     useEffect(() => {
         getDistricts();
         getAllCities();
@@ -61,7 +61,7 @@ const ManageCity = () => {
             setdivisions(cityData);
         } catch (error) {
             message.error("Failed to fetch divisions!");
-        } finally{
+        } finally {
             setTableLoading(false)
         }
     };
@@ -106,7 +106,7 @@ const ManageCity = () => {
         try {
             const response = await axios.put(
                 `${api}/admins/cities/update-details/${selectCity.id}`,
-                { name: values.name, details: values.details},
+                { name: values.name, details: values.details },
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
 
@@ -128,8 +128,8 @@ const ManageCity = () => {
         if (!selectCity) return;
         setLoading(true);
         const formData = new FormData();
-        if (values.pictures?.fileList) {
-            values.pictures.fileList.forEach((file) => {
+        if (fileList) {
+            fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
@@ -219,11 +219,10 @@ const ManageCity = () => {
 
     return (
         <>
-            <Admin_nav />
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
-                <Table loading={tableLoading} columns={columns} dataSource={division} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={division} scroll={{ "x": "100%" }} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
             { /* Create Division Modal */}
@@ -259,7 +258,8 @@ const ManageCity = () => {
                             multiple
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
@@ -303,7 +303,8 @@ const ManageCity = () => {
                             multiple
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => updateImagesForm.setFieldsValue({ pictures: { fileList } })}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
@@ -368,15 +369,15 @@ const ManageCity = () => {
                 )}
 
             </Modal>
-               {/* Create Area Type Modal */}
-               <Modal
+            {/* Create Area Type Modal */}
+            <Modal
                 title="Create Area Type"
                 open={areaTypeModalVisible}
                 onCancel={() => setAreaTypeModalVisible(false)}
                 footer={null}
             >
-                <Form layout="vertical" onFinish={handleUpdateareaType}>
-                <Form.Item label="Select Area type" name="areaType" rules={[{ required: true, message: "Please select a area type" }]}>
+                <Form form={updateDetailsForm} layout="vertical" onFinish={handleUpdateareaType}>
+                    <Form.Item label="Select Area type" name="areaType" rules={[{ required: true, message: "Please select a area type" }]}>
                         <Select placeholder="Select a Area Type">
                             <Option key={1} value={"Urban"}>{"Urban"}</Option>
                             <Option key={2} value={"Rural"}>{"Rural"}</Option>
@@ -386,6 +387,7 @@ const ManageCity = () => {
                         Submit
                     </Button>
                 </Form>
+
             </Modal>
         </>
     );

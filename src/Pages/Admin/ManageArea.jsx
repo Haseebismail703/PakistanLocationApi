@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import Admin_nav from "../../Component/AdminCom/AdminNavbar";
 import api from "../../Api/api";
 import axios from "axios";
 
@@ -20,6 +19,7 @@ const ManageArea = () => {
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [fileList, setFileList] = useState([])
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
@@ -126,8 +126,8 @@ const ManageArea = () => {
         setLoading(true);
         const formData = new FormData();
 
-        if (values.pictures?.fileList) {
-            values.pictures.fileList.forEach((file) => {
+        if (fileList) {
+            fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
@@ -158,7 +158,7 @@ const ManageArea = () => {
         try {
             const response = await axios.put(
             );
-    
+
             if (response.status === 200) {
                 message.success("Area image deleted successfully!");
                 getAllArea();
@@ -170,7 +170,7 @@ const ManageArea = () => {
             message.error(error.response?.data?.message || "Error deleting area image. Please try again.");
         }
     };
-    
+
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
@@ -192,51 +192,51 @@ const ManageArea = () => {
 
     return (
         <>
-            <Admin_nav />
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Area</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Area</Button>
-                <Table loading={tableLoading} columns={columns} dataSource={area} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={area} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
             </div>
 
-           { /* Create Area Modal */}
-                        <Modal
-                            title="Create Area"
-                            open={createModalVisible}
-                            onCancel={() => setCreateModalVisible(false)}
-                            footer={null}
+            { /* Create Area Modal */}
+            <Modal
+                title="Create Area"
+                open={createModalVisible}
+                onCancel={() => setCreateModalVisible(false)}
+                footer={null}
+            >
+                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
+                    <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
+                        <TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item label="Select a city" name="cityId" rules={[{ required: true, message: "Please select a country!" }]}>
+                        <Select placeholder="Select a Area">
+                            {city && city.map((data) => (
+                                <Option key={data._id} value={data._id}>{data.name}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Upload Images" name="pictures">
+                        <Upload
+                            multiple
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            fileList={fileList}
+                            onChange={({ fileList }) => setFileList(fileList)}
                         >
-                            <Form form={createForm} layout="vertical" onFinish={handleCreate}>
-                                <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
-                                    <TextArea rows={4} />
-                                </Form.Item>
-                                <Form.Item label="Select a city" name="cityId" rules={[{ required: true, message: "Please select a country!" }]}>
-                                    <Select placeholder="Select a Area">
-                                        {city && city.map((data) => (
-                                            <Option key={data._id} value={data._id}>{data.name}</Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item label="Upload Images" name="pictures">
-                                    <Upload
-                                        multiple
-                                        listType="picture-card"
-                                        beforeUpload={() => false}
-                                        onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
-                                    >
-                                        <Button icon={<PlusOutlined />}>Upload</Button>
-                                    </Upload>
-                                </Form.Item>
-                                <Button type="primary" htmlType="submit" loading={loading}>
-                                    Submit
-                                </Button>
-                            </Form>
-                        </Modal>
+                            <Button icon={<PlusOutlined />}>Upload</Button>
+                        </Upload>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Submit
+                    </Button>
+                </Form>
+            </Modal>
 
-                        {/* Update  Modal */}
+            {/* Update  Modal */}
             <Modal
                 title="Update Area"
                 open={updateDetailsModalVisible}
@@ -269,7 +269,8 @@ const ManageArea = () => {
                             multiple
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => updateImagesForm.setFieldsValue({ pictures: { fileList } })}
+                            fileList={fileList}
+                            onChange={({ fileList }) => setFileList(fileList)}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
@@ -314,7 +315,7 @@ const ManageArea = () => {
                 {selectdistrict?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                         {selectdistrict.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                            <div key={index} style={{ textAlign: "center", marginLeft: 20 }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger

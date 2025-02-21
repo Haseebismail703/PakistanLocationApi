@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import Admin_nav from "../../Component/AdminCom/AdminNavbar";
 import api from "../../Api/api";
 import axios from "axios";
 
 const { TextArea } = Input;
 const { Option } = Select;
-
 const ManageProvince = () => {
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [updateDetailsModalVisible, setUpdateDetailsModalVisible] = useState(false);
@@ -17,9 +15,10 @@ const ManageProvince = () => {
     const [provinces, setProvinces] = useState([]);
     const [selectedProvince, setSelectedProvince] = useState(null);
     const [countries, setCountries] = useState('');
+    const [fileList,setFileList] = useState([])
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
-    const [createForm] = Form.useForm();
+    const [form] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
     const user = JSON.parse(localStorage.getItem("user"));
@@ -58,7 +57,7 @@ const ManageProvince = () => {
             setProvinces(provincesData);
         } catch (error) {
             message.error("Failed to fetch provinces!");
-        }finally {
+        } finally {
             setTableLoading(false);
         }
     };
@@ -67,8 +66,8 @@ const ManageProvince = () => {
         setLoading(true);
         const formData = new FormData();
 
-        if (values.pictures?.fileList) {
-            values.pictures.fileList.forEach((file) => {
+        if (fileList) {
+            fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
@@ -163,7 +162,7 @@ const ManageProvince = () => {
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
                 }
             );
-    
+
             if (response.status === 200) {
                 message.success("Province image deleted successfully!");
                 getAllProvinces();
@@ -175,7 +174,7 @@ const ManageProvince = () => {
             message.error(error.response?.data?.message || "Error deleting province image. Please try again.");
         }
     };
-    
+
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
@@ -197,11 +196,10 @@ const ManageProvince = () => {
 
     return (
         <>
-            <Admin_nav />
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Provinces</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Province</Button>
-                <Table loading={tableLoading}  columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
             </div>
 
             {/* Create Province Modal */}
@@ -211,7 +209,7 @@ const ManageProvince = () => {
                 onCancel={() => setCreateModalVisible(false)}
                 footer={null}
             >
-                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
+                <Form form={form} layout="vertical" onFinish={handleCreate}>
                     <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
                         <Input />
                     </Form.Item>
@@ -220,18 +218,21 @@ const ManageProvince = () => {
                     </Form.Item>
                     <Form.Item label="Country" name="countryId" rules={[{ required: true, message: "Please select a country!" }]}>
                         <Select placeholder="Select a country">
-                            <Option key={countries._id} value={countries._id}>{countries.name}</Option>
+                        <Option key={"2"} value={"67b72539ee82dd269e9c2b40"}>{"pakistan"}</Option>
+                            {/* <Option key={countries._id} value={countries._id && countries._id}>{countries.name ? countries.name : "pakistan"}</Option> */}
                         </Select>
                     </Form.Item>
                     <Form.Item label="Upload Images" name="pictures">
                         <Upload
                             multiple
+                            fileList={fileList}
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
+                            onChange={({ fileList }) => setFileList(fileList)}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
+
                     </Form.Item>
                     <Button type="primary" htmlType="submit" loading={loading}>
                         Submit
@@ -272,7 +273,8 @@ const ManageProvince = () => {
                             multiple
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => updateImagesForm.setFieldsValue({ pictures: { fileList } })}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
@@ -317,7 +319,7 @@ const ManageProvince = () => {
                 {selectedProvince?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                         {selectedProvince.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                            <div key={index} style={{ textAlign: "center", marginLeft: 20 }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger

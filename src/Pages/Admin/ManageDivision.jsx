@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import Admin_nav from "../../Component/AdminCom/AdminNavbar";
 import api from "../../Api/api";
 import axios from "axios";
 
@@ -17,6 +16,7 @@ const ManageDivision = () => {
     const [division, setdivisions] = useState([]);
     const [selectdivision, setselectdivision] = useState(null);
     const [province, setprovince] = useState('');
+    const [fileList,setFileList] = useState([])
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
@@ -68,8 +68,8 @@ const ManageDivision = () => {
         setLoading(true);
         const formData = new FormData();
 
-        if (values.pictures?.fileList) {
-            values.pictures.fileList.forEach((file) => {
+        if (fileList) {
+            fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
@@ -197,11 +197,10 @@ const ManageDivision = () => {
 
     return (
         <>
-            <Admin_nav />
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
-                <Table loading={tableLoading} columns={columns} dataSource={division} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table loading={tableLoading} columns={columns} dataSource={division} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
            { /* Create Division Modal */}
@@ -230,7 +229,8 @@ const ManageDivision = () => {
                                         multiple
                                         listType="picture-card"
                                         beforeUpload={() => false}
-                                        onChange={({ fileList }) => createForm.setFieldsValue({ pictures: { fileList } })}
+                                        onChange={({ fileList }) => setFileList(fileList)}
+                                        fileList={fileList}
                                     >
                                         <Button icon={<PlusOutlined />}>Upload</Button>
                                     </Upload>
@@ -274,7 +274,8 @@ const ManageDivision = () => {
                             multiple
                             listType="picture-card"
                             beforeUpload={() => false}
-                            onChange={({ fileList }) => updateImagesForm.setFieldsValue({ pictures: { fileList } })}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
