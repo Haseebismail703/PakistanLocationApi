@@ -35,7 +35,7 @@ const cards = [
 
 function Feature() {
   return (
-    <div className="min-h-screen bg-base-100 py-12">
+    <div id="feature" className="min-h-screen bg-base-100 py-12">
       {/* Title */}
       <h2 className="text-4xl font-bold text-center text-base-content mb-12">
         Explore Our Features 🚀

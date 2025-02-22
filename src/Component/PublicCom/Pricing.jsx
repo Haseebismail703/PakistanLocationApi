@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const pricingPlans = [
   {
@@ -9,9 +10,10 @@ const pricingPlans = [
     features: [
       { text: "Basic location access", icon: "📍" },
       { text: "Standard API response time", icon: "⏳" },
-      { text: "1,000 API requests per month", icon: "📊" },
+      { text: "1,000 API requests per day", icon: "📊" },
     ],
     button: "Get Started",
+    path : "/register"
   },
   {
     title: "Basic Plan",
@@ -21,9 +23,10 @@ const pricingPlans = [
     features: [
       { text: "Expanded location coverage", icon: "🗺️" },
       { text: "Faster API response time", icon: "⚡" },
-      { text: "5,000 API requests per month", icon: "📈" },
+      { text: "5,000 API requests per day", icon: "📈" },
     ],
     button: "Purchase Plan",
+    path : "/"
   },
   {
     title: "Pro Plan",
@@ -36,12 +39,14 @@ const pricingPlans = [
       { text: "Unlimited API requests", icon: "♾️" },
     ],
     button: "Purchase Plan",
+    path : "/"
   },
 ];
 
 function Pricing() {
+  const navigate = useNavigate()
   return (
-    <div>
+    <div id="pricing">
       <section className="py-24 relative">
         <div className="absolute h-[36.5rem] w-full top-0  to-violet-600 -z-10" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -87,13 +92,9 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-
-                <a
-                  href="javascript:;"
-                  className="py-2.5 px-5 bg-indigo-50 shadow-sm rounded-full transition-all duration-500 text-base text-indigo-600 font-semibold text-center w-fit mx-auto group-hover:bg-indigo-600 group-hover:text-white"
-                >
+                <button onClick={() => navigate(plan.path)} className="py-2.5 px-5 bg-indigo-50 shadow-sm rounded-full transition-all duration-500 text-base text-indigo-600 font-semibold text-center w-fit mx-auto group-hover:bg-indigo-600 group-hover:text-white" >
                   {plan.button}
-                </a>
+                </button>
               </div>
             ))}
           </div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 function HeroSection() {
   let navigate = useNavigate()
   return (
-    <div className="font-sans mt-24 mb-24" style={{ marginTop: 200 }} >
+    <div id='home' className="font-sans mt-24 mb-24" style={{ marginTop: 200 }} >
       <div className="text-center max-w-2xl max-md:max-w-md mx-auto">
         <div>
           <h2 className=" md:text-4xl text-3xl font-extrabold mb-4 md:!leading-[45px]">

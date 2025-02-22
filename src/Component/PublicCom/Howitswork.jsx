@@ -20,7 +20,7 @@ const steps = [
 
 function HowItsWork() {
     return (
-        <section className="relative overflow-hidden bg-base-100 py-12 transition-all duration-300">
+        <section id="how its work" className="relative overflow-hidden bg-base-100 py-12 transition-all duration-300">
             <center>
                 <h2 className="text-4xl font-bold text-primary">
                     How It Works ✅
