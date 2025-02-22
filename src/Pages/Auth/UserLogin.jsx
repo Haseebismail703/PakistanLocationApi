@@ -49,7 +49,9 @@ function UserLogin() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-3 text-sm ${theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600 outline-none' : 'text-gray-800 bg-white border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`w-full px-4 py-3 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border ${
+                theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600' : 'text-gray-900 bg-white border-gray-300'
+              }`}
               placeholder="Enter your email"
             />
           </div>
@@ -62,7 +64,9 @@ function UserLogin() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full px-4 py-3 text-sm ${theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600 outline-none' : 'text-gray-800 bg-white border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`w-full px-4 py-3 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border ${
+                theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600' : 'text-gray-900 bg-white border-gray-300'
+              }`}
               placeholder="Enter your password"
             />
           </div>

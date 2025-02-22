@@ -7,7 +7,7 @@ function Footer() {
         <div className="w-full max-w-screen-xl mx-auto md:py-8">
           <div className="sm:flex sm:items-center sm:justify-between">
             <a
-              href="https://flowbite.com/"
+              href="http://localhost:5173/"
               className="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse"
             >
               <img
@@ -45,7 +45,7 @@ function Footer() {
           <hr className="my-6 border-base-300 sm:mx-auto lg:my-8" />
           <span className="block text-sm text-base-content sm:text-center">
             © 2025{" "}
-            <a href="https://flowbite.com/" className="hover:underline">
+            <a href="http://localhost:5173/" className="hover:underline">
               Pakistan location api™
             </a>
             . All Rights Reserved.

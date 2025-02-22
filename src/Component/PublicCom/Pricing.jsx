@@ -48,10 +48,10 @@ function Pricing() {
   return (
     <div id="pricing">
       <section className="py-24 relative">
-        <div className="absolute h-[36.5rem] w-full top-0  to-violet-600 -z-10" />
+        <div className="absolute h-[36.5rem] w-full top-0 bg-gradient-to-r from-violet-500 to-violet-600 -z-10" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
-            <h2 className="font-manrope text-5xl text-center font-bold text-white mb-4">
+          <div className="mb-12 flex justify-center">
+            <h2 className="text-4xl font-bold text-white">
               Suitable Pricing Plans
             </h2>
           </div>
@@ -70,7 +70,7 @@ function Pricing() {
                     {plan.icons}
                   </div>
 
-                  <h3 className="font-manrope text-2xl font-bold my-7 text-center text-indigo-600">
+                  <h3 className="font-manrope text-2xl font-bold my-7 text-center text-indigo-600 group-hover:text-white">
                     {plan.title}
                   </h3>
                   <div className="flex items-center justify-center">
