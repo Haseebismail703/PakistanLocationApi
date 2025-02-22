@@ -1,109 +1,106 @@
-import React, { useState } from "react";
-import { Layout, Card, Row, Col, Table, Switch } from "antd";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Card, Col, Row, Typography, Spin } from "antd";
+import { UserOutlined, TeamOutlined, BarChartOutlined } from "@ant-design/icons";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import api from '../../Api/api';
 
-const { Content } = Layout;
+const { Title, Text } = Typography;
 
-// Default Data
-const stats = [
-  { title: "Total Requests", value: 5000 },
-  { title: "Active Users", value: 1200 },
-  { title: "Total Locations", value: 800 },
-];
+function Home() {
+  const [userData, setUserData] = useState([]);
+  const [adminData, setAdminData] = useState([]);
+  const [freePlan, setFreePlan] = useState(0);
+  const [paidPlan, setPaidPlan] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-const requestData = [
-  { date: "Feb 14", requests: 100 },
-  { date: "Feb 15", requests: 250 },
-  { date: "Feb 16", requests: 400 },
-  { date: "Feb 17", requests: 600 },
-];
+  const storeAdmin = localStorage.getItem("admin");
+  const getAdmin = storeAdmin ? JSON.parse(storeAdmin) : null;
 
-const cityData = [
-  { city: "Karachi", queries: 300 },
-  { city: "Lahore", queries: 250 },
-  { city: "Islamabad", queries: 200 },
-  { city: "Peshawar", queries: 180 },
-];
+  useEffect(() => {
+    const fetchAdminsData = async () => {
+      try {
+        const [adminsResponse, usersResponse] = await Promise.all([
+          axios.get(`${api}/admins/get-admins`, {
+            headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
+          }),
+          axios.get(`${api}/admins/get-users`, {
+            headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
+          }),
+        ]);
 
-const users = [
-  { key: "1", name: "John Doe", email: "john@example.com", apiCalls: 300 },
-  { key: "2", name: "Alice Smith", email: "alice@example.com", apiCalls: 150 },
-];
+        const user = usersResponse.data.data;
+        setUserData(user);
+        setFreePlan(user.filter((item) => item.plan === "free").length);
+        setPaidPlan(user.filter((item) => item.plan === "pro").length);
+        setAdminData(adminsResponse?.data?.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-const locations = [
-  { key: "1", name: "Karachi", coordinates: "24.8607° N, 67.0011° E" },
-  { key: "2", name: "Lahore", coordinates: "31.5497° N, 74.3436° E" },
-];
+    fetchAdminsData();
+  }, []);
 
-const AdminDashboard = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const graphData = [
+    { name: "Users", value: userData?.length || 0 },
+    { name: "Admins", value: adminData?.length || 0 },
+    { name: "Free Users", value: freePlan },
+    { name: "Paid Users", value: paidPlan }
+  ];
 
   return (
-    <Layout style={{ minHeight: "100vh", background: darkMode ? "#001529" : "#f0f2f5" }}>
-      <Content style={{ padding: "20px" }}>
-        <Switch
-          checked={darkMode}
-          onChange={() => setDarkMode(!darkMode)}
-          checkedChildren="🌙"
-          unCheckedChildren="☀️"
-          style={{ marginBottom: 20 }}
-        />
-        
-        {/* Stats Cards */}
-        <Row gutter={16}>
-          {stats.map((stat, index) => (
-            <Col span={8} key={index}>
-              <Card title={stat.title} bordered style={{ textAlign: "center" }}>
-                <h2>{stat.value}</h2>
+    <div style={{ padding: "20px" }}>
+      {loading ? (
+        <Row justify="center" style={{ marginTop: "50px" }}>
+          <Spin size="large" />
+        </Row>
+      ) : (
+        <>
+          <Row gutter={[16, 16]} wrap={false} justify="space-between" style={{ overflowX: "auto", paddingBottom: "10px" }}>
+            {[ 
+              { icon: <UserOutlined />, color: "#1890ff", title: "Total Users", value: userData?.length || 0 },
+              { icon: <TeamOutlined />, color: "#52c41a", title: "Total Admins", value: adminData?.length || 0 },
+              { icon: <BarChartOutlined />, color: "#faad14", title: "Free Users", value: freePlan },
+              { icon: <BarChartOutlined />, color: "#faad14", title: "Paid Users", value: paidPlan }
+            ].map((item, index) => (
+              <Col key={index} flex="1 1 200px">
+                <Card style={{ borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ fontSize: "40px", color: item.color, marginRight: "15px" }}>
+                      {item.icon}
+                    </span>
+                    <div>
+                      <Title level={4} style={{ margin: 0 }}>{item.title}</Title>
+                      <Text strong style={{ fontSize: "20px" }}>{item.value}</Text>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          {/* Graph Section */}
+          <Row gutter={[24, 0]} style={{ marginTop: "20px" }}>
+            <Col xs={24}>
+              <Card  className="chart-box">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={graphData}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#1890ff" barSize={40} radius={[5, 5, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </Card>
             </Col>
-          ))}
-        </Row>
-        
-        {/* Charts */}
-        <Row gutter={16} style={{ marginTop: 20 }}>
-          <Col span={12}>
-            <Card title="API Requests Over Time">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={requestData}>
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="requests" stroke="#8884d8" />
-                </LineChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card title="Most Queried Cities">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={cityData}>
-                  <XAxis dataKey="city" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="queries" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-        </Row>
-        
-        {/* Tables */}
-        <Row gutter={16} style={{ marginTop: 20 }}>
-          <Col span={12}>
-            <Card title="Users">
-              <Table columns={[{ title: "Name", dataIndex: "name" }, { title: "Email", dataIndex: "email" }, { title: "API Calls", dataIndex: "apiCalls" }]} dataSource={users} pagination={false} />
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card title="Locations">
-              <Table columns={[{ title: "Name", dataIndex: "name" }, { title: "Coordinates", dataIndex: "coordinates" }]} dataSource={locations} pagination={false} />
-            </Card>
-          </Col>
-        </Row>
-      </Content>
-    </Layout>
+          </Row>
+        </>
+      )}
+    </div>
   );
-};
+}
 
-export default AdminDashboard;
+export default Home;
