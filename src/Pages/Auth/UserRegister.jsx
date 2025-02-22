@@ -1,89 +1,75 @@
-import React, { useState } from "react";
-import { Card, Form, Input, Button, message } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import api from "../../Api/api";
-const UserRegister = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
+import { message } from "antd";
+import api from '../../Api/api';
 
-  // Form Submit Function
-  const onFinish = async (values) => {
-    setLoading(true);
-    try {
-      const response = await axios.post(`${api}/users/register`, values);
-      message.success("Registration successful!");
-      form.resetFields();
-    } catch (error) {
-      message.error(error.response?.data?.message || "Registration failed!");
+function UserRegister() {
+  const navigate = useNavigate();
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      message.error("Passwords do not match!");
+      return;
     }
-    setLoading(false);
+    try {
+      const response = await axios.post(`${api}/users/register`, formData, { withCredentials: true });
+      if (response.data.success) {
+        message.success(response.data.message);
+        navigate('/login');
+      }
+    } catch (error) {
+      console.log("Registration error: ", error);
+    }
   };
 
   return (
-    <div className="flex h-screen justify-center items-center bg-gray-100">
-      <Card className="w-96 shadow-lg rounded-xl">
-        <h2 className="text-center text-2xl font-semibold mb-4">Register</h2>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
-
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Name is required!" }]}
-          >
-            <Input placeholder="Enter your name" />
-          </Form.Item>
-
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, type: "email", message: "Enter a valid email!" }]}
-          >
-            <Input placeholder="Enter your email" />
-          </Form.Item>
-
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: "Password is required!" }]}
-          >
-            <Input.Password placeholder="Enter your password" />
-          </Form.Item>
-
-          <Form.Item
-            label="Confirm Password"
-            name="confirmPassword"
-            dependencies={["password"]}
-            rules={[
-              { required: true, message: "Please confirm your password!" },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue("password") === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error("Passwords do not match!"));
-                },
-              }),
-            ]}
-          >
-            <Input.Password placeholder="Confirm your password" />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit" className="w-full" loading={loading}>
+    <div className={`min-h-screen flex items-center justify-center p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className={`max-w-md w-full mx-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-lg p-8 rounded-xl`}>
+        <h1 className={`text-center text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Register</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {['name', 'email', 'password', 'confirmPassword'].map((field, index) => (
+            <div key={index}>
+              <label className={`block text-sm mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
+                {field === 'confirmPassword' ? 'Confirm Password' : field.charAt(0).toUpperCase() + field.slice(1)}
+              </label>
+              <input
+                type={field.includes('password') ? 'password' : 'text'}
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border ${
+                  theme === 'dark' ? 'text-gray-200 bg-gray-700 border-gray-600' : 'text-gray-900 bg-white border-gray-300'
+                }`}
+                placeholder={`Enter your ${field}`}
+              />
+            </div>
+          ))}
+          <button type="submit" className="w-full py-3 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
             Register
-          </Button>
-
-          <p className="text-center text-sm mt-4">
-            Already have an account?{" "}
-            <span className="text-blue-600 font-semibold cursor-pointer" onClick={() => navigate("/login")}>
-              Login here
-            </span>
-          </p>
-        </Form>
-      </Card>
+          </button>
+        </form>
+        <p className={`text-center text-sm mt-6 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
+          Already have an account? 
+          <button onClick={() => navigate('/login')} className="text-blue-600 font-semibold hover:underline ml-1">
+            Login here
+          </button>
+        </p>
+      </div>
     </div>
   );
-};
+}
 
 export default UserRegister;
