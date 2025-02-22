@@ -47,7 +47,7 @@ function Admin_nav() {
     <div>
       <Header className="bg-base-100 shadow-lg fixed w-full z-10 flex justify-between items-center px-4">
         <div className="flex items-center">
-          <div className="text-xl text-primary">Admin Dashboard</div>
+          {/* <div className="text-xl text-primary">Admin Dashboard</div> */}
         </div>
         {/* Dark Mode Toggle Button */}
         <Switch checked={theme === "dark"} onChange={toggleTheme} checkedChildren="🌙" unCheckedChildren="☀️" />

@@ -1,18 +1,18 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Pages/PublicPages/Home';
-import UserRegister from './Pages/Auth/UserRegister';
-import UserLogin from './Pages/Auth/UserLogin';
-import ManageAdmin from './Pages/Admin/ManageAdmin';
-import ManageCountry from './Pages/Admin/ManageCountry';
-import ManageProvince from './Pages/Admin/ManageProvince';
-import ManageDivision from './Pages/Admin/ManageDivision';
-import ManageCity from './Pages/Admin/ManageCity';
-import ManageDistrics from './Pages/Admin/ManageDistrics';
-import ManageArea from './Pages/Admin/ManageArea';
-import AdminDashboard from './Pages/Admin/AdminDashboard';
+import UserRegister from './Pages/AuthPage/UserRegister';
+import UserLogin from './Pages/AuthPage/UserLogin';
+import ManageAdmin from './Pages/AdminPage/ManageAdmin';
+import ManageCountry from './Pages/AdminPage/ManageCountry';
+import ManageProvince from './Pages/AdminPage/ManageProvince';
+import ManageDivision from './Pages/AdminPage/ManageDivision';
+import ManageCity from './Pages/AdminPage/ManageCity';
+import ManageDistrics from './Pages/AdminPage/ManageDistrics';
+import ManageArea from './Pages/AdminPage/ManageArea';
+import AdminDashboard from './Pages/AdminPage/AdminDashboard';
 import LayoutWrapper from './Component/AdminCom/WrapperLayout'; // Import LayoutWrapper
-import AdminLogin from './Pages/Auth/AdminLogin';
+import AdminLogin from './Pages/AuthPage/AdminLogin';
 
 function App() {
   return (

@@ -3,49 +3,56 @@ import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } fro
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
 import api from "../../Api/api";
 import axios from "axios";
+import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
 const { Option } = Select;
-const ManageProvince = () => {
+
+const ManageDistrics = () => {
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [updateDetailsModalVisible, setUpdateDetailsModalVisible] = useState(false);
     const [updateImagesModalVisible, setUpdateImagesModalVisible] = useState(false);
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
-    const [provinces, setProvinces] = useState([]);
-    const [selectedProvince, setSelectedProvince] = useState(null);
-    const [countries, setCountries] = useState('');
-    const [fileList,setFileList] = useState([])
+    const [districts, setdistricts] = useState([]);
+    const [selectdistrict, setselectdistrict] = useState(null);
+    const [divisions, setdivisions] = useState('');
+    const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
-    const [form] = Form.useForm();
+    const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
     const user = JSON.parse(localStorage.getItem("admin"));
 
+    let canRead = usePermission("read-operations")
+    let canCreate = usePermission("create-operations")
+    let canUpdate = usePermission("update-operations")
+    let canDelete = usePermission("delete-operations")
     useEffect(() => {
-        getCountries();
-        getAllProvinces();
+        getdivisions();
+        getAlldistricts();
     }, []);
 
-    const getCountries = async () => {
+    const getdivisions = async () => {
         try {
-            const response = await axios.get(`${api}/admins/country`, {
+            const response = await axios.get(`${api}/admins/divisions`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            setCountries(response.data?.data);
+            console.log(response.data?.data);
+            setdivisions(response.data?.data);
         } catch (error) {
-            message.error("Failed to fetch countries!");
+            message.error("Failed to fetch divisions!");
         }
     };
 
-    const getAllProvinces = async () => {
-        setTableLoading(true);
+    const getAlldistricts = async () => {
+        setTableLoading(true)
         try {
-            const response = await axios.get(`${api}/admins/provinces`, {
+            const response = await axios.get(`${api}/admins/districts`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            const provincesData = response.data?.data?.map((data, index) => ({
+            const districtsData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
                 name: data.name,
@@ -54,11 +61,11 @@ const ManageProvince = () => {
                 details: data.details,
                 countryId: data.countryId,
             }));
-            setProvinces(provincesData);
+            setdistricts(districtsData);
         } catch (error) {
-            message.error("Failed to fetch provinces!");
+            message.error("Failed to fetch districts!");
         } finally {
-            setTableLoading(false);
+            setTableLoading(false)
         }
     };
 
@@ -67,26 +74,26 @@ const ManageProvince = () => {
         const formData = new FormData();
 
         if (fileList) {
-            fileList.forEach((file) => {
+           fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
 
         formData.append("name", values.name);
         formData.append("details", values.details);
-        formData.append("countryId", values.countryId);
+        formData.append("divisionId", values.divisionId);
 
         try {
-            const response = await axios.post(`${api}/admins/provinces/create`, formData, {
+            const response = await axios.post(`${api}/admins/districts/create`, formData, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
 
             if (response.status === 201) {
-                message.success("Province added successfully!");
+                message.success("District added successfully!");
                 setCreateModalVisible(false);
-                getAllProvinces();
+                getAlldistricts();
             } else {
-                message.error("Failed to add province!");
+                message.error("Failed to add District!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error submitting data. Please try again.");
@@ -96,22 +103,20 @@ const ManageProvince = () => {
     };
 
     const handleUpdateDetails = async (values) => {
-        if (!selectedProvince) return;
-
+        if (!selectdistrict) return;
         setLoading(true);
         try {
             const response = await axios.put(
-                `${api}/admins/provinces/update-details/${selectedProvince.id}`,
+                `${api}/admins/districts/update-details/${selectdistrict.id}`,
                 { name: values.name, details: values.details },
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
-
             if (response.status === 200) {
-                message.success("Province details updated successfully!");
+                message.success("District updated successfully!");
                 setUpdateDetailsModalVisible(false);
-                getAllProvinces();
+                getAlldistricts();
             } else {
-                message.error("Failed to update province details!");
+                message.error("Failed to update District details!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating data. Please try again.");
@@ -120,8 +125,8 @@ const ManageProvince = () => {
         }
     };
 
-    const handleUpdateImages = async (values) => {
-        if (!selectedProvince) return;
+    const handleAddImage = async (values) => {
+        if (!selectdistrict) return;
 
         setLoading(true);
         const formData = new FormData();
@@ -134,17 +139,17 @@ const ManageProvince = () => {
 
         try {
             const response = await axios.put(
-                `${api}/admins/provinces/add-pictures/${selectedProvince.id}`,
+                `${api}/admins/districts/add-pictures/${selectdistrict.id}`,
                 formData,
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
 
             if (response.data) {
-                message.success("Province images updated successfully!");
+                message.success("District images updated successfully!");
                 setUpdateImagesModalVisible(false);
-                getAllProvinces();
+                getAlldistricts();
             } else {
-                message.error("Failed to update province images!");
+                message.error("Failed to update District images!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating images. Please try again.");
@@ -156,7 +161,7 @@ const ManageProvince = () => {
     const handleDelete = async (item) => {
         try {
             const response = await axios.put(
-                `${api}/admins/provinces/delete-pictures/${selectedProvince.id}`,
+                `${api}/admins/districts/delete-pictures/${selectdistrict.id}`,
                 { picturesToDelete: [item] },
                 {
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
@@ -164,29 +169,35 @@ const ManageProvince = () => {
             );
 
             if (response.status === 200) {
-                message.success("Province image deleted successfully!");
-                getAllProvinces();
+                message.success("District image deleted successfully!");
+                getAlldistricts();
                 setDeleteImagesModalVisible(false)
             } else {
-                message.error("Failed to delete province image!");
+                message.error("Failed to delete District image!");
             }
         } catch (error) {
-            message.error(error.response?.data?.message || "Error deleting province image. Please try again.");
+            message.error(error.response?.data?.message || "Error deleting District image. Please try again.");
         }
     };
 
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name" },
+        { title: "Name", dataIndex: "name", key: "name",
+            render: (_, record) => (
+                <>
+                    <span>{canRead ? record.name : "_"}</span>
+                </>
+            )
+         },
         {
             title: "Actions",
             key: "action",
             render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button icon={<EyeOutlined />} onClick={() => { setSelectedProvince(record); setViewModalVisible(true); }}>View</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setSelectedProvince(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<PlusOutlined />} onClick={() => { setSelectedProvince(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => { setSelectedProvince(record); setDeleteImagesModalVisible(true); }}>
+                    <Button disabled={!canRead} icon={<EyeOutlined />} onClick={() => { setselectdistrict(record); setViewModalVisible(true); }}>View</Button>
+                    <Button disabled={!canUpdate} icon={<EditOutlined />} onClick={() => { setselectdistrict(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
+                    <Button disabled={!canUpdate} icon={<PlusOutlined />} onClick={() => { setselectdistrict(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button disabled={!canDelete} icon={<DeleteOutlined />} danger onClick={() => { setselectdistrict(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
                 </div>
@@ -197,42 +208,42 @@ const ManageProvince = () => {
     return (
         <>
             <div style={{ padding: 20 }}>
-                <center><h1 style={{ fontSize: 30 }}>Manage Provinces</h1></center>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Province</Button>
-                <Table loading={tableLoading} columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
+                <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
+                <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
+                <Table loading={tableLoading} columns={columns} dataSource={districts} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
-            {/* Create Province Modal */}
+            { /* Create Districs Modal */}
             <Modal
-                title="Create Province"
+                title="Create Districs"
                 open={createModalVisible}
                 onCancel={() => setCreateModalVisible(false)}
                 footer={null}
             >
-                <Form form={form} layout="vertical" onFinish={handleCreate}>
+                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
                     <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
                         <Input />
                     </Form.Item>
                     <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
                         <TextArea rows={4} />
                     </Form.Item>
-                    <Form.Item label="Country" name="countryId" rules={[{ required: true, message: "Please select a country!" }]}>
-                        <Select placeholder="Select a country">
-                        <Option key={"2"} value={"67b72539ee82dd269e9c2b40"}>{"pakistan"}</Option>
-                            {/* <Option key={countries._id} value={countries._id && countries._id}>{countries.name ? countries.name : "pakistan"}</Option> */}
+                    <Form.Item label="Select a divisions" name="divisionId" rules={[{ required: true, message: "Please select a country!" }]}>
+                        <Select placeholder="Select a divisions">
+                            {divisions && divisions.map((data) => (
+                                <Option key={data._id} value={data._id}>{data.name}</Option>
+                            ))}
                         </Select>
                     </Form.Item>
                     <Form.Item label="Upload Images" name="pictures">
                         <Upload
                             multiple
-                            fileList={fileList}
                             listType="picture-card"
                             beforeUpload={() => false}
                             onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
                             <Button icon={<PlusOutlined />}>Upload</Button>
                         </Upload>
-
                     </Form.Item>
                     <Button type="primary" htmlType="submit" loading={loading}>
                         Submit
@@ -242,7 +253,7 @@ const ManageProvince = () => {
 
             {/* Update Details Modal */}
             <Modal
-                title="Update Province Details"
+                title="Update District"
                 open={updateDetailsModalVisible}
                 onCancel={() => setUpdateDetailsModalVisible(false)}
                 footer={null}
@@ -260,14 +271,14 @@ const ManageProvince = () => {
                 </Form>
             </Modal>
 
-            {/* Update Images Modal */}
+            {/* Add Images Modal */}
             <Modal
-                title="Add Province Images"
+                title="Add District Images"
                 open={updateImagesModalVisible}
                 onCancel={() => setUpdateImagesModalVisible(false)}
                 footer={null}
             >
-                <Form form={updateImagesForm} layout="vertical" onFinish={handleUpdateImages}>
+                <Form form={updateImagesForm} layout="vertical" onFinish={handleAddImage}>
                     <Form.Item label="Upload Images" name="pictures">
                         <Upload
                             multiple
@@ -287,19 +298,19 @@ const ManageProvince = () => {
 
             {/* View Modal */}
             <Modal
-                title="Province Details"
+                title="District Details"
                 open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={null}
             >
-                {selectedProvince && (
+                {selectdistrict && (
                     <div>
-                        <h3>Name: {selectedProvince.name}</h3>
-                        <p><strong>Details:</strong> {selectedProvince.details}</p>
+                        <h3>Name: {selectdistrict.name}</h3>
+                        <p><strong>Details:</strong> {selectdistrict.details}</p>
                         <h4>Images:</h4>
-                        {selectedProvince.pictures?.length > 0 ? (
-                            selectedProvince.pictures.map((pic, index) => (
-                                <Image key={index} width={200} src={pic} alt={`Province ${index}`} />
+                        {selectdistrict.pictures?.length > 0 ? (
+                            selectdistrict.pictures.map((pic, index) => (
+                                <Image key={index} width={200} src={pic} alt={`District ${index}`} />
                             ))
                         ) : (
                             <p>No images available</p>
@@ -311,15 +322,23 @@ const ManageProvince = () => {
 
             {/* Delete model  */}
             <Modal
-                title="Delete Province Images"
+                title="Delete District Images"
                 open={deleteImagesModalVisible}
                 onCancel={() => setDeleteImagesModalVisible(false)}
                 footer={null}
             >
-                {selectedProvince?.pictures?.length > 0 ? (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                        {selectedProvince.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center", marginLeft: 20 }}>
+                {selectdistrict?.pictures?.length > 0 ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "15px", justifyContent: "center" }}>
+                        {selectdistrict.pictures.map((imgUrl, index) => (
+                            <div key={index} style={{ 
+                                display: "flex", 
+                                alignItems: "center", 
+                                gap: "10px", 
+                                border: "1px solid #ccc", 
+                                padding: "10px", 
+                                borderRadius: "10px", 
+                                background: "#f9f9f9"
+                            }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger
@@ -341,4 +360,4 @@ const ManageProvince = () => {
     );
 };
 
-export default ManageProvince;
+export default ManageDistrics;

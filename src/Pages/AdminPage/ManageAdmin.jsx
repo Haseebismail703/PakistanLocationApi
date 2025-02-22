@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Input, Table, Switch, Select, message } from "antd";
 import axios from "axios";
 import api from '../../Api/api.js'
+import usePermission from '../../Hooks/usePermission.js'
 const ManageAdmin = () => {
     const getUser = {
         _id: "67b2f10457c5b0f20e561417",
@@ -23,12 +24,19 @@ const ManageAdmin = () => {
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [tableLoader,setTableLoader] = useState(false)
+    const [tableLoader, setTableLoader] = useState(false)
     const [form] = Form.useForm();
     const [updateForm] = Form.useForm();
 
     const storeAdmin = localStorage.getItem("admin");
     const getAdmin = storeAdmin ? JSON.parse(storeAdmin) : null;
+
+
+    const create = usePermission("create-operations")
+    const read = usePermission("read-operations")
+    const update = usePermission('update-operations')
+    const deleteOperation = usePermission('')
+
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -61,18 +69,21 @@ const ManageAdmin = () => {
         }
     };
 
-    // Fetch all admins
     const fetchAdmins = async () => {
-setTableLoader(true)
+        setTableLoader(true);
         try {
             const response = await axios.get(`${api}/admins/get-admins`, {
                 headers: {
                     "Authorization": `Bearer ${getAdmin?.accessToken}`,
                 },
-            }
-            )
+            });
 
-            const admins = response.data?.data?.map((record, index) => ({
+            let admins = response.data?.data || [];
+
+            // 🔥 Sirf woh admins rakhna jo logged-in admin na ho
+            admins = admins.filter(record => record._id !== getAdmin.admin?._id);
+
+            admins = admins.map((record, index) => ({
                 key: record._id || index.toString(),
                 no: index + 1,
                 name: record.name,
@@ -80,16 +91,14 @@ setTableLoader(true)
                 role: record.role,
                 status: record.status,
                 permissions: record.permissions || []
-            })) || [];
+            }));
 
             setUsers(admins);
 
         } catch (error) {
-
-            // message.error(error.response?.data?.message || "Fetch admins failed!");
             console.log("Error fetching admins:", error);
-        } finally{
-          setTableLoader(false)
+        } finally {
+            setTableLoader(false);
         }
     };
 
@@ -172,44 +181,81 @@ setTableLoader(true)
         }
     };
 
-
+    // console.log(read)
     // Table columns
     const columns = [
-      { title: "No", dataIndex: "no", key: "no" },
-      { title: "Name", dataIndex: "name", key: "name" },
-      { title: "Email", dataIndex: "email", key: "email" },
-      { title: "Role", dataIndex: "role", key: "role" },
-      { title: "Status", dataIndex: "status", key: "status",
-        render: (status, record) => (
-        <span style={{ color: status === "active" ? "green" : "red" }}>
-          {status}
-        </span>
-       )
-      },
-      {
-        title: "Action",
-        key: "action",
-        render: (status, record) => (
-          <>
-            <Switch checked={record.status === "active"} onChange={() => toggleStatus(record)} />
-            <Button type="primary" onClick={() => showUpdateModal(record)} style={{marginLeft:"20px"}}>
-              Update
-            </Button>
-          </>
-        ),
-      }
+        { title: "No", dataIndex: "no", key: "no" },
+        {
+            title: "Name", dataIndex: "name", key: "name",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {read ? record.name : "_"}
+                    </span>
+                </>
+            )
+        },
+        {
+            title: "Email", dataIndex: "email", key: "email",
+            render: (_, record) => (
+                <span>
+                    {read ? record.email : "_"}
+                </span>
+            )
+        },
+        {
+            title: "Role", dataIndex: "role", key: "role",
+            render: (_, record) => (
+                <span>
+                    {read ? record.role : "_"}
+                </span>
+            )
+        },
+        {
+            title: "Status", dataIndex: "status", key: "status",
+            render: (status, record) => (
+                <span style={{ color: status === "active" ? "green" : "red" }}>
+                    {read ? status : "_" }
+                </span>
+            )
+        },
+        {
+            title: "Action",
+            key: "action",
+            render: (_, record) => (
+                <>
+                    {update ? (
+                        <>
+                            <Switch
+                                checked={record.status === "active"}
+                                onChange={() => toggleStatus(record)}
+                            />
+                            <Button
+                                type="primary"
+                                onClick={() => showUpdateModal(record)}
+                                style={{ marginLeft: "20px" }}
+                            >
+                                Update
+                            </Button>
+                        </>
+                    ) : (
+                        <p>{"You have no permission"}</p>
+                    )}
+                </>
+            ),
+        },
     ];
 
     return (
-      <>
-        <br /><br />
-        <center>
-          <h1 style={{ fontSize: "24px" }}>Manage Admins</h1>
-        </center>
-        <div style={{ padding: "20px" }}>
-          <Button type="primary" onClick={showModal}>
-            Create Admin
-          </Button>
+        <>
+            <br /><br />
+            <center>
+                <h1 style={{ fontSize: "24px" }}>Manage Admins</h1>
+            </center>
+            <div style={{ padding: "20px" }}>
+                 <Button disabled={create ? false : true} type="primary" onClick={showModal}>
+                    Create Admin
+                </Button>
                 <Modal
                     title="Create Admin"
                     open={isModalVisible}
@@ -266,6 +312,7 @@ setTableLoader(true)
                                 {
                                     getUser?.permission?.map((perm) => (
                                         <Select.Option key={perm} value={perm}>
+                                            {perm}
                                         </Select.Option>
                                     ))
                                 }
@@ -280,14 +327,15 @@ setTableLoader(true)
                 </Modal>
 
                 {/* Table to display users */}
-                <Table
-                    columns={columns}
-                    dataSource={users}
-                    pagination={{ pageSize: 5 }}
-                    style={{ marginTop: "20px" }}
-                    scroll={{ x: true }}
-                    loading={tableLoader}
-                />
+                    <Table
+                        columns={columns}
+                        dataSource={users}
+                        pagination={{ pageSize: 5 }}
+                        style={{ marginTop: "20px" }}
+                        scroll={{ x: true }}
+                        loading={tableLoader}
+                        locale={{ emptyText: "No data available" }}
+                    />
             </div>
         </>
     );

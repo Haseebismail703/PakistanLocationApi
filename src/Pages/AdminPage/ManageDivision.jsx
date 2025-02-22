@@ -3,6 +3,7 @@ import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } fro
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
 import api from "../../Api/api";
 import axios from "axios";
+import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -23,7 +24,10 @@ const ManageDivision = () => {
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
     const user = JSON.parse(localStorage.getItem("admin"));
-
+    let canRead = usePermission("read-operations")
+    let canCreate = usePermission("create-operations")
+    let canUpdate = usePermission("update-operations")
+    let canDelete = usePermission("delete-operations")
     useEffect(() => {
         getProvince();
         getAlldivisions();
@@ -178,16 +182,22 @@ const ManageDivision = () => {
     
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name" },
+        { title: "Name", dataIndex: "name", key: "name",
+            render: (_, record) => (
+                <>
+                    <span>{canRead ? record.name : "_"}</span>
+                </>
+            )
+         },
         {
             title: "Actions",
             key: "action",
             render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button icon={<EyeOutlined />} onClick={() => { setselectdivision(record); setViewModalVisible(true); }}>View</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<PlusOutlined />} onClick={() => { setselectdivision(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectdivision(record); setDeleteImagesModalVisible(true); }}>
+                    <Button disabled={!canRead} icon={<EyeOutlined />} onClick={() => { setselectdivision(record); setViewModalVisible(true); }}>View</Button>
+                    <Button disabled={!canUpdate} icon={<EditOutlined />} onClick={() => { setselectdivision(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
+                    <Button disabled={!canUpdate} icon={<PlusOutlined />} onClick={() => { setselectdivision(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button disabled={!canDelete} icon={<DeleteOutlined />} danger onClick={() => { setselectdivision(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
                 </div>
@@ -199,7 +209,7 @@ const ManageDivision = () => {
         <>
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
+                <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
                 <Table loading={tableLoading} columns={columns} dataSource={division} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
             </div>
 
@@ -320,7 +330,15 @@ const ManageDivision = () => {
                 {selectdivision?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                         {selectdivision.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                            <div key={index} style={{ 
+                                display: "flex", 
+                                alignItems: "center", 
+                                gap: "10px", 
+                                border: "1px solid #ccc", 
+                                padding: "10px", 
+                                borderRadius: "10px", 
+                                background: "#f9f9f9"
+                            }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger

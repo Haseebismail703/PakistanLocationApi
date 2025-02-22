@@ -55,7 +55,6 @@ function Pricing() {
               Suitable Pricing Plans
             </h2>
           </div>
-
           {/* Grid */}
           <div className="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-8 lg:space-y-0 lg:items-center">
             {/* Pricing Cards */}

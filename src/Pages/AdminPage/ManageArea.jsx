@@ -1,50 +1,70 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
 import api from "../../Api/api";
 import axios from "axios";
+import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const ManageCountry = () => {
+const ManageArea = () => {
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [updateDetailsModalVisible, setUpdateDetailsModalVisible] = useState(false);
     const [updateImagesModalVisible, setUpdateImagesModalVisible] = useState(false);
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
-    const [country, setCountry] = useState([]);
-    const [selectCountry, setselectCountry] = useState(null);
+    const [area, setArea] = useState([]);
+    const [selectArea, setselectArea] = useState(null);
+    const [city, setCity] = useState('');
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
-    const [fileList,setFileList] = useState([])
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [fileList, setFileList] = useState([])
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
     const user = JSON.parse(localStorage.getItem("admin"));
 
+    let canRead = usePermission("read-operations")
+    let canCreate = usePermission("create-operations")
+    let canUpdate = usePermission("update-operations")
+    let canDelete = usePermission("delete-operations")
     useEffect(() => {
-      getAllCountry();
+        getCity();
+        getAllArea();
     }, []);
-    const getAllCountry = async () => {
-        setTableLoading(true);
+
+    const getCity = async () => {
         try {
-            const response = await axios.get(`${api}/admins/country`, {
+            const response = await axios.get(`${api}/admins/cities`, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
-            // console.log(response)
-            const countryData = response.data?.data?.map((data, index) => ({
+            setCity(response.data?.data);
+        } catch (error) {
+            message.error("Failed to fetch divisions!");
+        }
+    };
+
+    const getAllArea = async () => {
+        setTableLoading(true);
+        try {
+            const response = await axios.get(`${api}/admins/areas`, {
+                headers: { Authorization: `Bearer ${user?.accessToken}` },
+            });
+            const areaData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
                 pictures: data.pictures,
                 details: data.details,
+                countryId: data.countryId,
             }));
-            setCountry(countryData);
+            setArea(areaData);
         } catch (error) {
-            message.error("Failed to fetch country!");
-        }finally {
+            message.error("Failed to fetch districts!");
+        } finally {
             setTableLoading(false);
         }
     };
@@ -61,18 +81,19 @@ const ManageCountry = () => {
 
         formData.append("name", values.name);
         formData.append("details", values.details);
+        formData.append("cityId", values.cityId);
 
         try {
-            const response = await axios.post(`${api}/admins/country/create`, formData, {
+            const response = await axios.post(`${api}/admins/areas/create`, formData, {
                 headers: { Authorization: `Bearer ${user?.accessToken}` },
             });
 
             if (response.status === 201) {
-                message.success("country added successfully!");
+                message.success("Area added successfully!");
                 setCreateModalVisible(false);
-                getAllCountry();
+                getAllArea();
             } else {
-                message.error("Failed to add country!");
+                message.error("Failed to add Area!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error submitting data. Please try again.");
@@ -82,20 +103,20 @@ const ManageCountry = () => {
     };
 
     const handleUpdateDetails = async (values) => {
-        if (!selectCountry) return;
+        if (!selectArea) return;
         setLoading(true);
         try {
             const response = await axios.put(
-                `${api}/admins/country/update-details/${selectCountry.id}`,
+                `${api}/admins/areas/update-details/${selectArea.id}`,
                 { name: values.name, details: values.details },
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
             if (response.status === 200) {
-                message.success("Country details updated successfully!");
+                message.success("Area updated successfully!");
                 setUpdateDetailsModalVisible(false);
-                getAllCountry();
+                getAllArea();
             } else {
-                message.error("Failed to update Country details!");
+                message.error("Failed to update Area details!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating data. Please try again.");
@@ -104,30 +125,31 @@ const ManageCountry = () => {
         }
     };
 
-    const handleUpdateImages = async (values) => {
-        if (!selectCountry) return;
+    const handleAddImage = async (values) => {
+        if (!selectArea) return;
 
         setLoading(true);
         const formData = new FormData();
 
-        if (values.pictures?.fileList) {
-            values.pictures.fileList.forEach((file) => {
+        if (fileList) {
+            fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
+
         try {
             const response = await axios.put(
-                `${api}/admins/country/add-pictures/${selectCountry.id}`,
+                `${api}/admins/areas/add-pictures/${selectArea.id}`,
                 formData,
                 { headers: { Authorization: `Bearer ${user?.accessToken}` } }
             );
 
             if (response.data) {
-                message.success("Country images add successfully!");
+                message.success("Area images add successfully!");
                 setUpdateImagesModalVisible(false);
-                getAllCountry();
+                getAllArea();
             } else {
-                message.error("Failed to update country images!");
+                message.error("Failed to add Area images!");
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error updating images. Please try again.");
@@ -137,27 +159,31 @@ const ManageCountry = () => {
     };
 
     const handleDelete = async (item) => {
+        if (!selectArea) return;
+        setDeleteLoading(true);
         try {
             const response = await axios.put(
-                `${api}/admins/country/delete-pictures/${selectCountry.id}`,
+                `${api}/admins/areas/delete-pictures/${selectArea.id}`,
                 { picturesToDelete: [item] },
                 {
                     headers: { Authorization: `Bearer ${user?.accessToken}` },
                 }
             );
-    
+
             if (response.status === 200) {
-                message.success("Country image deleted successfully!");
-                getAllCountry();
+                message.success("Area image deleted successfully!");
+                getAllArea();
                 setDeleteImagesModalVisible(false)
             } else {
-                message.error("Failed to delete country image!");
+                message.error("Failed to delete Area image!");
             }
         } catch (error) {
-            message.error(error.response?.data?.message || "Error deleting country image. Please try again.");
+            message.error(error.response?.data?.message || "Error deleting Area image. Please try again.");
+        }finally {
+            setDeleteLoading(false);
         }
     };
-    
+
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
@@ -166,10 +192,10 @@ const ManageCountry = () => {
             key: "action",
             render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button icon={<EyeOutlined />} onClick={() => { setselectCountry(record); setViewModalVisible(true); }}>View</Button>
-                    <Button icon={<EditOutlined />} onClick={() => { setselectCountry(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
-                    <Button icon={<PlusOutlined />} onClick={() => { setselectCountry(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => { setselectCountry(record); setDeleteImagesModalVisible(true); }}>
+                    <Button disabled={!canRead} icon={<EyeOutlined />} onClick={() => { setselectArea(record); setViewModalVisible(true); }}>View</Button>
+                    <Button disabled={!canUpdate} icon={<EditOutlined />} onClick={() => { setselectArea(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
+                    <Button disabled={!canUpdate} icon={<PlusOutlined />} onClick={() => { setselectArea(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
+                    <Button disabled={!canDelete} icon={<DeleteOutlined />} danger onClick={() => { setselectArea(record); setDeleteImagesModalVisible(true); }}>
                         Delete
                     </Button>
                 </div>
@@ -180,14 +206,14 @@ const ManageCountry = () => {
     return (
         <>
             <div style={{ padding: 20 }}>
-                <center><h1 style={{ fontSize: 30 }}>Manage Country</h1></center>
-                <Button disabled={country ? true : false} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Country</Button>
-                <Table loading={tableLoading}  columns={columns} dataSource={country} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
+                <center><h1 style={{ fontSize: 30 }}>Manage Area</h1></center>
+                <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Area</Button>
+                <Table loading={tableLoading} columns={columns} dataSource={area} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
             </div>
 
-            {/* Create Country Modal */}
+            { /* Create Area Modal */}
             <Modal
-                title="Create Country"
+                title="Create Area"
                 open={createModalVisible}
                 onCancel={() => setCreateModalVisible(false)}
                 footer={null}
@@ -198,6 +224,13 @@ const ManageCountry = () => {
                     </Form.Item>
                     <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
                         <TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item label="Select a city" name="cityId" rules={[{ required: true, message: "Please select a country!" }]}>
+                        <Select placeholder="Select a Area">
+                            {city && city.map((data) => (
+                                <Option key={data._id} value={data._id}>{data.name}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                     <Form.Item label="Upload Images" name="pictures">
                         <Upload
@@ -216,9 +249,9 @@ const ManageCountry = () => {
                 </Form>
             </Modal>
 
-            {/* Update Details Modal */}
+            {/* Update  Modal */}
             <Modal
-                title="Update Country Details"
+                title="Update Area"
                 open={updateDetailsModalVisible}
                 onCancel={() => setUpdateDetailsModalVisible(false)}
                 footer={null}
@@ -238,12 +271,12 @@ const ManageCountry = () => {
 
             {/* Add Images Modal */}
             <Modal
-                title="Add Country Images"
+                title="Add Area Images"
                 open={updateImagesModalVisible}
                 onCancel={() => setUpdateImagesModalVisible(false)}
                 footer={null}
             >
-                <Form form={updateImagesForm} layout="vertical" onFinish={handleUpdateImages}>
+                <Form form={updateImagesForm} layout="vertical" onFinish={handleAddImage}>
                     <Form.Item label="Upload Images" name="pictures">
                         <Upload
                             multiple
@@ -263,19 +296,19 @@ const ManageCountry = () => {
 
             {/* View Modal */}
             <Modal
-                title="Country Details"
+                title="Area Details"
                 open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={null}
             >
-                {selectCountry && (
+                {selectArea && (
                     <div>
-                        <h3>Name: {selectCountry.name}</h3>
-                        <p><strong>Details:</strong> {selectCountry.details}</p>
+                        <h3>Name: {selectArea.name}</h3>
+                        <p><strong>Details:</strong> {selectArea.details}</p>
                         <h4>Images:</h4>
-                        {selectCountry.pictures?.length > 0 ? (
-                            selectCountry.pictures.map((pic, index) => (
-                                <Image key={index} width={200} src={pic} alt={`Country ${index}`} />
+                        {selectArea.pictures?.length > 0 ? (
+                            selectArea.pictures.map((pic, index) => (
+                                <Image key={index} width={200} src={pic} alt={`District ${index}`} />
                             ))
                         ) : (
                             <p>No images available</p>
@@ -287,15 +320,15 @@ const ManageCountry = () => {
 
             {/* Delete model  */}
             <Modal
-                title="Delete Country Images"
+                title="Delete Area Images"
                 open={deleteImagesModalVisible}
                 onCancel={() => setDeleteImagesModalVisible(false)}
                 footer={null}
             >
-                {selectCountry?.pictures?.length > 0 ? (
+                {selectArea?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                        {selectCountry.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ textAlign: "center" , marginLeft : 20 }}>
+                        {selectArea.pictures.map((imgUrl, index) => (
+                            <div key={index} style={{ textAlign: "center", marginLeft: 20 }}>
                                 <Image src={imgUrl} width={100} height={100} />
                                 <Button
                                     danger
@@ -317,4 +350,4 @@ const ManageCountry = () => {
     );
 };
 
-export default ManageCountry;
+export default ManageArea;
