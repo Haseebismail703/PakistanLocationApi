@@ -189,7 +189,7 @@ const ManageCountry = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Country</h1></center>
                 <Button disabled={country ? true : false} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Country</Button>
-                <Table loading={tableLoading} columns={columns} dataSource={country} pagination={{ pageSize: 5 }} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
+                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={country} pagination={{ pageSize: 5 }} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
             </div>
 
             {/* Create Country Modal */}

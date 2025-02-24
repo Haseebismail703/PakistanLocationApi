@@ -13,7 +13,9 @@ import ManageArea from './Pages/AdminPage/ManageArea';
 import AdminDashboard from './Pages/AdminPage/AdminDashboard';
 import LayoutWrapper from './Component/AdminCom/WrapperLayout'; // Import LayoutWrapper
 import AdminLogin from './Pages/AuthPage/AdminLogin';
-
+import UserForm from  './Pages/PublicPages/UserForm'
+import Profile from './Pages/UserPages/Profile'
+import GenerateApiKey from './Pages/UserPages/ApiKey';
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +25,7 @@ function App() {
         <Route path="/register" element={<UserRegister />} />
         <Route path="/login" element={<UserLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/form" element={<UserForm />} />
     
         {/* Admin Routes (Wrapped in Layout) */}
         <Route path="/admin/*" element={<LayoutWrapper> 
@@ -35,9 +38,12 @@ function App() {
             <Route path="manage-cities" element={<ManageCity />} />
             <Route path="manage-district" element={<ManageDistrics />} />
             <Route path="manage-area" element={<ManageArea />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="api" element={<GenerateApiKey />} />
           </Routes>
         </LayoutWrapper>} />
-        
+         
+
       </Routes>
     </BrowserRouter>
   );

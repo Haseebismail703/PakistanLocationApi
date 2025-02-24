@@ -215,7 +215,7 @@ const ManageAdmin = () => {
             title: "Status", dataIndex: "status", key: "status",
             render: (status, record) => (
                 <span style={{ color: status === "active" ? "green" : "red" }}>
-                    {read ? status : "_" }
+                    {read ? status : "_"}
                 </span>
             )
         },
@@ -253,7 +253,7 @@ const ManageAdmin = () => {
                 <h1 style={{ fontSize: "24px" }}>Manage Admins</h1>
             </center>
             <div style={{ padding: "20px" }}>
-                 <Button disabled={create ? false : true} type="primary" onClick={showModal}>
+                <Button disabled={create ? false : true} type="primary" onClick={showModal}>
                     Create Admin
                 </Button>
                 <Modal
@@ -327,15 +327,15 @@ const ManageAdmin = () => {
                 </Modal>
 
                 {/* Table to display users */}
-                    <Table
-                        columns={columns}
-                        dataSource={users}
-                        pagination={{ pageSize: 5 }}
-                        style={{ marginTop: "20px" }}
-                        scroll={{ x: true }}
-                        loading={tableLoader}
-                        locale={{ emptyText: "No data available" }}
-                    />
+                <Table
+                    columns={columns}
+                    dataSource={users}
+                    pagination={{ pageSize: 5 }}
+                    style={{ marginTop: "20px" }}
+                    scroll={{ x: true }}
+                    loading={tableLoader}
+                    locale={{ emptyText: "No data available" }}
+                />
             </div>
         </>
     );

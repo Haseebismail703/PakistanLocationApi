@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Card, Col, Row, Typography, Spin } from "antd";
 import { UserOutlined, TeamOutlined, BarChartOutlined } from "@ant-design/icons";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import api from '../../Api/api';
-
 const { Title, Text } = Typography;
 
 function Home() {
