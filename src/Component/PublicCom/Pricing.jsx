@@ -69,7 +69,7 @@ function Pricing() {
                     {plan.icons}
                   </div>
 
-                  <h3 className="font-manrope text-2xl font-bold my-7 text-center text-indigo-600 group-hover:text-white">
+                  <h3 className="font-manrope text-2xl font-bold my-7 text-center text-indigo-600 ">
                     {plan.title}
                   </h3>
                   <div className="flex items-center justify-center">
