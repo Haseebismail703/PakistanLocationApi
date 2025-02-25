@@ -25,7 +25,7 @@ const ManageCity = () => {
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
     const [form] = Form.useForm();
-    const user = JSON.parse(localStorage.getItem("admin"));
+    const getAdmin = JSON.parse(localStorage.getItem("admin"));
     let canRead = usePermission("read-operations")
     let canCreate = usePermission("create-operations")
     let canUpdate = usePermission("update-operations")
@@ -38,7 +38,7 @@ const ManageCity = () => {
     const getDistricts = async () => {
         try {
             const response = await axios.get(`${api}/admins/districts`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             // console.log(response.data?.data);
             setDistricts(response.data?.data);
@@ -51,7 +51,7 @@ const ManageCity = () => {
         setTableLoading(true)
         try {
             const response = await axios.get(`${api}/admins/cities`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             const cityData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
@@ -88,7 +88,7 @@ const ManageCity = () => {
 
         try {
             const response = await axios.post(`${api}/admins/cities/create`, formData, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
 
             if (response.status === 201) {
@@ -112,7 +112,7 @@ const ManageCity = () => {
             const response = await axios.put(
                 `${api}/admins/cities/update-details/${selectCity.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
 
             if (response.status === 200) {
@@ -142,7 +142,7 @@ const ManageCity = () => {
             const response = await axios.put(
                 `${api}/admins/cities/add-pictures/${selectCity.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
 
             if (response.data) {
@@ -165,7 +165,7 @@ const ManageCity = () => {
                 `${api}/admins/cities/delete-pictures/${selectCity.id}`,
                 { picturesToDelete: [item] },
                 {
-                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
                 }
             );
 
@@ -218,7 +218,7 @@ const ManageCity = () => {
         setLoading(true);
         try {
             const response = await axios.put(`${api}/admins/cities/update-area-type/${selectCity.id}`, { areaType: values.areaType }, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             if (response.status === 200) {
                 message.success("Area Type updated successfully!");

@@ -24,7 +24,7 @@ const ManageArea = () => {
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
-    const user = JSON.parse(localStorage.getItem("admin"));
+    const getAdmin = JSON.parse(localStorage.getItem("admin"));
 
     let canRead = usePermission("read-operations")
     let canCreate = usePermission("create-operations")
@@ -38,7 +38,7 @@ const ManageArea = () => {
     const getCity = async () => {
         try {
             const response = await axios.get(`${api}/admins/cities`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             setCity(response.data?.data);
         } catch (error) {
@@ -50,7 +50,7 @@ const ManageArea = () => {
         setTableLoading(true);
         try {
             const response = await axios.get(`${api}/admins/areas`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             const areaData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
@@ -85,7 +85,7 @@ const ManageArea = () => {
 
         try {
             const response = await axios.post(`${api}/admins/areas/create`, formData, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
 
             if (response.status === 201) {
@@ -109,7 +109,7 @@ const ManageArea = () => {
             const response = await axios.put(
                 `${api}/admins/areas/update-details/${selectArea.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
             if (response.status === 200) {
                 message.success("Area updated successfully!");
@@ -141,7 +141,7 @@ const ManageArea = () => {
             const response = await axios.put(
                 `${api}/admins/areas/add-pictures/${selectArea.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
 
             if (response.data) {
@@ -166,7 +166,7 @@ const ManageArea = () => {
                 `${api}/admins/areas/delete-pictures/${selectArea.id}`,
                 { picturesToDelete: [item] },
                 {
-                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
                 }
             );
 

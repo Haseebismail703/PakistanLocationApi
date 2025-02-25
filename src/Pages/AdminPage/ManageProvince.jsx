@@ -22,7 +22,7 @@ const ManageProvince = () => {
     const [form] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
-    const user = JSON.parse(localStorage.getItem("admin"));
+    const getAdmin = JSON.parse(localStorage.getItem("admin"));
 
     let canRead = usePermission("read-operations")
     let canCreate = usePermission("create-operations")
@@ -36,7 +36,7 @@ const ManageProvince = () => {
     const getCountries = async () => {
         try {
             const response = await axios.get(`${api}/admins/country`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             setCountries(response.data?.data);
         } catch (error) {
@@ -48,7 +48,7 @@ const ManageProvince = () => {
         setTableLoading(true);
         try {
             const response = await axios.get(`${api}/admins/provinces`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             const provincesData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
@@ -83,7 +83,7 @@ const ManageProvince = () => {
 
         try {
             const response = await axios.post(`${api}/admins/provinces/create`, formData, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
 
             if (response.status === 201) {
@@ -108,7 +108,7 @@ const ManageProvince = () => {
             const response = await axios.put(
                 `${api}/admins/provinces/update-details/${selectedProvince.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
 
             if (response.status === 200) {
@@ -141,7 +141,7 @@ const ManageProvince = () => {
             const response = await axios.put(
                 `${api}/admins/provinces/add-pictures/${selectedProvince.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
 
             if (response.data) {
@@ -164,7 +164,7 @@ const ManageProvince = () => {
                 `${api}/admins/provinces/delete-pictures/${selectedProvince.id}`,
                 { picturesToDelete: [item] },
                 {
-                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
                 }
             );
 

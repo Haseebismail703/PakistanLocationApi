@@ -21,7 +21,7 @@ const ManageCountry = () => {
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
-    const user = JSON.parse(localStorage.getItem("admin"));
+    const getAdmin = JSON.parse(localStorage.getItem("admin"));
 
     let canRead = usePermission("read-operations")
     let canCreate = usePermission("create-operations")
@@ -36,7 +36,7 @@ const ManageCountry = () => {
         setTableLoading(true);
         try {
             const response = await axios.get(`${api}/admins/country`, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
             // console.log(response)
             const countryData = response.data?.data?.map((data, index) => ({
@@ -70,7 +70,7 @@ const ManageCountry = () => {
 
         try {
             const response = await axios.post(`${api}/admins/country/create`, formData, {
-                headers: { Authorization: `Bearer ${user?.accessToken}` },
+                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
             });
 
             if (response.status === 201) {
@@ -94,7 +94,7 @@ const ManageCountry = () => {
             const response = await axios.put(
                 `${api}/admins/country/update-details/${selectCountry.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
             if (response.status === 200) {
                 message.success("Country details updated successfully!");
@@ -125,7 +125,7 @@ const ManageCountry = () => {
             const response = await axios.put(
                 `${api}/admins/country/add-pictures/${selectCountry.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${user?.accessToken}` } }
+                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
             );
 
             if (response.data) {
@@ -148,7 +148,7 @@ const ManageCountry = () => {
                 `${api}/admins/country/delete-pictures/${selectCountry.id}`,
                 { picturesToDelete: [item] },
                 {
-                    headers: { Authorization: `Bearer ${user?.accessToken}` },
+                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
                 }
             );
 
@@ -188,7 +188,7 @@ const ManageCountry = () => {
         <>
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Country</h1></center>
-                <Button disabled={country ? true : false} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Country</Button>
+                <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Country</Button>
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={country} pagination={{ pageSize: 5 }} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
             </div>
 
