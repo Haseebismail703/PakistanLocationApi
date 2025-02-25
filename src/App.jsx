@@ -50,7 +50,7 @@ const UserProtectedRoute = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}><Spin /></div>}>
+      <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}><Spin size="large" /></div>}>
         <Routes>
           {/* Public Routes (No Layout) */}
           <Route path="/" element={<Home />} />

@@ -1,125 +1,122 @@
-import React, { useState,useEffect } from "react";
-import { Button, Card, Input, message, Typography, Table, Switch } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Card, Input, message, Typography, Space } from "antd";
 import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import axios from "axios";
-import api from '../../Api/api.js'
+import api from "../../Api/api.js";
+
 const { Title, Text } = Typography;
 
 const GenerateApiKey = () => {
-  const [apiKeys, setApiKeys] = useState([]);
-  const [isApiKeyVisible, setIsApiKeyVisible] = useState({});
+  const [apiKey, setApiKey] = useState(null);
+  const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Function to generate API Key
-  const generateKey = async() => { 
-    const user = JSON.parse(localStorage.getItem("user")); 
+  // Fetch API Key from Profile
+  const fetchApiKey = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
     try {
-      let res = await axios.get(`${api}/users/generate-api-key`,{
+      setLoading(true);
+      const res = await axios.get(`${api}/users/profile`, {
         headers: {
-          "Authorization": `Bearer ${user.accessToken}`
-        }
-      })
-     if(res){
-       message.success(res.data?.message);
-     }
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      });
+
+      if (res?.data?.data?.apiKey) {
+        setApiKey(res.data.data.apiKey);
+      } else {
+        setApiKey(null);
+      }
     } catch (error) {
-      message.success("Somthing went wrong");
+      message.error("Failed to fetch API key");
+    } finally {
+      setLoading(false);
     }
-    // 
-  };
-  
-//   const fetchApiKeys = async () => {
-//     const user = JSON.parse(localStorage.getItem("user"));
-//     try {
-//       let res = await axios.get(`${api}/users/api-keys`, {
-//         headers: {
-//           "Authorization": `Bearer ${user.accessToken}`
-//         }
-//       });
-//       if (res) {
-//         setApiKeys(res.data.apiKeys);
-//       }
-//     } catch (error) {
-//       message.error("Failed to fetch API keys");
-//     }
-//   };
-
-
-//  useEffect(() => {
-//     fetchApiKeys();
-//   }, []);
-
-  // Function to copy API Key
-  const copyToClipboard = (key) => {
-    navigator.clipboard.writeText(key);
-    message.success("API Key copied to clipboard!");
   };
 
-  // Function to toggle API Key status
-  const toggleStatus = (id) => {
-    setApiKeys(apiKeys.map(api => api.id === id ? { ...api, status: api.status === "Active" ? "Inactive" : "Active" } : api));
+  useEffect(() => {
+    fetchApiKey();
+  }, []);
+
+  // Generate API Key and Refresh Profile
+  const generateKey = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    try {
+      setLoading(true);
+      const res = await axios.get(`${api}/users/generate-api-key`, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      });
+
+      if (res) {
+        message.success(res.data?.message);
+        fetchApiKey(); // Refresh API key after generation
+      }
+    } catch (error) {
+      message.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Table columns
-  const columns = [
-    {
-      title: "API Key",
-      dataIndex: "key",
-      key: "key",
-      render: (text, record) => (
-        <div className="flex items-center">
-          <Input 
-            value={text} 
-            readOnly 
-            type={isApiKeyVisible[record.id] ? "text" : "password"}
-            className="mr-2"
-          />
-          <Button 
-            type="text" 
-            icon={isApiKeyVisible[record.id] ? <EyeOutlined /> : <EyeInvisibleOutlined />} 
-            onClick={() => setIsApiKeyVisible(prev => ({ ...prev, [record.id]: !prev[record.id] }))}
-          />
-        </div>
-      ),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (text, record) => (
-        <Switch 
-          checked={text === "Active"} 
-          onChange={() => toggleStatus(record.id)} 
-        />
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Button type="default" onClick={() => copyToClipboard(record.key)} icon={<CopyOutlined />}>
-          Copy
-        </Button>
-      ),
-    },
-  ];
+  // Copy API Key to Clipboard
+  const copyToClipboard = () => {
+    if (apiKey) {
+      navigator.clipboard.writeText(apiKey);
+      message.success("API Key copied to clipboard!");
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6">
-      <Title level={2} className="mb-6">Generate API Key</Title>
+    <div className="flex flex-col items-center justify-center p-6 ">
+      <Card className="shadow-lg p-6 w-full max-w-lg bg-white rounded-xl">
+        <Title level={3} className="text-center">API Key</Title>
+        <Text type="secondary" className="block text-center mb-4">
+          Generate, view, and copy your API key securely.
+        </Text>
 
-      <Card className="shadow-lg p-6 w-full max-w-md">
-        <div className="mb-4">
-          <Text strong>Generate a New API Key:</Text>
-          <Button type="primary" onClick={generateKey} icon={<KeyOutlined />} block className="mt-3">
-            Generate API Key
-          </Button>
-        </div>
+        {/* Generate API Key Button */}
+        <Button
+          type="primary"
+          onClick={generateKey}
+          icon={<KeyOutlined />}
+          block
+          loading={loading}
+        >
+          Generate API Key
+        </Button>
+
+        {/* API Key Display Section */}
+        {apiKey && (
+          <Card className="shadow-md p-4 mt-6 border rounded-lg">
+            <Text strong>API Key</Text>
+            <div className="flex items-center gap-2 mt-2">
+              <Input
+                value={apiKey}
+                readOnly
+                type={isApiKeyVisible ? "text" : "password"}
+                className="flex-1"
+              />
+              <Button
+                type="text"
+                icon={isApiKeyVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                onClick={() => setIsApiKeyVisible((prev) => !prev)}
+              />
+            </div>
+
+            <Button
+              type="default"
+              onClick={copyToClipboard}
+              icon={<CopyOutlined />}
+              block
+              className="mt-3"
+            >
+              Copy API Key
+            </Button>
+          </Card>
+        )}
       </Card>
-
-      {/* API Keys Table */}
-      <div className="w-full max-w-3xl mt-6">
-        <Table dataSource={apiKeys} columns={columns} rowKey="id" pagination={{ pageSize: 5 }} />
-      </div>
     </div>
   );
 };

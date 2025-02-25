@@ -9,21 +9,26 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [name, setName] = useState("John Doe");
   const [email] = useState("johndoe@example.com");
-
+  const user = JSON.parse(localStorage.getItem("user")); 
   // Function to update name via API
   const handleUpdateName = async () => {
     try {
-      await axios.put("https://api.example.com/update-profile", { name });
-      message.success("Name updated successfully!");
+     let res = await axios.put(`${api}/users/update`, { name },{
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      });
+      // console.log(res.data)
+      message.success(res.data?.message);
     } catch (error) {
       message.error("Failed to update name. Try again!");
+      console.log(error)
     }
   };
 
   // Function to change password via API
 const handleChangePassword = async (values) => {
     try {
-        const user = JSON.parse(localStorage.getItem("user")); 
         await axios.put(`${api}/users/change-password`, values, {
             headers: {
                 Authorization: `Bearer ${user.accessToken}`,
