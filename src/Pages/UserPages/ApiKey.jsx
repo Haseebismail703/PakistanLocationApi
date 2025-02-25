@@ -1,33 +1,52 @@
-import React, { useState } from "react";
-import { Button, Card, Input, message, Typography, Modal, Table, Switch } from "antd";
-import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined, LockOutlined } from "@ant-design/icons";
-
+import React, { useState,useEffect } from "react";
+import { Button, Card, Input, message, Typography, Table, Switch } from "antd";
+import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import axios from "axios";
+import api from '../../Api/api.js'
 const { Title, Text } = Typography;
 
 const GenerateApiKey = () => {
   const [apiKeys, setApiKeys] = useState([]);
-  const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isApiKeyVisible, setIsApiKeyVisible] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Function to generate API Key
-  const generateKey = () => {
-    if (password === "12345") { // Replace with real authentication logic
-      const newKey = `sk-${Math.random().toString(36).substr(2, 24)}`;
-      const newApiKey = {
-        key: newKey,
-        status: "Active",
-        id: apiKeys.length + 1,
-      };
-      setApiKeys([...apiKeys, newApiKey]);
-      message.success("API Key generated successfully!");
-      setIsModalOpen(false);
-      setPassword("");
-    } else {
-      message.error("Incorrect password!");
+  const generateKey = async() => { 
+    const user = JSON.parse(localStorage.getItem("user")); 
+    try {
+      let res = await axios.get(`${api}/users/generate-api-key`,{
+        headers: {
+          "Authorization": `Bearer ${user.accessToken}`
+        }
+      })
+     if(res){
+       message.success(res.data?.message);
+     }
+    } catch (error) {
+      message.success("Somthing went wrong");
     }
+    // 
   };
+  
+//   const fetchApiKeys = async () => {
+//     const user = JSON.parse(localStorage.getItem("user"));
+//     try {
+//       let res = await axios.get(`${api}/users/api-keys`, {
+//         headers: {
+//           "Authorization": `Bearer ${user.accessToken}`
+//         }
+//       });
+//       if (res) {
+//         setApiKeys(res.data.apiKeys);
+//       }
+//     } catch (error) {
+//       message.error("Failed to fetch API keys");
+//     }
+//   };
+
+
+//  useEffect(() => {
+//     fetchApiKeys();
+//   }, []);
 
   // Function to copy API Key
   const copyToClipboard = (key) => {
@@ -85,13 +104,13 @@ const GenerateApiKey = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center  p-6 ">
+    <div className="flex flex-col items-center justify-center p-6">
       <Title level={2} className="mb-6">Generate API Key</Title>
 
       <Card className="shadow-lg p-6 w-full max-w-md">
         <div className="mb-4">
           <Text strong>Generate a New API Key:</Text>
-          <Button type="primary" onClick={() => setIsModalOpen(true)} icon={<KeyOutlined />} block className="mt-3">
+          <Button type="primary" onClick={generateKey} icon={<KeyOutlined />} block className="mt-3">
             Generate API Key
           </Button>
         </div>
@@ -101,25 +120,6 @@ const GenerateApiKey = () => {
       <div className="w-full max-w-3xl mt-6">
         <Table dataSource={apiKeys} columns={columns} rowKey="id" pagination={{ pageSize: 5 }} />
       </div>
-
-      {/* Password Modal */}
-      <Modal
-        title="Enter Password to Generate API Key"
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsModalOpen(false)}>Cancel</Button>,
-          <Button key="generate" type="primary" onClick={generateKey}>Generate</Button>,
-        ]}
-      >
-        <Input.Password
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          prefix={<LockOutlined />}
-          visibilityToggle={{ visible: isPasswordVisible, onVisibleChange: setIsPasswordVisible }}
-        />
-      </Modal>
     </div>
   );
 };

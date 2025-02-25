@@ -11,7 +11,7 @@ import ManageCity from './Pages/AdminPage/ManageCity';
 import ManageDistrics from './Pages/AdminPage/ManageDistrics';
 import ManageArea from './Pages/AdminPage/ManageArea';
 import AdminDashboard from './Pages/AdminPage/AdminDashboard';
-import LayoutWrapper from './Component/AdminCom/WrapperLayout'; // Import LayoutWrapper
+import AdminSidebar from './Component/AdminCom/AdminSidebar'; 
 import AdminLogin from './Pages/AuthPage/AdminLogin';
 import UserSidebar from './Component/UserComp/UserSidebar'
 import UserForm from './Pages/PublicPages/UserForm'
@@ -31,7 +31,7 @@ function App() {
         <Route path="/form" element={<UserForm />} />
 
         {/* Admin Routes (Wrapped in Layout) */}
-        <Route path="/admin/*" element={<LayoutWrapper>
+        <Route path="/admin/*" element={<AdminSidebar>
           <Routes>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="manage-admin" element={<ManageAdmin />} />
@@ -42,7 +42,7 @@ function App() {
             <Route path="manage-district" element={<ManageDistrics />} />
             <Route path="manage-area" element={<ManageArea />} />
           </Routes>
-        </LayoutWrapper>} />
+        </AdminSidebar>} />
 
         <Route path="/user/*" element={<UserSidebar>
           <Routes>

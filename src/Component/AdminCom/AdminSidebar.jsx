@@ -4,21 +4,24 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
   UserOutlined,
-  ShoppingCartOutlined,
-  CustomerServiceOutlined,
-  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  UserAddOutlined,
+  GlobalOutlined,
+  ApartmentOutlined,
+  ClusterOutlined,
+  EnvironmentOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 import api from "../../Api/api";
 
 const { Header, Sider, Content } = Layout;
 
-const UserSidebar = ({ children }) => {
+const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const location = useLocation();
   const [selectedKey, setSelectedKey] = useState("dashboard");
+  const location = useLocation();
   const navigate = useNavigate();
   const storeUser = localStorage.getItem("user");
   const user = storeUser ? JSON.parse(storeUser) : null;
@@ -30,9 +33,7 @@ const UserSidebar = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.get(`${api}/users/logout`, {
-        withCredentials: true,
-      });
+      await axios.get(`${api}/admins/logout`, { withCredentials: true });
       localStorage.removeItem("user");
 
       document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -47,50 +48,60 @@ const UserSidebar = ({ children }) => {
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
-  // Sidebar menu items
   const menuItems = [
     {
       key: "dashboard",
-      label: <Link to="/user/dashboard">Dashboard</Link>,
       icon: <DashboardOutlined />,
+      label: <Link to="/admin/dashboard">Dashboard</Link>,
     },
     {
-      key: "profile",
-      label: <Link to="/user/profile">My Profile</Link>,
-      icon: <UserOutlined />,
+      key: "manage-admin",
+      icon: <UserAddOutlined />,
+      label: <Link to="/admin/manage-admin">Manage Admin</Link>,
     },
     {
-      key: "api",
-      label: <Link to="/user/api">API Key</Link>,
-      icon: <ShoppingCartOutlined />,
+      key: "manage-country",
+      icon: <GlobalOutlined />,
+      label: <Link to="/admin/manage-country">Manage Country</Link>,
     },
     {
-      key: "support",
-      label: <Link to="/user/contact">Admin Contact</Link>,
-      icon: <CustomerServiceOutlined />,
+      key: "manage-province",
+      icon: <ApartmentOutlined />,
+      label: <Link to="/admin/manage-province">Manage Province</Link>,
+    },
+    {
+      key: "manage-division",
+      icon: <ClusterOutlined />,
+      label: <Link to="/admin/manage-division">Manage Division</Link>,
+    },
+    {
+      key: "manage-district",
+      icon: <EnvironmentOutlined />,
+      label: <Link to="/admin/manage-district">Manage District</Link>,
+    },
+    {
+      key: "manage-cities",
+      icon: <ApartmentOutlined />,
+      label: <Link to="/admin/manage-cities">Manage Cities</Link>,
+    },
+    {
+      key: "manage-area",
+      icon: <ClusterOutlined />,
+      label: <Link to="/admin/manage-area">Manage Area</Link>,
     },
     {
       key: "logout",
-      label: "Logout",
       icon: <LogoutOutlined />,
-      danger: true,
+      label: "Logout",
       onClick: handleLogout,
+      danger: true,
     },
   ];
 
-  // User dropdown menu
   const userMenu = {
     items: [
-      {
-        key: "profile",
-        label: <Link to="/user/profile">Profile</Link>,
-      },
-      {
-        key: "logout",
-        label: "Logout",
-        danger: true,
-        onClick: handleLogout,
-      },
+      { key: "profile", label: <Link to="/user/profile">Profile</Link> },
+      { key: "logout", label: "Logout", danger: true, onClick: handleLogout },
     ],
   };
 
@@ -114,8 +125,15 @@ const UserSidebar = ({ children }) => {
       >
         <div style={{ textAlign: "center", padding: "20px" }}>
           {!collapsed && (
-            <p style={{ color: "#fff", marginTop: "10px", fontSize: "20px", fontWeight: "bold" }}>
-              WELCOME {user?.user?.name}
+            <p
+              style={{
+                color: "#fff",
+                marginTop: "10px",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
+            >
+              Admin panel
             </p>
           )}
         </div>
@@ -124,6 +142,7 @@ const UserSidebar = ({ children }) => {
           theme="dark"
           mode="inline"
           selectedKeys={[selectedKey]}
+          onClick={(e) => setSelectedKey(e.key)}
           style={{ background: "#000", color: "#fff" }}
           items={menuItems}
         />
@@ -156,7 +175,7 @@ const UserSidebar = ({ children }) => {
               style={{ fontSize: "18px", cursor: "pointer", color: "#000" }}
             />
           )}
-          <Dropdown menu={userMenu} placement="bottomRight">
+          <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
             <Avatar
               size={40}
               icon={<UserOutlined />}
@@ -182,4 +201,4 @@ const UserSidebar = ({ children }) => {
   );
 };
 
-export default UserSidebar;
+export default AdminSidebar;

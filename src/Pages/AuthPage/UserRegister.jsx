@@ -28,7 +28,7 @@ function UserRegister() {
       const response = await axios.post(`${api}/users/register`, formData, { withCredentials: true });
       if (response.data.success) {
         message.success(response.data.message);
-        navigate('/login');
+        navigate('/user/dashboard');
       }
     } catch (error) {
       console.log("Registration error: ", error);

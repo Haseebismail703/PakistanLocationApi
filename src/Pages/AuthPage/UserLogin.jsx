@@ -23,6 +23,7 @@ function UserLogin() {
       if (response.data.success) {
         message.success(response.data.message);
         localStorage.setItem("user", JSON.stringify(response.data?.data));
+        navigate('/user/dashboard');
         setFormData({ email: '', password: '' });
       }
     } catch (error) {
