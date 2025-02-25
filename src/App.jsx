@@ -1,60 +1,104 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './Pages/PublicPages/Home';
-import UserRegister from './Pages/AuthPage/UserRegister';
-import UserLogin from './Pages/AuthPage/UserLogin';
-import ManageAdmin from './Pages/AdminPage/ManageAdmin';
-import ManageCountry from './Pages/AdminPage/ManageCountry';
-import ManageProvince from './Pages/AdminPage/ManageProvince';
-import ManageDivision from './Pages/AdminPage/ManageDivision';
-import ManageCity from './Pages/AdminPage/ManageCity';
-import ManageDistrics from './Pages/AdminPage/ManageDistrics';
-import ManageArea from './Pages/AdminPage/ManageArea';
-import AdminDashboard from './Pages/AdminPage/AdminDashboard';
-import AdminSidebar from './Component/AdminCom/AdminSidebar'; 
-import AdminLogin from './Pages/AuthPage/AdminLogin';
-import UserSidebar from './Component/UserComp/UserSidebar'
-import UserForm from './Pages/PublicPages/UserForm'
-import Profile from './Pages/UserPages/Profile'
-import GenerateApiKey from './Pages/UserPages/ApiKey';
-import UserDashboard from './Pages/UserPages/UserDashboard';
-import UserContact from './Pages/UserPages/Contact';
+import React, { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Spin } from "antd";
+// Auth pages
+const Home = lazy(() => import("./Pages/PublicPages/Home"));
+const UserRegister = lazy(() => import("./Pages/AuthPage/UserRegister"));
+const UserLogin = lazy(() => import("./Pages/AuthPage/UserLogin"));
+const AdminLogin = lazy(() => import("./Pages/AuthPage/AdminLogin"));
+const UserForm = lazy(() => import("./Pages/PublicPages/UserForm"));
+const NotFound = lazy(() => import("./Pages/PublicPages/NotFound"));
+
+// Admin Pages
+const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
+const AdminDashboard = lazy(() => import("./Pages/AdminPage/AdminDashboard"));
+const ManageAdmin = lazy(() => import("./Pages/AdminPage/ManageAdmin"));
+const ManageCountry = lazy(() => import("./Pages/AdminPage/ManageCountry"));
+const ManageProvince = lazy(() => import("./Pages/AdminPage/ManageProvince"));
+const ManageDivision = lazy(() => import("./Pages/AdminPage/ManageDivision"));
+const ManageCity = lazy(() => import("./Pages/AdminPage/ManageCity"));
+const ManageDistrics = lazy(() => import("./Pages/AdminPage/ManageDistrics"));
+const ManageArea = lazy(() => import("./Pages/AdminPage/ManageArea"));
+
+// User Pages
+const UserSidebar = lazy(() => import("./Component/UserComp/UserSidebar"));
+const Profile = lazy(() => import("./Pages/UserPages/Profile"));
+const GenerateApiKey = lazy(() => import("./Pages/UserPages/ApiKey"));
+const UserDashboard = lazy(() => import("./Pages/UserPages/UserDashboard"));
+const UserContact = lazy(() => import("./Pages/UserPages/Contact"));
+
+// Authentication Check
+const isAdminAuthenticated = () => {
+  const admin = localStorage.getItem("admin");
+  return admin ? JSON.parse(admin) : null;
+};
+
+const isUserAuthenticated = () => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+};
+
+// Protected Routes
+const AdminProtectedRoute = ({ children }) => {
+  return isAdminAuthenticated() ? children : <Navigate to="/" />;
+};
+
+const UserProtectedRoute = ({ children }) => {
+  return isUserAuthenticated() ? children : <Navigate to="/login" />;
+};
+
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public Routes (No Layout) */}
-        <Route path="/" element={<Home />} />
-        <Route path="/register" element={<UserRegister />} />
-        <Route path="/login" element={<UserLogin />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/form" element={<UserForm />} />
+      <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}><Spin /></div>}>
+        <Routes>
+          {/* Public Routes (No Layout) */}
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<UserRegister />} />
+          <Route path="/login" element={<UserLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/form" element={<UserForm />} />
+          <Route path="*" element={<NotFound />} />
 
-        {/* Admin Routes (Wrapped in Layout) */}
-        <Route path="/admin/*" element={<AdminSidebar>
-          <Routes>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="manage-admin" element={<ManageAdmin />} />
-            <Route path="manage-country" element={<ManageCountry />} />
-            <Route path="manage-province" element={<ManageProvince />} />
-            <Route path="manage-division" element={<ManageDivision />} />
-            <Route path="manage-cities" element={<ManageCity />} />
-            <Route path="manage-district" element={<ManageDistrics />} />
-            <Route path="manage-area" element={<ManageArea />} />
-          </Routes>
-        </AdminSidebar>} />
+          {/* Admin Routes (Protected) */}
+          <Route
+            path="/admin/*"
+            element={
+              <AdminProtectedRoute>
+                <AdminSidebar>
+                  <Routes>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="manage-admin" element={<ManageAdmin />} />
+                    <Route path="manage-country" element={<ManageCountry />} />
+                    <Route path="manage-province" element={<ManageProvince />} />
+                    <Route path="manage-division" element={<ManageDivision />} />
+                    <Route path="manage-cities" element={<ManageCity />} />
+                    <Route path="manage-district" element={<ManageDistrics />} />
+                    <Route path="manage-area" element={<ManageArea />} />
+                  </Routes>
+                </AdminSidebar>
+              </AdminProtectedRoute>
+            }
+          />
 
-        <Route path="/user/*" element={<UserSidebar>
-          <Routes>
-            <Route path="profile" element={<Profile />} />
-            <Route path="api" element={<GenerateApiKey />} />
-            <Route path="dashboard" element={<UserDashboard />} />
-            <Route path="contact" element={<UserContact />} />
-
-          </Routes>
-        </UserSidebar>} />
-
-      </Routes>
+          {/* User Routes (Protected) */}
+          <Route
+            path="/user/*"
+            element={
+              <UserProtectedRoute>
+                <UserSidebar>
+                  <Routes>
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="api" element={<GenerateApiKey />} />
+                    <Route path="dashboard" element={<UserDashboard />} />
+                    <Route path="contact" element={<UserContact />} />
+                  </Routes>
+                </UserSidebar>
+              </UserProtectedRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
