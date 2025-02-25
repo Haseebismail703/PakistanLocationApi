@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Col, Row, Typography, Spin } from "antd";
 import { UserOutlined, TeamOutlined, BarChartOutlined } from "@ant-design/icons";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import api from '../../Api/api';
+
 const { Title, Text } = Typography;
 
 function Home() {
@@ -81,10 +82,10 @@ function Home() {
             ))}
           </Row>
 
-          {/* Graph Section */}
+          {/* Bar Chart Section */}
           <Row gutter={[24, 0]} style={{ marginTop: "20px" }}>
             <Col xs={24}>
-              <Card  className="chart-box">
+              <Card className="chart-box">
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={graphData}>
                     <XAxis dataKey="name" />

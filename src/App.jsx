@@ -13,9 +13,12 @@ import ManageArea from './Pages/AdminPage/ManageArea';
 import AdminDashboard from './Pages/AdminPage/AdminDashboard';
 import LayoutWrapper from './Component/AdminCom/WrapperLayout'; // Import LayoutWrapper
 import AdminLogin from './Pages/AuthPage/AdminLogin';
-import UserForm from  './Pages/PublicPages/UserForm'
+import UserSidebar from './Component/UserComp/UserSidebar'
+import UserForm from './Pages/PublicPages/UserForm'
 import Profile from './Pages/UserPages/Profile'
 import GenerateApiKey from './Pages/UserPages/ApiKey';
+import UserDashboard from './Pages/UserPages/UserDashboard';
+import UserContact from './Pages/UserPages/Contact';
 function App() {
   return (
     <BrowserRouter>
@@ -26,9 +29,9 @@ function App() {
         <Route path="/login" element={<UserLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/form" element={<UserForm />} />
-    
+
         {/* Admin Routes (Wrapped in Layout) */}
-        <Route path="/admin/*" element={<LayoutWrapper> 
+        <Route path="/admin/*" element={<LayoutWrapper>
           <Routes>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="manage-admin" element={<ManageAdmin />} />
@@ -38,11 +41,18 @@ function App() {
             <Route path="manage-cities" element={<ManageCity />} />
             <Route path="manage-district" element={<ManageDistrics />} />
             <Route path="manage-area" element={<ManageArea />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="api" element={<GenerateApiKey />} />
           </Routes>
         </LayoutWrapper>} />
-         
+
+        <Route path="/user/*" element={<UserSidebar>
+          <Routes>
+            <Route path="profile" element={<Profile />} />
+            <Route path="api" element={<GenerateApiKey />} />
+            <Route path="dashboard" element={<UserDashboard />} />
+            <Route path="contact" element={<UserContact />} />
+
+          </Routes>
+        </UserSidebar>} />
 
       </Routes>
     </BrowserRouter>
