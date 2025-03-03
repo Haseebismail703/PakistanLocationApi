@@ -1,5 +1,5 @@
 import React from "react";
-
+import logo from '../../assets/logo.png';
 function Footer() {
   return (
     <div>
@@ -11,7 +11,7 @@ function Footer() {
               className="flex items-center mb-4 sm:mb-0 space-x-3 rtl:space-x-reverse"
             >
               <img
-                src="https://cdn-icons-png.flaticon.com/512/8627/8627947.png"
+                src={logo}
                 className="h-8"
                 alt="Flowbite Logo"
               />

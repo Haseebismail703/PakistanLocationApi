@@ -335,6 +335,7 @@ const ManageAdmin = () => {
                     scroll={{ x: true }}
                     loading={tableLoader}
                     locale={{ emptyText: "No data available" }}
+                    
                 />
             </div>
         </>

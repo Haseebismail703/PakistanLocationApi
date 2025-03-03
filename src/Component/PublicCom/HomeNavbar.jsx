@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ThemContButton from "./ThemContButton";
-
+import logo from '../../assets/logo.png';
 const HomeNavbar = () => {
   const navigate = useNavigate();
 
@@ -63,7 +63,10 @@ const HomeNavbar = () => {
         </div>
 
         {/* Logo */}
-        <a className="btn btn-ghost normal-case text-xl">Pakistan Location API</a>
+        {/* <a className="btn btn-ghost normal-case text-xl">Pakistan Location API</a> */}
+        <div className="logo" style={{ marginRight: "20px" }}>
+        <img src={logo} alt="Logo" style={{ height: "50px" }} />
+      </div>
       </div>
 
       {/* Navbar Center (Desktop Menu) */}

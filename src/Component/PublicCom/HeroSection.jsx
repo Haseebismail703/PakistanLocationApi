@@ -11,7 +11,7 @@ function HeroSection() {
             <span className="text-blue-600">Location </span>
             Api
           </h2>
-          <p className=" mt-6 text-sm leading-relaxed max-sm:text-center">
+          <p className="mt-6 text-sm leading-relaxed max-sm:text-center">
           Our Pakistan Location API provides precise and comprehensive location data for users across Pakistan. Whether you need details about cities, provinces,  our API ensures fast, reliable, and up-to-date results. Easily integrate our service to access accurate area-based information, making location-based applications seamless and efficient.
           </p>
           {/* <div className="grid sm:grid-cols-3 gap-6 items-center mt-12">
