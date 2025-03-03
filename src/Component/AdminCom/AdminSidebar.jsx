@@ -88,6 +88,16 @@ const AdminSidebar = ({ children }) => {
       label: <Link to="/admin/manage-district">Manage District</Link>,
     },
     {
+      key: "manage-cities",
+      icon: <ApartmentOutlined />,
+      label: <Link to="/admin/manage-cities">Manage Cities</Link>,
+    },
+    {
+      key: "manage-area",
+      icon: <ClusterOutlined />,
+      label: <Link to="/admin/manage-area">Manage Area</Link>,
+    },
+    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
