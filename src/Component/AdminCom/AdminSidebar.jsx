@@ -15,6 +15,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import api from "../../Api/api";
+import logo from "../../assets/logo.png"; // Import your logo here
 
 const { Header, Sider, Content } = Layout;
 
@@ -87,16 +88,6 @@ const AdminSidebar = ({ children }) => {
       label: <Link to="/admin/manage-district">Manage District</Link>,
     },
     {
-      key: "manage-cities",
-      icon: <ApartmentOutlined />,
-      label: <Link to="/admin/manage-cities">Manage Cities</Link>,
-    },
-    {
-      key: "manage-area",
-      icon: <ClusterOutlined />,
-      label: <Link to="/admin/manage-area">Manage Area</Link>,
-    },
-    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
@@ -131,11 +122,19 @@ const AdminSidebar = ({ children }) => {
       >
         <div style={{ textAlign: "center", padding: "20px" }}>
           {!collapsed && (
-            <p style={{ color: "#fff", marginTop: "10px", fontSize: "20px", fontWeight: "bold" }}>
-              Admin panel
-            </p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ width: "50px", height: "auto", marginRight: "15px" }}
+              />
+              <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+                Admin Panel
+              </p>
+            </div>
           )}
         </div>
+
         <Menu
           theme="dark"
           mode="inline"
@@ -166,9 +165,19 @@ const AdminSidebar = ({ children }) => {
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Switch checked={darkMode} onChange={handleDarkModeToggle} checkedChildren="Dark" unCheckedChildren="Light" style={{ marginRight: 40 }} />
+            <Switch
+              checked={darkMode}
+              onChange={handleDarkModeToggle}
+              checkedChildren="Dark"
+              unCheckedChildren="Light"
+              style={{ marginRight: 40 }}
+            />
             <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
-              <Avatar size={40} icon={<UserOutlined />} style={{ cursor: "pointer", backgroundColor: "#000", color: "#fff", marginLeft: "10px" }} />
+              <Avatar
+                size={40}
+                icon={<UserOutlined />}
+                style={{ cursor: "pointer", backgroundColor: "#000", color: "#fff", marginLeft: "10px" }}
+              />
             </Dropdown>
           </div>
         </Header>

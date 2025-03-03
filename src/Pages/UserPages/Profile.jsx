@@ -1,21 +1,22 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { Input, Button, Card, Form, message, Typography } from "antd";
 import axios from "axios";
 import api from '../../Api/api.js'
 const { Title } = Typography;
-
+import { UserContext } from "../../Context/UserContext";
 const ProfilePage = () => {
   const [form] = Form.useForm();
+  const { user, loading } = useContext(UserContext);
   const [activeTab, setActiveTab] = useState("profile");
-  const [name, setName] = useState("John Doe");
-  const [email] = useState("johndoe@example.com");
-  const user = JSON.parse(localStorage.getItem("user")); 
+  const [name, setName] = useState(user.data?.name);
+  const getuser = JSON.parse(localStorage.getItem("user")); 
+  
   // Function to update name via API
   const handleUpdateName = async () => {
     try {
      let res = await axios.put(`${api}/users/update`, { name },{
         headers: {
-          Authorization: `Bearer ${user.accessToken}`,
+          Authorization: `Bearer ${getuser.accessToken}`,
         },
       });
       // console.log(res.data)
@@ -31,7 +32,7 @@ const handleChangePassword = async (values) => {
     try {
         await axios.put(`${api}/users/change-password`, values, {
             headers: {
-                Authorization: `Bearer ${user.accessToken}`,
+                Authorization: `Bearer ${getuser.accessToken}`,
             },
         });
         message.success("Password changed successfully!");
@@ -71,7 +72,7 @@ const handleChangePassword = async (values) => {
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
               </Form.Item>
               <Form.Item label="Email">
-                <Input value={email} disabled />
+                <Input value={user.data?.email} disabled />
               </Form.Item>
               <Button type="primary" onClick={handleUpdateName} block>
                 Update Name

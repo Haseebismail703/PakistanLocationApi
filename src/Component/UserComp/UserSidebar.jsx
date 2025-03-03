@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import api from "../../Api/api";
-
+import logo from "../../assets/logo.png";
 const { Header, Sider, Content } = Layout;
 
 const UserSidebar = ({ children }) => {
@@ -112,13 +112,24 @@ const UserSidebar = ({ children }) => {
           left: 0,
         }}
       >
-        <div style={{ textAlign: "center", padding: "20px" }}>
-          {!collapsed && (
-            <p style={{ color: "#fff", marginTop: "10px", fontSize: "20px", fontWeight: "bold" }}>
-              WELCOME {user?.user?.name}
-            </p>
-          )}
-        </div>
+
+
+         <div style={{ textAlign: "center", padding: "20px" }}>
+                 {!collapsed && (
+                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                     <img
+                       src={logo}
+                       alt="Logo"
+                       style={{ width: "50px", height: "auto", marginRight: "10px" }}
+                     />
+                     <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+                       User dashboard
+                     </p>
+                   </div>
+                 )}
+               </div>
+
+
 
         <Menu
           theme="dark"

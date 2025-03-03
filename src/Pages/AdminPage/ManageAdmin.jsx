@@ -10,14 +10,14 @@ const ManageAdmin = () => {
         email: "admin@gmail.com",
         role: "admin",
         permission: [
-            "manage-permissions",
-            "manage-admins",
-            "manage-users",
+            // "manage-permissions",
+            // "manage-admins",
+            // "manage-users",
             "create-operations",
             "read-operations",
             "update-operations",
             "delete-operations",
-            "no-permissions"
+            // "no-permissions"
         ]
     }
     const [isModalVisible, setIsModalVisible] = useState(false);
