@@ -1,13 +1,19 @@
 import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Spin } from "antd";
+
 // Auth pages
-const Home = lazy(() => import("./Pages/PublicPages/Home"));
 const UserRegister = lazy(() => import("./Pages/AuthPage/UserRegister"));
 const UserLogin = lazy(() => import("./Pages/AuthPage/UserLogin"));
 const AdminLogin = lazy(() => import("./Pages/AuthPage/AdminLogin"));
+
+
+// public pages 
+const Home = lazy(() => import("./Pages/PublicPages/Home"));
 const UserForm = lazy(() => import("./Pages/PublicPages/UserForm"));
 const NotFound = lazy(() => import("./Pages/PublicPages/NotFound"));
+const ForgotPassword = lazy(() => import("./Pages/PublicPages/ForgotPassword"));
+
 
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
@@ -59,7 +65,7 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/form" element={<UserForm />} />
           <Route path="*" element={<NotFound />} />
-
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* Admin Routes (Protected) */}
           <Route
             path="/admin/*"
