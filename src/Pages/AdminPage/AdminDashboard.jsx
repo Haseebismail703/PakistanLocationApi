@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Card, Col, Row, Typography, Spin } from "antd";
 import { UsergroupAddOutlined, UserSwitchOutlined, IdcardOutlined, CrownOutlined } from "@ant-design/icons";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import api from '../../Api/api';
+import adminInterceptor from "../../Api/adminInterceptor";
 
 const { Title, Text } = Typography;
 
@@ -21,12 +20,8 @@ function Home() {
     const fetchAdminsData = async () => {
       try {
         const [adminsResponse, usersResponse] = await Promise.all([
-          axios.get(`${api}/admins/get-admins`, {
-            headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-          }),
-          axios.get(`${api}/admins/get-users`, {
-            headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-          }),
+          adminInterceptor.get(`/admins/get-admins`),
+          adminInterceptor.get(`/admins/get-users`),
         ]);
 
         const user = usersResponse.data.data;

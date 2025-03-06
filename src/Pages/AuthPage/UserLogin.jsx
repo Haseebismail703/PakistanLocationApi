@@ -22,7 +22,9 @@ function UserLogin() {
 
       if (response.data.success) {
         message.success(response.data.message);
-        localStorage.setItem("user", JSON.stringify(response.data?.data));
+        localStorage.setItem("user", JSON.stringify(response.data.data?.user));
+        localStorage.setItem('accessToken', response.data.data?.accessToken);
+        localStorage.setItem('refreshToken', response.data.data?.refreshToken);
         navigate('/user/dashboard');
         setFormData({ email: '', password: '' });
       }

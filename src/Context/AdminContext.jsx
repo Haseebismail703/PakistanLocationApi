@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
-import api from "../Api/api.js";
+import adminInterceptor from "../Api/adminInterceptor";
 
 export const AdminContext = createContext();
 
@@ -11,13 +10,7 @@ const AdminProvider = ({ children }) => {
     useEffect(() => {
         const fetchAdmin = async () => {
             try {
-                const response = await axios.get(`${api}/admins/profile`, {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getAdmin?.accessToken}`,
-                    },
-                });
+                const response = await adminInterceptor.get(`/admins/profile`);
                 setAdmin(response.data);
                 // console.log(response.data)
             } catch (error) {

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button, Card, Input, message, Typography, Space } from "antd";
 import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import axios from "axios";
-import api from "../../Api/api.js";
-
+// import api from "../../Api/api.js";
+import userInterceptor from "../../Api/userInterceptor.js";
 const { Title, Text } = Typography;
 
 const GenerateApiKey = () => {
@@ -16,11 +16,7 @@ const GenerateApiKey = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     try {
       setLoading(true);
-      const res = await axios.get(`${api}/users/profile`, {
-        headers: {
-          Authorization: `Bearer ${user.accessToken}`,
-        },
-      });
+      const res = await userInterceptor.get(`/users/profile`);
 
       if (res?.data?.data?.apiKey) {
         setApiKey(res.data.data.apiKey);
@@ -43,11 +39,7 @@ const GenerateApiKey = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     try {
       setLoading(true);
-      const res = await axios.get(`${api}/users/generate-api-key`, {
-        headers: {
-          Authorization: `Bearer ${user.accessToken}`,
-        },
-      });
+      const res = await userInterceptor.get(`/users/generate-api-key`);
 
       if (res) {
         message.success(res.data?.message);

@@ -10,7 +10,6 @@ const AdminLogin = () => {
 
     const onFinish = async (values) => {
         console.log("values: ", values);
-
         setLoading(true);
         try {
             const response = await axios.post(`${api}/admins/login`,
@@ -20,13 +19,15 @@ const AdminLogin = () => {
                 },
             );
 
-            localStorage.setItem("admin", JSON.stringify(response.data?.data));
+            localStorage.setItem("admin", JSON.stringify(response.data.data?.admin));
+            localStorage.setItem('accessToken', response.data.data?.accessToken);
+            localStorage.setItem('refreshToken', response.data.data?.refreshToken);
             message.success("Login successful!");
             form.resetFields();
 
 
 
-              navigate("/admin/dashboard");
+            navigate("/admin/dashboard");
         } catch (error) {
             message.error(error.response?.data?.message || "Login failed!");
         }

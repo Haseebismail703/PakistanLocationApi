@@ -10,8 +10,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
-import axios from "axios";
-import api from "../../Api/api";
+import userInterceptor from "../../Api/userInterceptor";
 import logo from "../../assets/logo.png";
 const { Header, Sider, Content } = Layout;
 
@@ -20,8 +19,6 @@ const UserSidebar = ({ children }) => {
   const location = useLocation();
   const [selectedKey, setSelectedKey] = useState("dashboard");
   const navigate = useNavigate();
-  const storeUser = localStorage.getItem("user");
-  const user = storeUser ? JSON.parse(storeUser) : null;
 
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
@@ -30,7 +27,7 @@ const UserSidebar = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.get(`${api}/users/logout`, {
+      await userInterceptor.get(`/users/logout`, {
         withCredentials: true,
       });
       localStorage.removeItem("user");

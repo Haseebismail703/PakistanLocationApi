@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
-import api from "../Api/api.js";
+import userInterceptor from "../Api/userInterceptor.js";
 
 export const UserContext = createContext();
 
@@ -11,12 +10,8 @@ const UserProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`${api}/users/profile`, {
+                const response = await userInterceptor.get(`/users/profile`, {
                     withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getUser?.accessToken}`,
-                    },
                 });
                 setUser(response.data);
                 // console.log(response.data)
