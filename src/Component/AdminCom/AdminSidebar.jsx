@@ -13,8 +13,7 @@ import {
   EnvironmentOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import axios from "axios";
-import api from "../../Api/api";
+import adminInterceptor from "../../Api/adminInterceptor";
 import logo from "../../assets/logo.png"; // Import your logo here
 
 const { Header, Sider, Content } = Layout;
@@ -27,8 +26,7 @@ const AdminSidebar = ({ children }) => {
   );
   const location = useLocation();
   const navigate = useNavigate();
-  const storeUser = localStorage.getItem("user");
-  const user = storeUser ? JSON.parse(storeUser) : null;
+
 
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
@@ -38,7 +36,7 @@ const AdminSidebar = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.get(`${api}/admins/logout`, { withCredentials: true });
+      await adminInterceptor.get(`/admins/logout`, { withCredentials: true });
       localStorage.removeItem("user");
       document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";

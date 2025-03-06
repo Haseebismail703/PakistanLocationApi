@@ -12,7 +12,7 @@ const AdminProvider = ({ children }) => {
             try {
                 const response = await adminInterceptor.get(`/admins/profile`);
                 setAdmin(response.data);
-                // console.log(response.data)
+                console.log(response.data)
             } catch (error) {
                 console.error("Failed to fetch Admin", error);
             } finally {

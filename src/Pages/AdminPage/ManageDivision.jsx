@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import api from "../../Api/api";
-import axios from "axios";
+import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
@@ -35,9 +34,7 @@ const ManageDivision = () => {
 
     const getProvince = async () => {
         try {
-            const response = await axios.get(`${api}/admins/provinces`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/provinces`);
             console.log(response.data?.data);
             setprovince(response.data?.data);
         } catch (error) {
@@ -48,9 +45,7 @@ const ManageDivision = () => {
     const getAlldivisions = async () => {
         setTableLoading(true)
         try {
-            const response = await axios.get(`${api}/admins/divisions`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/divisions`);
             const divisionsData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -83,9 +78,7 @@ const ManageDivision = () => {
         formData.append("provinceId", values.provinceId);
 
         try {
-            const response = await axios.post(`${api}/admins/divisions/create`, formData, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.post(`/admins/divisions/create`, formData);
 
             if (response.status === 201) {
                 message.success("Division added successfully!");
@@ -105,10 +98,10 @@ const ManageDivision = () => {
         if (!selectdivision) return;
         setLoading(true);
         try {
-            const response = await axios.put(
-                `${api}/admins/divisions/update-details/${selectdivision.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/divisions/update-details/${selectdivision.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+              
             );
 
             if (response.status === 200) {
@@ -138,10 +131,10 @@ const ManageDivision = () => {
         }
 
         try {
-            const response = await axios.put(
-                `${api}/admins/divisions/add-pictures/${selectdivision.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/divisions/add-pictures/${selectdivision.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+              
             );
 
             if (response.data) {
@@ -160,12 +153,9 @@ const ManageDivision = () => {
 
     const handleDelete = async (item) => {
         try {
-            const response = await axios.put(
-                `${api}/admins/divisions/delete-pictures/${selectdivision.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/divisions/delete-pictures/${selectdivision.id}`,
                 { picturesToDelete: [item] },
-                {
-                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-                }
             );
     
             if (response.status === 200) {

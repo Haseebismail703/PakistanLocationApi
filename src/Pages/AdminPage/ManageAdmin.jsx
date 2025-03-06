@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Input, Table, Switch, Select, message } from "antd";
-import axios from "axios";
-import api from '../../Api/api.js'
+import adminInterceptor from "../../Api/adminInterceptor.js";
 import usePermission from '../../Hooks/usePermission.js'
+
 const ManageAdmin = () => {
     const getUser = {
         _id: "67b2f10457c5b0f20e561417",
@@ -23,7 +23,7 @@ const ManageAdmin = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
     const [users, setUsers] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedAdmin, setSelectedAdmin] = useState(null);
     const [tableLoader, setTableLoader] = useState(false)
     const [form] = Form.useForm();
     const [updateForm] = Form.useForm();
@@ -35,7 +35,6 @@ const ManageAdmin = () => {
     const create = usePermission("create-operations")
     const read = usePermission("read-operations")
     const update = usePermission('update-operations')
-    const deleteOperation = usePermission('')
 
 
     const showModal = () => {
@@ -44,17 +43,9 @@ const ManageAdmin = () => {
 
     const handleSubmit = async (values) => {
         try {
-            const response = await axios.post(
-                `${api}/admins/register`,
-                values,
-                { withCredentials: true },
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        "Authorization": `Bearer ${getAdmin?.accessToken}`,
-                    },
-                }
-            );
+            const response = await adminInterceptor.post(
+                `/admins/register`,
+                values,);
 
             if (response.data) {
                 message.success(response?.data?.message);
@@ -72,16 +63,12 @@ const ManageAdmin = () => {
     const fetchAdmins = async () => {
         setTableLoader(true);
         try {
-            const response = await axios.get(`${api}/admins/get-admins`, {
-                headers: {
-                    "Authorization": `Bearer ${getAdmin?.accessToken}`,
-                },
-            });
+            const response = await adminInterceptor.get(`/admins/get-admins`);
 
             let admins = response.data?.data || [];
 
             // 🔥 Sirf woh admins rakhna jo logged-in admin na ho
-            admins = admins.filter(record => record._id !== getAdmin.admin?._id);
+            admins = admins.filter(record => record._id !== getAdmin?._id);
 
             admins = admins.map((record, index) => ({
                 key: record._id || index.toString(),
@@ -113,7 +100,7 @@ const ManageAdmin = () => {
 
     // Open modal for updating user permissions
     const showUpdateModal = (user) => {
-        setSelectedUser(user);
+        setSelectedAdmin(user);
         updateForm.setFieldsValue({ permissions: user.permissions || [] });
         setIsUpdateModalVisible(true);
     };
@@ -121,13 +108,11 @@ const ManageAdmin = () => {
     // Handle form submission for updating permissions
     const handleUpdateSubmit = async (values) => {
         console.log("Selected Permissions:", values.permissions);
-        if (!selectedUser) return message.error("No admin selected")
-
+        if (!selectedAdmin) return message.error("No admin selected")
+ 
         try {
-
-            const response = await axios.put(`${api}/admins/update-permissions/${selectedUser.key}`,
-                { permissions: values.permissions },
-                { withCredentials: true })
+            const response = await adminInterceptor.put(`/admins/update-permissions/${selectedAdmin.key}`,
+                { permissions: values.permissions })
             console.log("response: ", response);
 
             message.success(response?.data?.message);
@@ -135,7 +120,7 @@ const ManageAdmin = () => {
             // **State Update for Immediate UI Change**
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                    user.key === selectedUser.key ? { ...user, permissions: values.permissions } : user
+                    user.key === selectedAdmin.key ? { ...user, permissions: values.permissions } : user
                 )
             );
 
@@ -157,11 +142,9 @@ const ManageAdmin = () => {
         try {
             const newStatus = item.status === "active" ? "inactive" : "active";
 
-            const response = await axios.put(`${api}/admins/update-status/${item.key}`,
-                { status: newStatus },
-                {
-                    headers: { "Authorization": `Bearer ${getAdmin?.accessToken}` },
-                }
+            const response = await adminInterceptor.put(`/admins/update-status/${item.key}`,
+                { status: newStatus }
+                
             );
 
             if (response.data) {

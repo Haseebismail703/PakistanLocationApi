@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import api from "../../Api/api";
-import axios from "axios";
+import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
@@ -35,9 +34,7 @@ const ManageProvince = () => {
 
     const getCountries = async () => {
         try {
-            const response = await axios.get(`${api}/admins/country`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/country`);
             setCountries(response.data?.data);
         } catch (error) {
             message.error("Failed to fetch countries!");
@@ -47,9 +44,7 @@ const ManageProvince = () => {
     const getAllProvinces = async () => {
         setTableLoading(true);
         try {
-            const response = await axios.get(`${api}/admins/provinces`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/provinces`);
             const provincesData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -82,9 +77,7 @@ const ManageProvince = () => {
         formData.append("countryId", values.countryId);
 
         try {
-            const response = await axios.post(`${api}/admins/provinces/create`, formData, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.post(`/admins/provinces/create`, formData);
 
             if (response.status === 201) {
                 message.success("Province added successfully!");
@@ -105,10 +98,10 @@ const ManageProvince = () => {
 
         setLoading(true);
         try {
-            const response = await axios.put(
-                `${api}/admins/provinces/update-details/${selectedProvince.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/provinces/update-details/${selectedProvince.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+               
             );
 
             if (response.status === 200) {
@@ -138,10 +131,10 @@ const ManageProvince = () => {
         }
 
         try {
-            const response = await axios.put(
-                `${api}/admins/provinces/add-pictures/${selectedProvince.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/provinces/add-pictures/${selectedProvince.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+               
             );
 
             if (response.data) {
@@ -160,12 +153,9 @@ const ManageProvince = () => {
 
     const handleDelete = async (item) => {
         try {
-            const response = await axios.put(
-                `${api}/admins/provinces/delete-pictures/${selectedProvince.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/provinces/delete-pictures/${selectedProvince.id}`,
                 { picturesToDelete: [item] },
-                {
-                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-                }
             );
 
             if (response.status === 200) {

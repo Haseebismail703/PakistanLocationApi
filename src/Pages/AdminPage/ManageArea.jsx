@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import api from "../../Api/api";
-import axios from "axios";
+import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
@@ -37,9 +36,7 @@ const ManageArea = () => {
 
     const getCity = async () => {
         try {
-            const response = await axios.get(`${api}/admins/cities`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/cities`);
             setCity(response.data?.data);
         } catch (error) {
             message.error("Failed to fetch divisions!");
@@ -49,9 +46,7 @@ const ManageArea = () => {
     const getAllArea = async () => {
         setTableLoading(true);
         try {
-            const response = await axios.get(`${api}/admins/areas`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/areas`);
             const areaData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -84,9 +79,7 @@ const ManageArea = () => {
         formData.append("cityId", values.cityId);
 
         try {
-            const response = await axios.post(`${api}/admins/areas/create`, formData, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.post(`/admins/areas/create`, formData);
 
             if (response.status === 201) {
                 message.success("Area added successfully!");
@@ -106,10 +99,10 @@ const ManageArea = () => {
         if (!selectArea) return;
         setLoading(true);
         try {
-            const response = await axios.put(
-                `${api}/admins/areas/update-details/${selectArea.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/areas/update-details/${selectArea.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+                
             );
             if (response.status === 200) {
                 message.success("Area updated successfully!");
@@ -138,10 +131,10 @@ const ManageArea = () => {
         }
 
         try {
-            const response = await axios.put(
-                `${api}/admins/areas/add-pictures/${selectArea.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/areas/add-pictures/${selectArea.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+                
             );
 
             if (response.data) {
@@ -162,12 +155,10 @@ const ManageArea = () => {
         if (!selectArea) return;
         setDeleteLoading(true);
         try {
-            const response = await axios.put(
-                `${api}/admins/areas/delete-pictures/${selectArea.id}`,
-                { picturesToDelete: [item] },
-                {
-                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-                }
+            const response = await adminInterceptor.put(
+                `/admins/areas/delete-pictures/${selectArea.id}`,
+                { picturesToDelete: [item] }
+                
             );
 
             if (response.status === 200) {

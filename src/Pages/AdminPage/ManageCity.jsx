@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import api from "../../Api/api";
-import axios from "axios";
+import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
 const { TextArea } = Input;
@@ -37,9 +36,7 @@ const ManageCity = () => {
 
     const getDistricts = async () => {
         try {
-            const response = await axios.get(`${api}/admins/districts`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/districts`);
             // console.log(response.data?.data);
             setDistricts(response.data?.data);
         } catch (error) {
@@ -50,9 +47,7 @@ const ManageCity = () => {
     const getAllCities = async () => {
         setTableLoading(true)
         try {
-            const response = await axios.get(`${api}/admins/cities`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.get(`/admins/cities`);
             const cityData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -87,9 +82,7 @@ const ManageCity = () => {
         formData.append("areaType", values.areaType);
 
         try {
-            const response = await axios.post(`${api}/admins/cities/create`, formData, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.post(`/admins/cities/create`, formData);
 
             if (response.status === 201) {
                 message.success("Cties added successfully!");
@@ -109,10 +102,10 @@ const ManageCity = () => {
         if (!selectCity) return;
         setLoading(true);
         try {
-            const response = await axios.put(
-                `${api}/admins/cities/update-details/${selectCity.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/cities/update-details/${selectCity.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+               
             );
 
             if (response.status === 200) {
@@ -139,10 +132,10 @@ const ManageCity = () => {
             });
         }
         try {
-            const response = await axios.put(
-                `${api}/admins/cities/add-pictures/${selectCity.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/cities/add-pictures/${selectCity.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+               
             );
 
             if (response.data) {
@@ -161,12 +154,10 @@ const ManageCity = () => {
 
     const handleDelete = async (item) => {
         try {
-            const response = await axios.put(
-                `${api}/admins/cities/delete-pictures/${selectCity.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/cities/delete-pictures/${selectCity.id}`,
                 { picturesToDelete: [item] },
-                {
-                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-                }
+                
             );
 
             if (response.status === 200) {
@@ -217,9 +208,7 @@ const ManageCity = () => {
         if (!selectCity) return;
         setLoading(true);
         try {
-            const response = await axios.put(`${api}/admins/cities/update-area-type/${selectCity.id}`, { areaType: values.areaType }, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.put(`/admins/cities/update-area-type/${selectCity.id}`, { areaType: values.areaType });
             if (response.status === 200) {
                 message.success("Area Type updated successfully!");
                 setAreaTypeModalVisible(false);
