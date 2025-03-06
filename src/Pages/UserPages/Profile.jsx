@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Input, Button, Card, Form, message, Typography } from "antd";
+import { Input, Button, Card, Form, message, Typography,Spin } from "antd";
 import userInterceptor from "../../Api/userInterceptor.js";
 import { UserContext } from "../../Context/UserContext";
 
@@ -9,9 +9,12 @@ const ProfilePage = () => {
   const [form] = Form.useForm();
   const { user } = useContext(UserContext);
   const [activeTab, setActiveTab] = useState("profile");
-  const [name, setName] = useState(user.data?.name);
+  const [name, setName] = useState(user?.data?.name || "");
 
-  // Name update function
+  if (!user) {
+    return <div style={{display : "flex" , justifyContent : "center"}}><Spin size="large" /></div>;
+  }
+
   const handleUpdateName = async () => {
     try {
       const res = await userInterceptor.put(`/users/update`, { name });
@@ -22,7 +25,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Change password function
   const handleChangePassword = async (values) => {
     try {
       const res = await userInterceptor.put(`/users/change-password`, values);
