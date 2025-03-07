@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
-import api from "../../Api/api";
-import axios from "axios";
+import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 const { TextArea } = Input;
 const { Option } = Select;
@@ -21,7 +20,6 @@ const ManageCountry = () => {
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
-    const getAdmin = JSON.parse(localStorage.getItem("admin"));
 
     let canRead = usePermission("read-operations")
     let canCreate = usePermission("create-operations")
@@ -32,22 +30,23 @@ const ManageCountry = () => {
     useEffect(() => {
         getAllCountry();
     }, []);
+    
     const getAllCountry = async () => {
         setTableLoading(true);
         try {
-            const response = await axios.get(`${api}/admins/country`, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
-            // console.log(response)
-            const countryData = response.data?.data?.map((data, index) => ({
-                key: index + 1,
-                id: data._id,
-                name: data.name,
-                createdAt: data.createdAt?.substring(0, 10),
-                pictures: data.pictures,
-                details: data.details,
-            }));
-            setCountry(countryData);
+            const response = await adminInterceptor.get(`/admins/country`);
+
+                const countryData = [{
+                    key: 1,
+                    id: response.data.data._id || "",
+                    name: response.data.data.name || "N/A",
+                    createdAt: response.data.data.createdAt ? response.data.data.createdAt.substring(0, 10) : "N/A",
+                    pictures: response.data.data.pictures || [],
+                    details: response.data.data.details || "No details available",
+                }];
+
+                setCountry(countryData);
+
         } catch (error) {
             message.error("Failed to fetch country!");
         } finally {
@@ -69,9 +68,7 @@ const ManageCountry = () => {
         formData.append("details", values.details);
 
         try {
-            const response = await axios.post(`${api}/admins/country/create`, formData, {
-                headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-            });
+            const response = await adminInterceptor.post(`/admins/country/create`, formData);
 
             if (response.status === 201) {
                 message.success("country added successfully!");
@@ -91,10 +88,10 @@ const ManageCountry = () => {
         if (!selectCountry) return;
         setLoading(true);
         try {
-            const response = await axios.put(
-                `${api}/admins/country/update-details/${selectCountry.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/country/update-details/${selectCountry.id}`,
                 { name: values.name, details: values.details },
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+               
             );
             if (response.status === 200) {
                 message.success("Country details updated successfully!");
@@ -122,10 +119,10 @@ const ManageCountry = () => {
             });
         }
         try {
-            const response = await axios.put(
-                `${api}/admins/country/add-pictures/${selectCountry.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/country/add-pictures/${selectCountry.id}`,
                 formData,
-                { headers: { Authorization: `Bearer ${getAdmin?.accessToken}` } }
+               
             );
 
             if (response.data) {
@@ -144,12 +141,9 @@ const ManageCountry = () => {
 
     const handleDelete = async (item) => {
         try {
-            const response = await axios.put(
-                `${api}/admins/country/delete-pictures/${selectCountry.id}`,
+            const response = await adminInterceptor.put(
+                `/admins/country/delete-pictures/${selectCountry.id}`,
                 { picturesToDelete: [item] },
-                {
-                    headers: { Authorization: `Bearer ${getAdmin?.accessToken}` },
-                }
             );
 
             if (response.status === 200) {
@@ -168,11 +162,11 @@ const ManageCountry = () => {
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
         {
-            title: "Actions", 
-            key: "action", 
-            render: (_, record) => ( 
+            title: "Actions",
+            key: "action",
+            render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
-                    <Button disabled={canRead ? false : true}  icon={<EyeOutlined />} onClick={() => { setselectCountry(record); setViewModalVisible(true); }}>View</Button>
+                    <Button disabled={canRead ? false : true} icon={<EyeOutlined />} onClick={() => { setselectCountry(record); setViewModalVisible(true); }}>View</Button>
                     <Button disabled={canUpdate ? false : true} icon={<EditOutlined />} onClick={() => { setselectCountry(record); setUpdateDetailsModalVisible(true); updateDetailsForm.setFieldsValue({ name: record.name, details: record.details }); }}>Update Details</Button>
                     <Button disabled={canUpdate ? false : true} icon={<PlusOutlined />} onClick={() => { setselectCountry(record); setUpdateImagesModalVisible(true); }}>Add Images</Button>
                     <Button disabled={canDelete ? false : true} icon={<DeleteOutlined />} danger onClick={() => { setselectCountry(record); setDeleteImagesModalVisible(true); }}>
@@ -182,7 +176,7 @@ const ManageCountry = () => {
             ),
         },
     ];
-     
+
 
     return (
         <>

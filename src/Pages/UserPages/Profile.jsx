@@ -9,7 +9,7 @@ const ProfilePage = () => {
   const [form] = Form.useForm();
   const { user } = useContext(UserContext);
   const [activeTab, setActiveTab] = useState("profile");
-  const [name, setName] = useState(user?.data?.name || "");
+  const [name, setName] = useState("");
 
   if (!user) {
     return <div style={{display : "flex" , justifyContent : "center"}}><Spin size="large" /></div>;
@@ -63,7 +63,7 @@ const ProfilePage = () => {
             <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
             <Form layout="vertical">
               <Form.Item label="Name">
-                <Input value={name} onChange={(e) => setName(e.target.value)} />
+                <Input value={user?.data?.name || ""} onChange={(e) => setName(e.target.value)} />
               </Form.Item>
               <Form.Item label="Email">
                 <Input value={user.data?.email} disabled />
