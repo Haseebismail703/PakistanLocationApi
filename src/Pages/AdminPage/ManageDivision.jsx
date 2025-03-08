@@ -45,7 +45,7 @@ const ManageDivision = () => {
     const getAlldivisions = async () => {
         setTableLoading(true)
         try {
-            const response = await adminInterceptor.get(`/admins/divisions`);
+            const response = await adminInterceptor.get(`/admins/divisions?limit=0`);
             const divisionsData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -55,6 +55,7 @@ const ManageDivision = () => {
                 details: data.details,
                 countryId: data.countryId,
             }));
+            console.log(response.data?.data);
             setdivisions(divisionsData);
         } catch (error) {
             message.error("Failed to fetch divisions!");

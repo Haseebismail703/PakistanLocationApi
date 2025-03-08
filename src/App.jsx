@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Spin } from "antd";
-
+import DivisionTable from "./Pages/PublicPages/Tab";
 // Auth pages
 const UserRegister = lazy(() => import("./Pages/AuthPage/UserRegister"));
 const UserLogin = lazy(() => import("./Pages/AuthPage/UserLogin"));
@@ -66,6 +66,7 @@ function App() {
           <Route path="/form" element={<UserForm />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/table" element={<DivisionTable />} />
           {/* Admin Routes (Protected) */}
           <Route
             path="/admin/*"

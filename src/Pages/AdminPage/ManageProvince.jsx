@@ -14,8 +14,8 @@ const ManageProvince = () => {
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [provinces, setProvinces] = useState([]);
     const [selectedProvince, setSelectedProvince] = useState(null);
-    const [countries, setCountries] = useState('');
-    const [fileList,setFileList] = useState([])
+    const [countries, setCountries] = useState("");
+    const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [form] = Form.useForm();
@@ -28,14 +28,16 @@ const ManageProvince = () => {
     let canUpdate = usePermission("update-operations")
     let canDelete = usePermission("delete-operations")
     useEffect(() => {
-        getCountries();
+        // getCountries();
         getAllProvinces();
     }, []);
 
     const getCountries = async () => {
         try {
-            const response = await adminInterceptor.get(`/admins/country`);
+            const response = await adminInterceptor.get(`/admins/country?limit=0`);
+            
             setCountries(response.data?.data);
+
         } catch (error) {
             message.error("Failed to fetch countries!");
         }
@@ -76,6 +78,7 @@ const ManageProvince = () => {
         formData.append("details", values.details);
         formData.append("countryId", values.countryId);
 
+
         try {
             const response = await adminInterceptor.post(`/admins/provinces/create`, formData);
 
@@ -83,6 +86,9 @@ const ManageProvince = () => {
                 message.success("Province added successfully!");
                 setCreateModalVisible(false);
                 getAllProvinces();
+                form.resetFields()
+                setFileList([])
+                
             } else {
                 message.error("Failed to add province!");
             }
@@ -101,7 +107,7 @@ const ManageProvince = () => {
             const response = await adminInterceptor.put(
                 `/admins/provinces/update-details/${selectedProvince.id}`,
                 { name: values.name, details: values.details },
-               
+              
             );
 
             if (response.status === 200) {
@@ -134,7 +140,7 @@ const ManageProvince = () => {
             const response = await adminInterceptor.put(
                 `/admins/provinces/add-pictures/${selectedProvince.id}`,
                 formData,
-               
+              
             );
 
             if (response.data) {
@@ -156,6 +162,7 @@ const ManageProvince = () => {
             const response = await adminInterceptor.put(
                 `/admins/provinces/delete-pictures/${selectedProvince.id}`,
                 { picturesToDelete: [item] },
+                
             );
 
             if (response.status === 200) {
@@ -172,7 +179,8 @@ const ManageProvince = () => {
 
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name",
+        {
+            title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
                 <>
                     <span>{canRead ? record.name : "_"}</span>
@@ -200,7 +208,7 @@ const ManageProvince = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Provinces</h1></center>
                 <Button disabled={canCreate ? false : true} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Province</Button>
-                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
+                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
             </div>
 
             {/* Create Province Modal */}
@@ -218,9 +226,8 @@ const ManageProvince = () => {
                         <TextArea rows={4} />
                     </Form.Item>
                     <Form.Item label="Country" name="countryId" rules={[{ required: true, message: "Please select a country!" }]}>
-                        <Select placeholder="Select a country">
-                        <Option key={"2"} value={"67b72539ee82dd269e9c2b40"}>{"pakistan"}</Option>
-                            {/* <Option key={countries._id} value={countries._id && countries._id}>{countries.name ? countries.name : "pakistan"}</Option> */}
+                        <Select placeholder="Select a country" onFocus={getCountries}>
+                            <Option key={countries?._id} value={countries?._id && countries?._id}>{countries?.name ? countries?.name : ""}</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item label="Upload Images" name="pictures">
@@ -320,13 +327,13 @@ const ManageProvince = () => {
                 {selectedProvince?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "15px", justifyContent: "center" }}>
                         {selectedProvince.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "10px", 
-                                border: "1px solid #ccc", 
-                                padding: "10px", 
-                                borderRadius: "10px", 
+                            <div key={index} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                border: "1px solid #ccc",
+                                padding: "10px",
+                                borderRadius: "10px",
                                 background: "#f9f9f9"
                             }}>
                                 <Image src={imgUrl} width={100} height={100} />
