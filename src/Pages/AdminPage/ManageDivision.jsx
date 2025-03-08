@@ -85,6 +85,8 @@ const ManageDivision = () => {
                 message.success("Division added successfully!");
                 setCreateModalVisible(false);
                 getAlldivisions();
+                setFileList([])
+                createForm.resetFields();
             } else {
                 message.error("Failed to add Division!");
             }
@@ -142,6 +144,7 @@ const ManageDivision = () => {
                 message.success("Division images updated successfully!");
                 setUpdateImagesModalVisible(false);
                 getAlldivisions();
+                setFileList([])
             } else {
                 message.error("Failed to update Division images!");
             }

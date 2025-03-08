@@ -146,6 +146,7 @@ const ManageProvince = () => {
             if (response.data) {
                 message.success("Province images updated successfully!");
                 setUpdateImagesModalVisible(false);
+                setFileList([])
                 getAllProvinces();
             } else {
                 message.error("Failed to update province images!");

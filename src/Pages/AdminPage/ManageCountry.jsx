@@ -73,7 +73,9 @@ const ManageCountry = () => {
             if (response.status === 201) {
                 message.success("country added successfully!");
                 setCreateModalVisible(false);
+                setFileList([])
                 getAllCountry();
+                createForm.resetFields();
             } else {
                 message.error("Failed to add country!");
             }
@@ -128,7 +130,9 @@ const ManageCountry = () => {
             if (response.data) {
                 message.success("Country images add successfully!");
                 setUpdateImagesModalVisible(false);
+                setFileList([])
                 getAllCountry();
+             
             } else {
                 message.error("Failed to update country images!");
             }

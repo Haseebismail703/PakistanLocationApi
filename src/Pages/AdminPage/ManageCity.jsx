@@ -88,6 +88,8 @@ const ManageCity = () => {
                 message.success("Cties added successfully!");
                 setCreateModalVisible(false);
                 getAllCities();
+                setFileList([])
+                createForm.resetFields();
             } else {
                 message.error("Failed to add Cties!");
             }
@@ -142,6 +144,7 @@ const ManageCity = () => {
                 message.success("Cities images updated successfully!");
                 setUpdateImagesModalVisible(false);
                 getAllCities();
+                setFileList([])
             } else {
                 message.error("Failed to update Cities images!");
             }

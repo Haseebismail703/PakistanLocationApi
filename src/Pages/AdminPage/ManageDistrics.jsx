@@ -85,6 +85,8 @@ const ManageDistrics = () => {
                 message.success("District added successfully!");
                 setCreateModalVisible(false);
                 getAlldistricts();
+                setFileList([])
+                createForm.resetFields();
             } else {
                 message.error("Failed to add District!");
             }
@@ -141,6 +143,7 @@ const ManageDistrics = () => {
                 message.success("District images updated successfully!");
                 setUpdateImagesModalVisible(false);
                 getAlldistricts();
+                setFileList([])
             } else {
                 message.error("Failed to update District images!");
             }

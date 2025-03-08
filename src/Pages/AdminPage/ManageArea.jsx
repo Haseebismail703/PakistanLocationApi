@@ -85,6 +85,8 @@ const ManageArea = () => {
                 message.success("Area added successfully!");
                 setCreateModalVisible(false);
                 getAllArea();
+                setFileList([])
+                createForm.resetFields();
             } else {
                 message.error("Failed to add Area!");
             }
@@ -141,6 +143,7 @@ const ManageArea = () => {
                 message.success("Area images add successfully!");
                 setUpdateImagesModalVisible(false);
                 getAllArea();
+                setFileList([])
             } else {
                 message.error("Failed to add Area images!");
             }

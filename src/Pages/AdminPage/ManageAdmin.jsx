@@ -65,8 +65,8 @@ const ManageAdmin = () => {
         try {
             const response = await adminInterceptor.get(`/admins/get-admins`);
 
-            let admins = response.data?.data || [];
-
+            let admins = response.data.data?.admins || [];
+               console.log("Admins: ", admins);
             // 🔥 Sirf woh admins rakhna jo logged-in admin na ho
             admins = admins.filter(record => record._id !== getAdmin?._id);
 
