@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Table, Pagination, message, Spin } from "antd";
-import adminInterceptor from "../../Api/adminInterceptor.js"; // Replace with your actual interceptor path
+import { Table, Pagination, message } from "antd";
+import adminInterceptor from "../../Api/adminInterceptor.js";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const DivisionList = () => {
-  // State Initialization
   const [divisions, setDivisions] = useState([]);
   const [tableLoading, setTableLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // Default page 1
-  const [pageSize, setPageSize] = useState(10); // Default limit 10
-  const [totalItems, setTotalItems] = useState(0); // Total items for pagination
+  const [totalItems, setTotalItems] = useState(0);
 
-  // Fetch Data Function
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get currentPage and pageSize from URL or default to 1 and 10
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  const pageSize = parseInt(searchParams.get("size")) || 10;
+
   const getAlldivisions = async () => {
     setTableLoading(true);
     try {
@@ -19,7 +23,6 @@ const DivisionList = () => {
         `/admins/divisions?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`
       );
 
-      // Map response to table data format
       const divisionsData = response.data?.data?.map((data, index) => ({
         key: index + 1,
         id: data._id,
@@ -30,9 +33,9 @@ const DivisionList = () => {
       }));
 
       console.log("Response Data:", response.data?.data);
-      
+
       setDivisions(divisionsData);
-      setTotalItems(response.data?.total || 100); // Set total items for pagination (Default: 100)
+      setTotalItems(divisionsData?.total || 300);
     } catch (error) {
       message.error("Failed to fetch divisions!");
     } finally {
@@ -40,12 +43,10 @@ const DivisionList = () => {
     }
   };
 
-  // Fetch data on page or page size change
   useEffect(() => {
     getAlldivisions();
   }, [currentPage, pageSize]);
 
-  // Ant Design Table Columns
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
     { title: "Name", dataIndex: "name", key: "name" },
@@ -57,33 +58,35 @@ const DivisionList = () => {
   return (
     <div style={{ padding: "20px" }}>
       <h2>Division List</h2>
-      
-      <Spin spinning={tableLoading}>
-        <Table
-          columns={columns}
-          dataSource={divisions}
-          pagination={false} // Disable default pagination
-          rowKey="id"
-          bordered
-          style={{ marginBottom: "16px" }}
-        />
-      </Spin>
 
-      {/* Custom Pagination */}
+      <Table
+        loading={tableLoading}
+        columns={columns}
+        dataSource={divisions}
+        pagination={false}
+        rowKey="id"
+        scroll={{ x: "100" }}
+        bordered
+        style={{ marginBottom: "16px" }}
+      />
+
       <Pagination
         current={currentPage}
         total={totalItems}
         pageSize={pageSize}
         onChange={(page, size) => {
-          setCurrentPage(page);
-          setPageSize(size);
+          if (page < currentPage || divisions.length === pageSize) {
+            navigate(`?page=${page}&size=${size}`);
+          } else {
+            message.warning("No more data to display.");
+          }
         }}
         showSizeChanger
         pageSizeOptions={["10", "20", "50", "100"]}
         style={{ textAlign: "center" }}
         showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-        hideOnSinglePage={true} // Hide pagination if there's only one page
-        showLessItems={true} // Show fewer page numbers in pagination
+        hideOnSinglePage={true}
+        showLessItems={true}
       />
     </div>
   );

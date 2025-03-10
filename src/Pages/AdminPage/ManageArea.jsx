@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Spin } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Spin, Pagination } from "antd";
+import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -20,19 +20,27 @@ const ManageArea = () => {
     const [tableLoading, setTableLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [fileList, setFileList] = useState([])
+    const [totalItems, setTotalItems] = useState(0);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
-    const getAdmin = JSON.parse(localStorage.getItem("admin"));
 
     let canRead = usePermission("read-operations")
     let canCreate = usePermission("create-operations")
     let canUpdate = usePermission("update-operations")
     let canDelete = usePermission("delete-operations")
+
+
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Get currentPage and pageSize from URL or default to 1 and 10
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("size")) || 10;
     useEffect(() => {
         getCity();
         getAllArea();
-    }, []);
+    }, [currentPage, pageSize]);
 
     const getCity = async () => {
         try {
@@ -46,7 +54,7 @@ const ManageArea = () => {
     const getAllArea = async () => {
         setTableLoading(true);
         try {
-            const response = await adminInterceptor.get(`/admins/areas`);
+            const response = await adminInterceptor.get(`/admins/areas?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const areaData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -57,6 +65,7 @@ const ManageArea = () => {
                 countryId: data.countryId,
             }));
             setArea(areaData);
+            setTotalItems(areaData?.total || 340);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {
@@ -104,7 +113,7 @@ const ManageArea = () => {
             const response = await adminInterceptor.put(
                 `/admins/areas/update-details/${selectArea.id}`,
                 { name: values.name, details: values.details },
-                
+
             );
             if (response.status === 200) {
                 message.success("Area updated successfully!");
@@ -136,7 +145,7 @@ const ManageArea = () => {
             const response = await adminInterceptor.put(
                 `/admins/areas/add-pictures/${selectArea.id}`,
                 formData,
-                
+
             );
 
             if (response.data) {
@@ -161,7 +170,7 @@ const ManageArea = () => {
             const response = await adminInterceptor.put(
                 `/admins/areas/delete-pictures/${selectArea.id}`,
                 { picturesToDelete: [item] }
-                
+
             );
 
             if (response.status === 200) {
@@ -173,7 +182,7 @@ const ManageArea = () => {
             }
         } catch (error) {
             message.error(error.response?.data?.message || "Error deleting Area image. Please try again.");
-        }finally {
+        } finally {
             setDeleteLoading(false);
         }
     };
@@ -202,7 +211,35 @@ const ManageArea = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Area</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Area</Button>
-                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={area} pagination={{ pageSize: 5 }} scroll={{"x" : "100%"}} style={{ marginTop: 20 }} />
+                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={area} pagination={false} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
+                <Pagination
+    current={currentPage}
+    total={totalItems}
+    pageSize={pageSize}
+    onChange={(page, size) => {
+        if (page < currentPage || area.length === pageSize) {
+            navigate(`?page=${page}&size=${size}`);
+        } else {
+            message.warning("No more data to display.");
+        }
+    }}
+    showSizeChanger
+    pageSizeOptions={["10", "20", "50", "100"]}
+    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+    hideOnSinglePage
+    showLessItems
+    prevIcon={<LeftOutlined />}
+    nextIcon={<RightOutlined />}
+    style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        marginTop: "20px",
+    }}
+/>
             </div>
 
             { /* Create Area Modal */}

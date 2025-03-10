@@ -66,7 +66,7 @@ const ManageAdmin = () => {
             const response = await adminInterceptor.get(`/admins/get-admins`);
 
             let admins = response.data.data?.admins || [];
-               console.log("Admins: ", admins);
+            console.log("Admins: ", admins);
             // 🔥 Sirf woh admins rakhna jo logged-in admin na ho
             admins = admins.filter(record => record._id !== getAdmin?._id);
 
@@ -109,7 +109,7 @@ const ManageAdmin = () => {
     const handleUpdateSubmit = async (values) => {
         console.log("Selected Permissions:", values.permissions);
         if (!selectedAdmin) return message.error("No admin selected")
- 
+
         try {
             const response = await adminInterceptor.put(`/admins/update-permissions/${selectedAdmin.key}`,
                 { permissions: values.permissions })
@@ -144,7 +144,7 @@ const ManageAdmin = () => {
 
             const response = await adminInterceptor.put(`/admins/update-status/${item.key}`,
                 { status: newStatus }
-                
+
             );
 
             if (response.data) {
@@ -318,7 +318,7 @@ const ManageAdmin = () => {
                     scroll={{ x: true }}
                     loading={tableLoader}
                     locale={{ emptyText: "No data available" }}
-                    
+
                 />
             </div>
         </>

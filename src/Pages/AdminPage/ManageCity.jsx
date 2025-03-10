@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Pagination } from "antd";
+import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined,LeftOutlined,RightOutlined } from "@ant-design/icons";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -14,11 +14,12 @@ const ManageCity = () => {
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [areaTypeModalVisible, setAreaTypeModalVisible] = useState(false);
-    const [division, setdivisions] = useState([]);
+    const [city, setCity] = useState([]);
     const [selectCity, setselectCity] = useState(null);
     const [districts, setDistricts] = useState('');
     const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
+    const [totalItems, setTotalItems] = useState(0);
     const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
@@ -29,10 +30,17 @@ const ManageCity = () => {
     let canCreate = usePermission("create-operations")
     let canUpdate = usePermission("update-operations")
     let canDelete = usePermission("delete-operations")
+
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Get currentPage and pageSize from URL or default to 1 and 10
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("size")) || 10;
     useEffect(() => {
         getDistricts();
         getAllCities();
-    }, []);
+    }, [currentPage, pageSize]);
 
     const getDistricts = async () => {
         try {
@@ -47,7 +55,7 @@ const ManageCity = () => {
     const getAllCities = async () => {
         setTableLoading(true)
         try {
-            const response = await adminInterceptor.get(`/admins/cities`);
+            const response = await adminInterceptor.get(`/admins/cities?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const cityData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -58,9 +66,10 @@ const ManageCity = () => {
                 countryId: data.countryId,
                 areaType: data.areaType
             }));
-            setdivisions(cityData);
+            setCity(cityData);
+            setTotalItems(cityData.total || 100);
         } catch (error) {
-            message.error("Failed to fetch divisions!");
+            message.error("Failed to fetch citys!");
         } finally {
             setTableLoading(false)
         }
@@ -107,7 +116,7 @@ const ManageCity = () => {
             const response = await adminInterceptor.put(
                 `/admins/cities/update-details/${selectCity.id}`,
                 { name: values.name, details: values.details },
-               
+
             );
 
             if (response.status === 200) {
@@ -137,7 +146,7 @@ const ManageCity = () => {
             const response = await adminInterceptor.put(
                 `/admins/cities/add-pictures/${selectCity.id}`,
                 formData,
-               
+
             );
 
             if (response.data) {
@@ -160,7 +169,7 @@ const ManageCity = () => {
             const response = await adminInterceptor.put(
                 `/admins/cities/delete-pictures/${selectCity.id}`,
                 { picturesToDelete: [item] },
-                
+
             );
 
             if (response.status === 200) {
@@ -177,20 +186,22 @@ const ManageCity = () => {
 
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name" ,
+        {
+            title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
                 <>
                     <span>{canRead ? record.name : "_"}</span>
                 </>
             )
-         },
-        { title: "Area Type", dataIndex: "areaType", name: "areaType",
+        },
+        {
+            title: "Area Type", dataIndex: "areaType", name: "areaType",
             render: (_, record) => (
                 <>
                     <span>{canRead ? record.areaType : "_"}</span>
                 </>
             )
-         },
+        },
         {
             title: "Actions",
             key: "action",
@@ -231,10 +242,39 @@ const ManageCity = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
-                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={division} scroll={{ "x": "100%" }} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={city} scroll={{ "x": "100%" }} pagination={false} style={{ marginTop: 20 }} />
+                <Pagination
+    current={currentPage}
+    total={totalItems}
+    pageSize={pageSize}
+    onChange={(page, size) => {
+        if (page < currentPage || city.length === pageSize) {
+            navigate(`?page=${page}&size=${size}`);
+        } else {
+            message.warning("No more data to display.");
+        }
+    }}
+    showSizeChanger
+    pageSizeOptions={["10", "20", "50", "100"]}
+    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+    hideOnSinglePage
+    showLessItems
+    prevIcon={<LeftOutlined />}
+    nextIcon={<RightOutlined />}
+    style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        marginTop: "20px",
+    }}
+/>
+
             </div>
 
-            { /* Create Division Modal */}
+            { /* Create city Modal */}
             <Modal
                 title="Create City"
                 open={createModalVisible}
@@ -326,7 +366,7 @@ const ManageCity = () => {
 
             {/* View Modal */}
             <Modal
-                title="Division Details"
+                title="city Details"
                 open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
                 footer={null}
@@ -340,7 +380,7 @@ const ManageCity = () => {
                         <h4>Images:</h4>
                         {selectCity.pictures?.length > 0 ? (
                             selectCity.pictures.map((pic, index) => (
-                                <Image key={index} width={200} src={pic} alt={`Division ${index}`} />
+                                <Image key={index} width={200} src={pic} alt={`city ${index}`} />
                             ))
                         ) : (
                             <p>No images available</p>
@@ -361,13 +401,13 @@ const ManageCity = () => {
                 {selectCity?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                         {selectCity.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "10px", 
-                                border: "1px solid #ccc", 
-                                padding: "10px", 
-                                borderRadius: "10px", 
+                            <div key={index} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                border: "1px solid #ccc",
+                                padding: "10px",
+                                borderRadius: "10px",
                                 background: "#f9f9f9"
                             }}>
                                 <Image src={imgUrl} width={100} height={100} />

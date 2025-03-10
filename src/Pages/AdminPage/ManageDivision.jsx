@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Pagination } from "antd";
+import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, RightOutlined, LeftOutlined } from "@ant-design/icons";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
@@ -16,7 +17,8 @@ const ManageDivision = () => {
     const [division, setdivisions] = useState([]);
     const [selectdivision, setselectdivision] = useState(null);
     const [province, setprovince] = useState('');
-    const [fileList,setFileList] = useState([])
+    const [fileList, setFileList] = useState([])
+    const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
@@ -27,10 +29,16 @@ const ManageDivision = () => {
     let canCreate = usePermission("create-operations")
     let canUpdate = usePermission("update-operations")
     let canDelete = usePermission("delete-operations")
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Get currentPage and pageSize from URL or default to 1 and 10
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("size")) || 10;
     useEffect(() => {
         getProvince();
         getAlldivisions();
-    }, []);
+    }, [currentPage, pageSize]);
 
     const getProvince = async () => {
         try {
@@ -45,7 +53,7 @@ const ManageDivision = () => {
     const getAlldivisions = async () => {
         setTableLoading(true)
         try {
-            const response = await adminInterceptor.get(`/admins/divisions?limit=0`);
+            const response = await adminInterceptor.get(`/admins/divisions?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const divisionsData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -57,9 +65,10 @@ const ManageDivision = () => {
             }));
             console.log(response.data?.data);
             setdivisions(divisionsData);
+            setTotalItems(divisionsData.total || 100);
         } catch (error) {
             message.error("Failed to fetch divisions!");
-        }finally{
+        } finally {
             setTableLoading(false)
         }
     };
@@ -104,7 +113,7 @@ const ManageDivision = () => {
             const response = await adminInterceptor.put(
                 `/admins/divisions/update-details/${selectdivision.id}`,
                 { name: values.name, details: values.details },
-              
+
             );
 
             if (response.status === 200) {
@@ -137,7 +146,7 @@ const ManageDivision = () => {
             const response = await adminInterceptor.put(
                 `/admins/divisions/add-pictures/${selectdivision.id}`,
                 formData,
-              
+
             );
 
             if (response.data) {
@@ -161,7 +170,7 @@ const ManageDivision = () => {
                 `/admins/divisions/delete-pictures/${selectdivision.id}`,
                 { picturesToDelete: [item] },
             );
-    
+
             if (response.status === 200) {
                 message.success("Division image deleted successfully!");
                 getAlldivisions();
@@ -173,16 +182,17 @@ const ManageDivision = () => {
             message.error(error.response?.data?.message || "Error deleting Division image. Please try again.");
         }
     };
-    
+
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name",
+        {
+            title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
                 <>
                     <span>{canRead ? record.name : "_"}</span>
                 </>
             )
-         },
+        },
         {
             title: "Actions",
             key: "action",
@@ -204,48 +214,76 @@ const ManageDivision = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
-                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={division} scroll={{"x" : "100%"}}  style={{ marginTop: 20 }} />
+                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={division} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
+                <Pagination
+    current={currentPage}
+    total={totalItems}
+    pageSize={pageSize}
+    onChange={(page, size) => {
+        if (page < currentPage || division.length === pageSize) {
+            navigate(`?page=${page}&size=${size}`);
+        } else {
+            message.warning("No more data to display.");
+        }
+    }}
+    showSizeChanger
+    pageSizeOptions={["10", "20", "50", "100"]}
+    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+    hideOnSinglePage
+    showLessItems
+    prevIcon={<LeftOutlined />}
+    nextIcon={<RightOutlined />}
+    style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        marginTop: "20px",
+    }}
+/>
             </div>
 
-           { /* Create Division Modal */}
-                        <Modal
-                            title="Create Division"
-                            open={createModalVisible}
-                            onCancel={() => setCreateModalVisible(false)}
-                            footer={null}
+            { /* Create Division Modal */}
+            <Modal
+                title="Create Division"
+                open={createModalVisible}
+                onCancel={() => setCreateModalVisible(false)}
+                footer={null}
+            >
+                <Form form={createForm} layout="vertical" onFinish={handleCreate}>
+                    <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
+                        <TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item label="Select a Province" name="provinceId" rules={[{ required: true, message: "Please select a country!" }]}>
+                        <Select placeholder="Select a Province">
+                            {province && province.map((data) => (
+                                <Option key={data._id} value={data._id}>{data.name}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Upload Images" name="pictures">
+                        <Upload
+                            multiple
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            onChange={({ fileList }) => setFileList(fileList)}
+                            fileList={fileList}
                         >
-                            <Form form={createForm} layout="vertical" onFinish={handleCreate}>
-                                <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter a name!" }]}>
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item label="Details" name="details" rules={[{ required: true, message: "Please enter details!" }]}>
-                                    <TextArea rows={4} />
-                                </Form.Item>
-                                <Form.Item label="Select a Province" name="provinceId" rules={[{ required: true, message: "Please select a country!" }]}>
-                                    <Select placeholder="Select a Province">
-                                        {province && province.map((data) => (
-                                            <Option key={data._id} value={data._id}>{data.name}</Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item label="Upload Images" name="pictures">
-                                    <Upload
-                                        multiple
-                                        listType="picture-card"
-                                        beforeUpload={() => false}
-                                        onChange={({ fileList }) => setFileList(fileList)}
-                                        fileList={fileList}
-                                    >
-                                        <Button icon={<PlusOutlined />}>Upload</Button>
-                                    </Upload>
-                                </Form.Item>
-                                <Button type="primary" htmlType="submit" loading={loading}>
-                                    Submit
-                                </Button>
-                            </Form>
-                        </Modal>
+                            <Button icon={<PlusOutlined />}>Upload</Button>
+                        </Upload>
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        Submit
+                    </Button>
+                </Form>
+            </Modal>
 
-                        {/* Update Details Modal */}
+            {/* Update Details Modal */}
             <Modal
                 title="Update Division Details"
                 open={updateDetailsModalVisible}
@@ -324,13 +362,13 @@ const ManageDivision = () => {
                 {selectdivision?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                         {selectdivision.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "10px", 
-                                border: "1px solid #ccc", 
-                                padding: "10px", 
-                                borderRadius: "10px", 
+                            <div key={index} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                border: "1px solid #ccc",
+                                padding: "10px",
+                                borderRadius: "10px",
                                 background: "#f9f9f9"
                             }}>
                                 <Image src={imgUrl} width={100} height={100} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Pagination } from "antd";
+import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
@@ -18,6 +19,7 @@ const ManageDistrics = () => {
     const [divisions, setdivisions] = useState('');
     const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
+    const [totalItems, setTotalItems] = useState(0);
     const [tableLoading, setTableLoading] = useState(false);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
@@ -28,10 +30,16 @@ const ManageDistrics = () => {
     let canCreate = usePermission("create-operations")
     let canUpdate = usePermission("update-operations")
     let canDelete = usePermission("delete-operations")
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Get currentPage and pageSize from URL or default to 1 and 10
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("size")) || 10;
     useEffect(() => {
         getdivisions();
         getAlldistricts();
-    }, []);
+    }, [currentPage, pageSize]);
 
     const getdivisions = async () => {
         try {
@@ -46,7 +54,7 @@ const ManageDistrics = () => {
     const getAlldistricts = async () => {
         setTableLoading(true)
         try {
-            const response = await adminInterceptor.get(`/admins/districts`);
+            const response = await adminInterceptor.get(`/admins/districts?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const districtsData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -57,6 +65,7 @@ const ManageDistrics = () => {
                 countryId: data.countryId,
             }));
             setdistricts(districtsData);
+            setTotalItems(districtsData.total || 100);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {
@@ -69,7 +78,7 @@ const ManageDistrics = () => {
         const formData = new FormData();
 
         if (fileList) {
-           fileList.forEach((file) => {
+            fileList.forEach((file) => {
                 formData.append("pictures", file.originFileObj);
             });
         }
@@ -104,7 +113,7 @@ const ManageDistrics = () => {
             const response = await adminInterceptor.put(
                 `/admins/districts/update-details/${selectdistrict.id}`,
                 { name: values.name, details: values.details },
-               
+
             );
             if (response.status === 200) {
                 message.success("District updated successfully!");
@@ -136,7 +145,7 @@ const ManageDistrics = () => {
             const response = await adminInterceptor.put(
                 `/admins/districts/add-pictures/${selectdistrict.id}`,
                 formData,
-               
+
             );
 
             if (response.data) {
@@ -159,7 +168,7 @@ const ManageDistrics = () => {
             const response = await adminInterceptor.put(
                 `/admins/districts/delete-pictures/${selectdistrict.id}`,
                 { picturesToDelete: [item] },
-               
+
             );
 
             if (response.status === 200) {
@@ -176,13 +185,14 @@ const ManageDistrics = () => {
 
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name",
+        {
+            title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
                 <>
                     <span>{canRead ? record.name : "_"}</span>
                 </>
             )
-         },
+        },
         {
             title: "Actions",
             key: "action",
@@ -204,7 +214,35 @@ const ManageDistrics = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
-                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={districts} scroll={{"x" : "100%"}} pagination={{ pageSize: 5 }} style={{ marginTop: 20 }} />
+                <Table pagination={false} locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={districts} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
+                <Pagination
+    current={currentPage}
+    total={totalItems}
+    pageSize={pageSize}
+    onChange={(page, size) => {
+        if (page < currentPage || districts.length === pageSize) {
+            navigate(`?page=${page}&size=${size}`);
+        } else {
+            message.warning("No more data to display.");
+        }
+    }}
+    showSizeChanger
+    pageSizeOptions={["10", "20", "50", "100"]}
+    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+    hideOnSinglePage
+    showLessItems
+    prevIcon={<LeftOutlined />}
+    nextIcon={<RightOutlined />}
+    style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        marginTop: "20px",
+    }}
+/>
             </div>
 
             { /* Create Districs Modal */}
@@ -324,13 +362,13 @@ const ManageDistrics = () => {
                 {selectdistrict?.pictures?.length > 0 ? (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "15px", justifyContent: "center" }}>
                         {selectdistrict.pictures.map((imgUrl, index) => (
-                            <div key={index} style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "10px", 
-                                border: "1px solid #ccc", 
-                                padding: "10px", 
-                                borderRadius: "10px", 
+                            <div key={index} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                border: "1px solid #ccc",
+                                padding: "10px",
+                                borderRadius: "10px",
                                 background: "#f9f9f9"
                             }}>
                                 <Image src={imgUrl} width={100} height={100} />

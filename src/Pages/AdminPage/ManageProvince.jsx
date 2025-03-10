@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Table, Upload, message, Select, Image } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Pagination } from "antd";
+import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 
@@ -17,6 +18,7 @@ const ManageProvince = () => {
     const [countries, setCountries] = useState("");
     const [fileList, setFileList] = useState([])
     const [loading, setLoading] = useState(false);
+    const [totalItems, setTotalItems] = useState(0);
     const [tableLoading, setTableLoading] = useState(false);
     const [form] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
@@ -27,15 +29,21 @@ const ManageProvince = () => {
     let canCreate = usePermission("create-operations")
     let canUpdate = usePermission("update-operations")
     let canDelete = usePermission("delete-operations")
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Get currentPage and pageSize from URL or default to 1 and 10
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("size")) || 10;
     useEffect(() => {
         // getCountries();
         getAllProvinces();
-    }, []);
+    }, [currentPage, pageSize]);
 
     const getCountries = async () => {
         try {
             const response = await adminInterceptor.get(`/admins/country?limit=0`);
-            
+
             setCountries(response.data?.data);
 
         } catch (error) {
@@ -46,7 +54,7 @@ const ManageProvince = () => {
     const getAllProvinces = async () => {
         setTableLoading(true);
         try {
-            const response = await adminInterceptor.get(`/admins/provinces`);
+            const response = await adminInterceptor.get(`/admins/provinces?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const provincesData = response.data?.data?.map((data, index) => ({
                 key: index + 1,
                 id: data._id,
@@ -57,6 +65,7 @@ const ManageProvince = () => {
                 countryId: data.countryId,
             }));
             setProvinces(provincesData);
+            setTotalItems(provincesData.total || 100);
         } catch (error) {
             message.error("Failed to fetch provinces!");
         } finally {
@@ -88,7 +97,7 @@ const ManageProvince = () => {
                 getAllProvinces();
                 form.resetFields()
                 setFileList([])
-                
+
             } else {
                 message.error("Failed to add province!");
             }
@@ -107,7 +116,7 @@ const ManageProvince = () => {
             const response = await adminInterceptor.put(
                 `/admins/provinces/update-details/${selectedProvince.id}`,
                 { name: values.name, details: values.details },
-              
+
             );
 
             if (response.status === 200) {
@@ -140,7 +149,7 @@ const ManageProvince = () => {
             const response = await adminInterceptor.put(
                 `/admins/provinces/add-pictures/${selectedProvince.id}`,
                 formData,
-              
+
             );
 
             if (response.data) {
@@ -163,7 +172,7 @@ const ManageProvince = () => {
             const response = await adminInterceptor.put(
                 `/admins/provinces/delete-pictures/${selectedProvince.id}`,
                 { picturesToDelete: [item] },
-                
+
             );
 
             if (response.status === 200) {
@@ -209,7 +218,44 @@ const ManageProvince = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Provinces</h1></center>
                 <Button disabled={canCreate ? false : true} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Province</Button>
-                <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={provinces} pagination={{ pageSize: 5 }} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
+                <Table
+                        loading={tableLoading}
+                        columns={columns}
+                        dataSource={provinces}
+                        pagination={false}
+                        // rowKey="id"
+                        scroll={{ x: "100" }}
+                        bordered
+                        style={{marginTop : 20 }}
+                      />
+               <Pagination
+    current={currentPage}
+    total={totalItems}
+    pageSize={pageSize}
+    onChange={(page, size) => {
+        if (page < currentPage || provinces.length === pageSize) {
+            navigate(`?page=${page}&size=${size}`);
+        } else {
+            message.warning("No more data to display.");
+        }
+    }}
+    showSizeChanger
+    pageSizeOptions={["10", "20", "50", "100"]}
+    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+    hideOnSinglePage
+    showLessItems
+    prevIcon={<LeftOutlined />}
+    nextIcon={<RightOutlined />}
+    style={{
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        borderRadius: "8px",
+        marginTop: "20px",
+    }}
+/>
             </div>
 
             {/* Create Province Modal */}
