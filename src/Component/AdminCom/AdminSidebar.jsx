@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Menu, Avatar, Dropdown, message, Switch } from "antd";
+import React, { useState, useEffect, useContext } from "react";
+import { Layout, Menu, Avatar, Dropdown, message, Switch,Alert ,Button} from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -26,8 +26,8 @@ const AdminSidebar = ({ children }) => {
   );
   const location = useLocation();
   const navigate = useNavigate();
-
-
+  let admin = JSON.parse(localStorage.getItem("admin"));
+    
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
@@ -56,6 +56,14 @@ const AdminSidebar = ({ children }) => {
     localStorage.setItem("darkMode", checked);
   };
 
+  const handleVerifyClick = async () => {
+    try {
+      const response = await adminInterceptor.post('/admins/send-verification-email');
+      message.success("Verification email sent successfully!");
+    } catch (error) {
+      message.error("Error sending verification email!");
+    }
+  };
   const menuItems = [
     {
       key: "dashboard",
@@ -173,6 +181,19 @@ const AdminSidebar = ({ children }) => {
             <MenuUnfoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           ) : (
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
+          )}
+           {admin?.isVerified === false && (
+            <Alert
+              message="Email verification required to perform operations"
+              type="warning"
+              showIcon
+              style={{ width: "50%", textAlign: "center" }}
+              action={
+                <Button size="small" type="primary" onClick={handleVerifyClick}>
+                  Verify Now
+                </Button>
+              }
+            />
           )}
           <div style={{ display: "flex", alignItems: "center" }}>
             <Switch
