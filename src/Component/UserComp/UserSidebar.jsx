@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Menu, Avatar, Dropdown, message } from "antd";
+import { Layout, Menu, Avatar, Dropdown, message, Alert, Button } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -40,6 +40,15 @@ const UserSidebar = ({ children }) => {
       navigate("/login");
     } catch (error) {
       message.error("Logout error!");
+    }
+  };
+  let user = JSON.parse(localStorage.getItem("user"));
+  const handleVerifyClick = async () => {
+    try {
+      const response = await userInterceptor.post('/users/send-verification-email');
+      message.success("Verification email sent successfully!");
+    } catch (error) {
+      message.error("Error sending verification email!");
     }
   };
 
@@ -112,20 +121,20 @@ const UserSidebar = ({ children }) => {
       >
 
 
-         <div style={{ textAlign: "center", padding: "20px" }}>
-                 {!collapsed && (
-                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                     <img
-                       src={logo}
-                       alt="Logo"
-                       style={{ width: "50px", height: "auto", marginRight: "10px" }}
-                     />
-                     <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
-                       User dashboard
-                     </p>
-                   </div>
-                 )}
-               </div>
+        <div style={{ textAlign: "center", padding: "20px" }}>
+          {!collapsed && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ width: "50px", height: "auto", marginRight: "10px" }}
+              />
+              <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+                User dashboard
+              </p>
+            </div>
+          )}
+        </div>
 
 
 
@@ -165,6 +174,21 @@ const UserSidebar = ({ children }) => {
               style={{ fontSize: "18px", cursor: "pointer", color: "#000" }}
             />
           )}
+
+          {user?.isVerified === false && (
+            <Alert
+              message="Email verification required to perform operations"
+              type="warning"
+              showIcon
+              style={{ width: "50%", textAlign: "center" }}
+              action={
+                <Button size="small" type="primary" onClick={handleVerifyClick}>
+                  Verify Now
+                </Button>
+              }
+            />
+          )}
+
           <Dropdown menu={userMenu} placement="bottomRight">
             <Avatar
               size={40}

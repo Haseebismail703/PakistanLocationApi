@@ -16,6 +16,8 @@ const AdminForgotPassword = lazy(() => import("./Pages/PublicPages/AdminForgotPa
 const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass"));
 const UserResetPass = lazy(() => import("./Pages/PublicPages/UserResetPass"));
 const UserForgotPass = lazy(() => import("./Pages/PublicPages/UserForgotPass"));
+const VerifyEmail = lazy(() => import("./Pages/PublicPages/VerifyEmail"));
+
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
 const AdminDashboard = lazy(() => import("./Pages/AdminPage/AdminDashboard"));
@@ -65,12 +67,15 @@ function App() {
           <Route path="/login" element={<UserLogin />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="*" element={<NotFound />} />
+          {/* Verify Email Route */}
+          <Route path="/admin/verify-email" element={<VerifyEmail />} />
+          <Route path="/user/verify-email" element={<VerifyEmail />} />
           {/* Admin forgot and reset Route */}
           <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-          <Route path="/reset-password/:token" element={<AdminResetPassword />} />
+          <Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
           {/* User forgot reset route */}
           <Route path="/forgot-password" element={<UserForgotPass />} />
-          <Route path="/user/reset-password/:token" element={<UserResetPass />} />
+          <Route path="/reset-password/:token" element={<UserResetPass />} />
 
           <Route path="/table" element={<DivisionTable />} />
           <Route path="/form" element={<UserForm />} />

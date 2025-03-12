@@ -28,7 +28,7 @@ function UserLogin() {
         localStorage.setItem("user", JSON.stringify(response.data.data?.user));
         localStorage.setItem('accessToken', response.data.data?.accessToken);
         localStorage.setItem('refreshToken', response.data.data?.refreshToken);
-        navigate('/user/dashboard');
+        window.location.href = '/user/dashboard';
         setFormData({ email: '', password: '' });
       }
     } catch (error) {

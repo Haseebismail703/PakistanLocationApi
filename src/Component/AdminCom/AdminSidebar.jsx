@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Layout, Menu, Avatar, Dropdown, message, Switch,Alert ,Button} from "antd";
+import { Layout, Menu, Avatar, Dropdown, message, Switch } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -14,20 +14,21 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import adminInterceptor from "../../Api/adminInterceptor";
-import logo from "../../assets/logo.png"; // Import your logo here
-
+import logo from "../../assets/logo.png";
+import VerifyAlert from "../PublicCom/VerifyAlert";
+import { AdminContext } from "../../Context/AdminContext";
 const { Header, Sider, Content } = Layout;
 
 const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("dashboard");
+  const { admin } = useContext(AdminContext);
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
   const location = useLocation();
   const navigate = useNavigate();
-  let admin = JSON.parse(localStorage.getItem("admin"));
-    
+
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
@@ -56,14 +57,7 @@ const AdminSidebar = ({ children }) => {
     localStorage.setItem("darkMode", checked);
   };
 
-  const handleVerifyClick = async () => {
-    try {
-      const response = await adminInterceptor.post('/admins/send-verification-email');
-      message.success("Verification email sent successfully!");
-    } catch (error) {
-      message.error("Error sending verification email!");
-    }
-  };
+
   const menuItems = [
     {
       key: "dashboard",
@@ -113,7 +107,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-
+console.log(admin)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -182,19 +176,6 @@ const AdminSidebar = ({ children }) => {
           ) : (
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
-           {admin?.isVerified === false && (
-            <Alert
-              message="Email verification required to perform operations"
-              type="warning"
-              showIcon
-              style={{ width: "50%", textAlign: "center" }}
-              action={
-                <Button size="small" type="primary" onClick={handleVerifyClick}>
-                  Verify Now
-                </Button>
-              }
-            />
-          )}
           <div style={{ display: "flex", alignItems: "center" }}>
             <Switch
               checked={darkMode}
@@ -212,18 +193,18 @@ const AdminSidebar = ({ children }) => {
             </Dropdown>
           </div>
         </Header>
-
-        <Content
-          style={{
-            margin: "80px 16px 16px",
-            padding: "24px",
-            background: darkMode ? "#333" : "#ffffff",
-            borderRadius: "10px",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          {children}
-        </Content>
+        {admin?.data?.isVerified === true ?
+          <Content
+            style={{
+              margin: "80px 16px 16px",
+              padding: "24px",
+              background: darkMode ? "#333" : "#ffffff",
+              borderRadius: "10px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            {children}
+          </Content> : <VerifyAlert />}
       </Layout>
     </Layout>
   );
