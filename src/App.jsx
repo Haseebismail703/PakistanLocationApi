@@ -14,8 +14,8 @@ const UserForm = lazy(() => import("./Pages/PublicPages/UserForm"));
 const NotFound = lazy(() => import("./Pages/PublicPages/NotFound"));
 const AdminForgotPassword = lazy(() => import("./Pages/PublicPages/AdminForgotPass"));
 const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass"));
-
-
+const UserResetPass = lazy(() => import("./Pages/PublicPages/UserResetPass"));
+const UserForgotPass = lazy(() => import("./Pages/PublicPages/UserForgotPass"));
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
 const AdminDashboard = lazy(() => import("./Pages/AdminPage/AdminDashboard"));
@@ -64,11 +64,16 @@ function App() {
           <Route path="/register" element={<UserRegister />} />
           <Route path="/login" element={<UserLogin />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/form" element={<UserForm />} />
           <Route path="*" element={<NotFound />} />
+          {/* Admin forgot and reset Route */}
           <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
           <Route path="/reset-password/:token" element={<AdminResetPassword />} />
+          {/* User forgot reset route */}
+          <Route path="/forgot-password" element={<UserForgotPass />} />
+          <Route path="/user/reset-password/:token" element={<UserResetPass />} />
+
           <Route path="/table" element={<DivisionTable />} />
+          <Route path="/form" element={<UserForm />} />
           {/* Admin Routes (Protected) */}
           <Route
             path="/admin/*"

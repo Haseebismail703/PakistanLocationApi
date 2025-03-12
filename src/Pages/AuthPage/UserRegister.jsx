@@ -34,6 +34,7 @@ function UserRegister() {
       }
     } catch (error) {
       console.log("Registration error: ", error);
+      message.error(error.response.data?.message);
     } finally {
       setLoading(false);
     }

@@ -32,8 +32,8 @@ function UserLogin() {
         setFormData({ email: '', password: '' });
       }
     } catch (error) {
-      console.log("Login error: ", error);
-      // message.error(response.data.message);    
+      // console.log("Login error: ", error);
+      message.error(error.response.data?.message);    
     } finally {
       setLoading(false);
     }
