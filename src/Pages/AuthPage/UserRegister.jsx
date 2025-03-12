@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import api from '../../Api/api';
 
 function UserRegister() {
@@ -13,6 +13,7 @@ function UserRegister() {
     password: '',
     confirmPassword: ''
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,6 +25,7 @@ function UserRegister() {
       message.error("Passwords do not match!");
       return;
     }
+    setLoading(true);
     try {
       const response = await axios.post(`${api}/users/register`, formData, { withCredentials: true });
       if (response.data.success) {
@@ -32,6 +34,8 @@ function UserRegister() {
       }
     } catch (error) {
       console.log("Registration error: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,8 +61,8 @@ function UserRegister() {
               />
             </div>
           ))}
-          <button type="submit" className="w-full py-3 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-            Register
+          <button type="submit" className="w-full py-3 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none" disabled={loading}>
+            {loading ? <Spin /> : 'Register'}
           </button>
         </form>
         <p className={`text-center text-sm mt-6 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>

@@ -12,8 +12,8 @@ const AdminLogin = lazy(() => import("./Pages/AuthPage/AdminLogin"));
 const Home = lazy(() => import("./Pages/PublicPages/Home"));
 const UserForm = lazy(() => import("./Pages/PublicPages/UserForm"));
 const NotFound = lazy(() => import("./Pages/PublicPages/NotFound"));
-const ForgotPassword = lazy(() => import("./Pages/PublicPages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./Pages/PublicPages/ResetPass"));
+const AdminForgotPassword = lazy(() => import("./Pages/PublicPages/AdminForgotPass"));
+const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass"));
 
 
 // Admin Pages
@@ -66,8 +66,8 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/form" element={<UserForm />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+          <Route path="/reset-password/:token" element={<AdminResetPassword />} />
           <Route path="/table" element={<DivisionTable />} />
           {/* Admin Routes (Protected) */}
           <Route
