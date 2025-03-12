@@ -4,9 +4,9 @@ import userInterceptor from "../Api/userInterceptor.js";
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
     const [loading, setLoading] = useState(true);
-    const getUser = JSON.parse(localStorage.getItem("user"));
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -14,17 +14,35 @@ const UserProvider = ({ children }) => {
                     withCredentials: true,
                 });
                 setUser(response.data);
-                // console.log(response.data)
+                localStorage.setItem("user", JSON.stringify(response.data)); // ✅ Save updated user
             } catch (error) {
                 console.error("Failed to fetch user", error);
+                localStorage.removeItem("user"); // ✅ If API fails, remove old user data
             } finally {
                 setLoading(false);
             }
         };
-if(getUser){
-    fetchUser();
-}
-        
+
+        // ✅ Listen for changes in localStorage
+        const handleStorageChange = () => {
+            const updatedUser = JSON.parse(localStorage.getItem("user"));
+            setUser(updatedUser);
+            if (updatedUser) {
+                fetchUser();
+            }
+        };
+
+        // ✅ Fetch user only if user exists in localStorage
+        if (user) {
+            fetchUser();
+        }
+
+        // ✅ Event Listener for localStorage changes
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
     }, []);
 
     return (

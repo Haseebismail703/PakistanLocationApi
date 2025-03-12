@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Menu, Avatar, Dropdown, message, Alert, Button } from "antd";
+import React, { useState, useEffect, useContext } from "react";
+import { Layout, Menu, Avatar, Dropdown, message } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -10,16 +10,18 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
+import { UserContext } from "../../Context/UserContext";
 import userInterceptor from "../../Api/userInterceptor";
 import logo from "../../assets/logo.png";
 const { Header, Sider, Content } = Layout;
-
+import VerifyAlert from '../../Component/PublicCom/VerifyAlert'
 const UserSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const [selectedKey, setSelectedKey] = useState("dashboard");
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
-
+console.log(user)
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
@@ -42,15 +44,7 @@ const UserSidebar = ({ children }) => {
       message.error("Logout error!");
     }
   };
-  let user = JSON.parse(localStorage.getItem("user"));
-  const handleVerifyClick = async () => {
-    try {
-      const response = await userInterceptor.post('/users/send-verification-email');
-      message.success("Verification email sent successfully!");
-    } catch (error) {
-      message.error("Error sending verification email!");
-    }
-  };
+
 
   const toggleCollapse = () => setCollapsed(!collapsed);
 
@@ -174,21 +168,6 @@ const UserSidebar = ({ children }) => {
               style={{ fontSize: "18px", cursor: "pointer", color: "#000" }}
             />
           )}
-
-          {user?.isVerified === false && (
-            <Alert
-              message="Email verification required to perform operations"
-              type="warning"
-              showIcon
-              style={{ width: "50%", textAlign: "center" }}
-              action={
-                <Button size="small" type="primary" onClick={handleVerifyClick}>
-                  Verify Now
-                </Button>
-              }
-            />
-          )}
-
           <Dropdown menu={userMenu} placement="bottomRight">
             <Avatar
               size={40}
@@ -199,17 +178,19 @@ const UserSidebar = ({ children }) => {
         </Header>
 
         {/* Content Area */}
-        <Content
-          style={{
-            margin: "80px 16px 16px",
-            padding: "24px",
-            background: "#ffffff",
-            borderRadius: "10px",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          {children}
-        </Content>
+        {user.data?.isVerified === true ?
+          <Content
+            style={{
+              margin: "80px 16px 16px",
+              padding: "24px",
+              background: "#ffffff",
+              borderRadius: "10px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            {children}
+          </Content> : <VerifyAlert />}
+
       </Layout>
     </Layout>
   );
