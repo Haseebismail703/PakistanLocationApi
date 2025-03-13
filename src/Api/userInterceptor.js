@@ -1,6 +1,7 @@
 import axios from 'axios';
+import api  from './api.js';
 const userInterceptor = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: `${api}`,
   withCredentials: true, // Automatically cookies send hongi
 });
 
@@ -54,7 +55,7 @@ userInterceptor.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          `http://localhost:8080/api/v1/users/refresh-tokens`,
+          `${api}/users/refresh-tokens`,
           {},
           { withCredentials: true }
         );

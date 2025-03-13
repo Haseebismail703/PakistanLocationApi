@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { message, Spin } from "antd";
 import api from '../../Api/api.js';
-
+import Bacground from '../../Component/BacgroundCom/LoginBacground.jsx';
 function AdminLogin() {
     const navigate = useNavigate();
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
@@ -40,8 +40,10 @@ function AdminLogin() {
     };
 
     return (
-        <div className={`min-h-screen flex items-center justify-center p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-            <div className={`max-w-md w-full mx-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-lg p-8 rounded-xl`}>
+        <>
+        <Bacground>
+        <div className={`relative ml-5 mr-5 z-10 max-w-md w-full mx-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-lg p-8 rounded-xl`}>
+            <div className={`text-center text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 <Spin spinning={loading}>
                     {/* Heading */}
                     <h1 className={`text-center text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -97,6 +99,8 @@ function AdminLogin() {
                 </Spin>
             </div>
         </div>
+        </Bacground>
+        </>
     );
 }
 
