@@ -9,7 +9,6 @@ const UserRegister = lazy(() => import("./Pages/AuthPage/UserRegister"));
 const UserLogin = lazy(() => import("./Pages/AuthPage/UserLogin"));
 const AdminLogin = lazy(() => import("./Pages/AuthPage/AdminLogin"));
 
-
 // public pages 
 const Home = lazy(() => import("./Pages/PublicPages/Home"));
 const UserForm = lazy(() => import("./Pages/PublicPages/UserForm"));
@@ -19,7 +18,7 @@ const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass
 const UserResetPass = lazy(() => import("./Pages/PublicPages/UserResetPass"));
 const UserForgotPass = lazy(() => import("./Pages/PublicPages/UserForgotPass"));
 const VerifyEmail = lazy(() => import("./Pages/PublicPages/VerifyEmail"));
-const Payment = lazy(() => import("./Pages/PublicPages/Payment"));
+
 
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
@@ -38,7 +37,7 @@ const Profile = lazy(() => import("./Pages/UserPages/Profile"));
 const GenerateApiKey = lazy(() => import("./Pages/UserPages/ApiKey"));
 const UserDashboard = lazy(() => import("./Pages/UserPages/UserDashboard"));
 const UserContact = lazy(() => import("./Pages/UserPages/Contact"));
-
+const Payment = lazy(() => import("./Pages/UserPages/Payment"));
 // Authentication Check
 const isAdminAuthenticated = () => {
   const admin = localStorage.getItem("admin");
