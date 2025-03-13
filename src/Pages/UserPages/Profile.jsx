@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Input, Button, Card, Form, message, Typography,Spin } from "antd";
+import { Input, Button, Card, Form, message, Typography, Spin } from "antd";
 import userInterceptor from "../../Api/userInterceptor.js";
 import { UserContext } from "../../Context/UserContext";
 
@@ -9,10 +9,10 @@ const ProfilePage = () => {
   const [form] = Form.useForm();
   const { user } = useContext(UserContext);
   const [activeTab, setActiveTab] = useState("profile");
-  const [name, setName] = useState("");
+  const [name, setName] = useState(user?.data?.name);
 
   if (!user) {
-    return <div style={{display : "flex" , justifyContent : "center"}}><Spin size="large" /></div>;
+    return <div style={{ display: "flex", justifyContent: "center" }}><Spin size="large" /></div>;
   }
 
   const handleUpdateName = async () => {
@@ -63,7 +63,7 @@ const ProfilePage = () => {
             <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
             <Form layout="vertical">
               <Form.Item label="Name">
-                <Input value={user?.data?.name || ""} onChange={(e) => setName(e.target.value)} />
+                <Input value={name} onChange={(e) => setName(e.target.value)} />
               </Form.Item>
               <Form.Item label="Email">
                 <Input value={user.data?.email} disabled />

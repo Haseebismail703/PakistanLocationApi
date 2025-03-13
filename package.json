@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@stripe/react-stripe-js": "^3.4.0",
+    "@stripe/stripe-js": "^6.0.0",
     "axios": "^1.7.9",
     "motion": "^12.4.7",
     "react": "^19.0.0",

@@ -2,6 +2,8 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Spin } from "antd";
 import DivisionTable from "./Pages/PublicPages/Tab";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 // Auth pages
 const UserRegister = lazy(() => import("./Pages/AuthPage/UserRegister"));
 const UserLogin = lazy(() => import("./Pages/AuthPage/UserLogin"));
@@ -17,6 +19,7 @@ const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass
 const UserResetPass = lazy(() => import("./Pages/PublicPages/UserResetPass"));
 const UserForgotPass = lazy(() => import("./Pages/PublicPages/UserForgotPass"));
 const VerifyEmail = lazy(() => import("./Pages/PublicPages/VerifyEmail"));
+const Payment = lazy(() => import("./Pages/PublicPages/Payment"));
 
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
@@ -55,7 +58,7 @@ const AdminProtectedRoute = ({ children }) => {
 const UserProtectedRoute = ({ children }) => {
   return isUserAuthenticated() ? children : <Navigate to="/login" />;
 };
-
+const stripePromise = loadStripe("pk_test_51R1j9WLr27OCkBRrCnJhQCWhT1nCbX29jcJN00t26hUE0uxkSa2eTj8QVgHZCk");
 function App() {
   return (
     <BrowserRouter>
@@ -76,6 +79,8 @@ function App() {
           {/* User forgot reset route */}
           <Route path="/forgot-password" element={<UserForgotPass />} />
           <Route path="/reset-password/:token" element={<UserResetPass />} />
+          {/* payment */}
+          <Route path="/payment" element={ <Elements stripe={stripePromise}><Payment /></Elements>}/>
 
           <Route path="/table" element={<DivisionTable />} />
           <Route path="/form" element={<UserForm />} />
