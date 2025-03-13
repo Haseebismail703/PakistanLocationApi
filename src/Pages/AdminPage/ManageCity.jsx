@@ -57,7 +57,7 @@ const ManageCity = () => {
         try {
             const response = await adminInterceptor.get(`/admins/cities?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const cityData = response.data?.data?.map((data, index) => ({
-                key: index + 1,
+                key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
@@ -67,7 +67,7 @@ const ManageCity = () => {
                 areaType: data.areaType
             }));
             setCity(cityData);
-            setTotalItems(cityData.total || 100);
+            setTotalItems(cityData.total || 1000);
         } catch (error) {
             message.error("Failed to fetch citys!");
         } finally {

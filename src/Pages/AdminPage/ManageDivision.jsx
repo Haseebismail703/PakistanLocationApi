@@ -55,7 +55,7 @@ const ManageDivision = () => {
         try {
             const response = await adminInterceptor.get(`/admins/divisions?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const divisionsData = response.data?.data?.map((data, index) => ({
-                key: index + 1,
+                key:index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
@@ -65,7 +65,7 @@ const ManageDivision = () => {
             }));
             console.log(response.data?.data);
             setdivisions(divisionsData);
-            setTotalItems(divisionsData.total || 100);
+            setTotalItems(divisionsData.total || 1000);
         } catch (error) {
             message.error("Failed to fetch divisions!");
         } finally {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Form, Input, Table, Switch, Select, message } from "antd";
+import { Button, Modal, Form, Input, Table, Switch, Select, message, Pagination } from "antd";
 import adminInterceptor from "../../Api/adminInterceptor.js";
 import usePermission from '../../Hooks/usePermission.js'
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 const ManageAdmin = () => {
     const getUser = {
         _id: "67b2f10457c5b0f20e561417",
@@ -12,7 +12,7 @@ const ManageAdmin = () => {
         permission: [
             // "manage-permissions",
             // "manage-admins",
-            // "manage-users",
+            // "manage-admin",
             "create-operations",
             "read-operations",
             "update-operations",
@@ -22,20 +22,24 @@ const ManageAdmin = () => {
     }
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
-    const [users, setUsers] = useState([]);
+    const [admin, setAdmin] = useState([]);
     const [selectedAdmin, setSelectedAdmin] = useState(null);
     const [tableLoader, setTableLoader] = useState(false)
+    const [totalItems, setTotalItems] = useState(0);
     const [form] = Form.useForm();
     const [updateForm] = Form.useForm();
-
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const storeAdmin = localStorage.getItem("admin");
     const getAdmin = storeAdmin ? JSON.parse(storeAdmin) : null;
-
+    // Get currentPage and pageSize from URL or default to 1 and 10
+    const currentPage = parseInt(searchParams.get("page")) || 1;
+    const pageSize = parseInt(searchParams.get("size")) || 10;
 
     const create = usePermission("create-operations")
     const read = usePermission("read-operations")
     const update = usePermission('update-operations')
-
+    const manageAdmin = usePermission('manage-admins')
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -63,7 +67,7 @@ const ManageAdmin = () => {
     const fetchAdmins = async () => {
         setTableLoader(true);
         try {
-            const response = await adminInterceptor.get(`/admins/get-admins`);
+            const response = await adminInterceptor.get(`/admins/get-admins?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
 
             let admins = response.data.data?.admins || [];
             console.log("Admins: ", admins);
@@ -80,8 +84,8 @@ const ManageAdmin = () => {
                 permissions: record.permissions || []
             }));
 
-            setUsers(admins);
-
+            setAdmin(admins);
+            setTotalItems(admins?.total || 1000);
         } catch (error) {
             console.log("Error fetching admins:", error);
         } finally {
@@ -91,7 +95,7 @@ const ManageAdmin = () => {
 
     useEffect(() => {
         fetchAdmins();
-    }, []);
+    }, [currentPage, pageSize]);
 
     // Close modal for adding user
     const handleCancel = () => {
@@ -118,8 +122,8 @@ const ManageAdmin = () => {
             message.success(response?.data?.message);
 
             // **State Update for Immediate UI Change**
-            setUsers((prevUsers) =>
-                prevUsers.map((user) =>
+            setAdmin((prevadmin) =>
+                prevadmin.map((user) =>
                     user.key === selectedAdmin.key ? { ...user, permissions: values.permissions } : user
                 )
             );
@@ -149,8 +153,8 @@ const ManageAdmin = () => {
 
             if (response.data) {
                 // ✅ State ko sahi tarike se update karna
-                setUsers((prevUsers) =>
-                    prevUsers.map((prevUser) =>
+                setAdmin((prevadmin) =>
+                    prevadmin.map((prevUser) =>
                         prevUser.key === item.key
                             ? { ...prevUser, status: newStatus }
                             : prevUser
@@ -271,8 +275,8 @@ const ManageAdmin = () => {
                             <Input.Password />
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit">
-                                Submit
+                            <Button disabled={manageAdmin ? false : true}  type="primary" htmlType="submit">
+                                Create now
                             </Button>
                         </Form.Item>
                     </Form>
@@ -309,10 +313,10 @@ const ManageAdmin = () => {
                     </Form>
                 </Modal>
 
-                {/* Table to display users */}
+                {/* Table to display admin */}
                 <Table
                     columns={columns}
-                    dataSource={users}
+                    dataSource={admin}
                     pagination={{ pageSize: 5 }}
                     style={{ marginTop: "20px" }}
                     scroll={{ x: true }}
@@ -320,6 +324,24 @@ const ManageAdmin = () => {
                     locale={{ emptyText: "No data available" }}
 
                 />
+                 <Pagination
+                        current={currentPage}
+                        total={totalItems}
+                        pageSize={pageSize}
+                        onChange={(page, size) => {
+                          if (page < currentPage || admin.length === pageSize) {
+                            navigate(`?page=${page}&size=${size}`);
+                          } else {
+                            message.warning("No more data to display.");
+                          }
+                        }}
+                        showSizeChanger
+                        pageSizeOptions={["10", "20", "50", "100"]}
+                        style={{ textAlign: "center" }}
+                        showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                        hideOnSinglePage={true}
+                        showLessItems={true}
+                      />
             </div>
         </>
     );

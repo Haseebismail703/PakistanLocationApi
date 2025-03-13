@@ -28,12 +28,12 @@ function AdminLogin() {
                 localStorage.setItem("admin", JSON.stringify(response.data.data?.admin));
                 localStorage.setItem('accessToken', response.data.data?.accessToken);
                 localStorage.setItem('refreshToken', response.data.data?.refreshToken);
-                navigate('/admin/dashboard');
+                window.location.href = '/admin/dashboard';
                 setFormData({ email: '', password: '' });
             }
         } catch (error) {
             console.log("Login error: ", error);
-            // message.error(response.data.message);    
+            message.error(error?.response.data.message);    
         } finally {
             setLoading(false);
         }

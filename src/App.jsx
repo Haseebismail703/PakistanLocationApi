@@ -69,15 +69,19 @@ function App() {
           <Route path="/login" element={<UserLogin />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="*" element={<NotFound />} />
+
           {/* Verify Email Route */}
           <Route path="/admin/verify-email" element={<VerifyEmail />} />
           <Route path="/user/verify-email" element={<VerifyEmail />} />
+
           {/* Admin forgot and reset Route */}
           <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-          <Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
+          <Route path="/admins/reset-password/:token" element={<AdminResetPassword />} />
+
           {/* User forgot reset route */}
           <Route path="/forgot-password" element={<UserForgotPass />} />
-          <Route path="/reset-password/:token" element={<UserResetPass />} />
+          <Route path="/users/reset-password/:token" element={<UserResetPass />} />
+          
           {/* payment */}
           <Route path="/payment" element={ <Elements stripe={stripePromise}><Payment /></Elements>}/>
 

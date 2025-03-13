@@ -56,7 +56,7 @@ const ManageDistrics = () => {
         try {
             const response = await adminInterceptor.get(`/admins/districts?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const districtsData = response.data?.data?.map((data, index) => ({
-                key: index + 1,
+                key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
@@ -65,7 +65,7 @@ const ManageDistrics = () => {
                 countryId: data.countryId,
             }));
             setdistricts(districtsData);
-            setTotalItems(districtsData.total || 100);
+            setTotalItems(districtsData.total || 1000);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {

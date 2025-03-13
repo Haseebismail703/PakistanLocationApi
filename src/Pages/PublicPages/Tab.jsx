@@ -24,7 +24,7 @@ const DivisionList = () => {
       );
 
       const divisionsData = response.data?.data?.map((data, index) => ({
-        key: index + 1,
+        key: index + 1 + (currentPage - 1) * pageSize,
         id: data._id,
         name: data.name || "N/A",
         createdAt: data.createdAt?.substring(0, 10) || "N/A",

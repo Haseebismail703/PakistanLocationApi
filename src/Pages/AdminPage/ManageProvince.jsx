@@ -56,7 +56,7 @@ const ManageProvince = () => {
         try {
             const response = await adminInterceptor.get(`/admins/provinces?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const provincesData = response.data?.data?.map((data, index) => ({
-                key: index + 1,
+                key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
@@ -65,7 +65,7 @@ const ManageProvince = () => {
                 countryId: data.countryId,
             }));
             setProvinces(provincesData);
-            setTotalItems(provincesData.total || 100);
+            setTotalItems(provincesData.total || 1000);
         } catch (error) {
             message.error("Failed to fetch provinces!");
         } finally {

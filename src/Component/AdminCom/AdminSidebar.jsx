@@ -177,13 +177,13 @@ console.log(admin)
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Switch
+            {/* <Switch
               checked={darkMode}
               onChange={handleDarkModeToggle}
               checkedChildren="Dark"
               unCheckedChildren="Light"
               style={{ marginRight: 40 }}
-            />
+            /> */}
             <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
               <Avatar
                 size={40}
