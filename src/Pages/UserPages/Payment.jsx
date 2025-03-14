@@ -23,10 +23,10 @@ const PaymentPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // const storedTheme = JSON.parse(localStorage.getItem("theme"));
-    // if (storedTheme) {
-    //   setTheme(storedTheme);
-    // }
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -79,67 +79,72 @@ const PaymentPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-6 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
       <div className="mb-6 w-full max-w-4xl">
-        <Steps
+        <Steps 
           current={showConfirmation ? 1 : 0}
           items={[
-            { title: <span className="text-white">Payment</span> },
-            { title: <span className="text-white">Confirm Payment</span> },
+            { title: <span className={theme === "dark" ? "text-white" : "text-black"}>Payment</span> },
+            { title: <span className={theme === "dark" ? "text-white" : "text-black"}>Confirm Payment</span> },
           ]}
+          progressDot={(dot, { status, index }) => (
+            <span className={`ant-steps-icon ${status === 'process' ? 'bg-blue-500' : status === 'finish' ? 'bg-green-500' : 'bg-gray-300'}`}>
+              {dot}
+            </span>
+          )}
         />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 max-w-4xl w-full">
         {/* Payment Form */}
         {!showConfirmation ? (
-          <div className="bg-gray-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-white text-2xl font-semibold mb-4">Payment</h2>
+          <div className={`p-6 rounded-2xl shadow-xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+            <h2 className={`text-2xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Payment</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="text-gray-400 text-sm">Full Name*</label>
+                <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Full Name*</label>
                 <input
                   name="fullName"
                   type="text"
                   required
-                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                  className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
                 />
               </div>
               <div>
-                <label className="text-gray-400 text-sm">Card Number*</label>
+                <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Card Number*</label>
                 <input
                   name="cardNumber"
                   type="text"
                   required
-                  className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                  className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-gray-400 text-sm">Exp Month*</label>
+                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Exp Month*</label>
                   <input
                     name="expMonth"
                     type="text"
                     required
-                    className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                    className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
                   />
                 </div>
                 <div>
-                  <label className="text-gray-400 text-sm">Exp Year*</label>
+                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Exp Year*</label>
                   <input
                     name="expYear"
                     type="text"
                     required
-                    className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                    className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
                   />
                 </div>
                 <div>
-                  <label className="text-gray-400 text-sm">CVC*</label>
+                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>CVC*</label>
                   <input
                     name="cvc"
                     type="password"
                     required
-                    className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"
+                    className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
                   />
                 </div>
               </div>
@@ -151,23 +156,23 @@ const PaymentPage = () => {
         ) : (
           // Confirmation Card
           <div className="fixed inset-0 flex items-center justify-center bg-opacity-50">
-            <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl w-96 text-center">
-              <h2 className="text-white text-3xl font-bold mb-6">Confirm Payment</h2>
+            <div className={`p-8 rounded-2xl shadow-2xl w-96 text-center ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+              <h2 className={`text-3xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`}>Confirm Payment</h2>
 
-              <div className="text-gray-300 space-y-4 text-lg">
+              <div className={`space-y-4 text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                 <div className="flex justify-between">
                   <span>Plan:</span>
-                  <span className="text-white font-medium">{selectedPlan.name}</span>
+                  <span className={`font-medium ${theme === "dark" ? "text-white" : "text-black"}`}>{selectedPlan.name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Requests per Day:</span>
-                  <span className="text-white font-medium">{selectedPlan.requestsPerDay}</span>
+                  <span className={`font-medium ${theme === "dark" ? "text-white" : "text-black"}`}>{selectedPlan.requestsPerDay}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Requests per Month:</span>
-                  <span className="text-white font-medium">{selectedPlan.requestsPerMonth}</span>
+                  <span className={`font-medium ${theme === "dark" ? "text-white" : "text-black"}`}>{selectedPlan.requestsPerMonth}</span>
                 </div>
-                <div className="flex justify-between text-xl font-semibold text-white">
+                <div className={`flex justify-between text-xl font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>
                   <span>Total amount:</span>
                   <span>
                     {(selectedPlan.amount * currencies[currency]).toFixed(2)} {currency}
@@ -187,12 +192,12 @@ const PaymentPage = () => {
 
         {/* Summary Section */}
         {!showConfirmation && (
-          <div className="bg-gray-800 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-white text-2xl font-semibold mb-4">Summary</h2>
-            <div className="text-gray-300 space-y-3">
+          <div className={`p-6 rounded-2xl shadow-xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+            <h2 className={`text-2xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Summary</h2>
+            <div className={`space-y-3 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
               <div className="flex justify-between">
                 <span>Plan</span>
-                <span className="text-white font-semibold">Pro</span>
+                <span className={`font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>Pro</span>
               </div>
               <div className="flex justify-between">
                 <span>Requests per Day</span>
@@ -202,7 +207,7 @@ const PaymentPage = () => {
                 <span>Requests per Month</span>
                 <span className="text-green-400 font-semibold">Unlimited</span>
               </div>
-              <div className="flex justify-between text-xl font-semibold text-white">
+              <div className={`flex justify-between text-xl font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>
                 <span>Total amount</span>
                 <span>
                   {(selectedPlan?.amount * currencies[currency]).toFixed(2)} {currency.toUpperCase()}
