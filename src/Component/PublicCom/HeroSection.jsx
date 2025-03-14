@@ -1,7 +1,31 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 function HeroSection() {
-  let navigate = useNavigate()
+  let navigate = useNavigate();
+  const [isUser, setIsUser] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setIsUser(true);
+      if (user.role === 'admin') {
+        setIsAdmin(true);
+      }
+    }
+  }, []);
+
+  const handleStartTrial = () => {
+    if (isAdmin) {
+      navigate('/admin/dashboard');
+    }  else if (isUser) {
+      navigate('/user/dashboard');
+    } else{
+      navigate('/register');  
+    }
+  };
+
   return (
     <div id='home' className="font-sans mt-24 mb-24" style={{ marginTop: 200 }} >
       <div className="text-center max-w-2xl max-md:max-w-md mx-auto">
@@ -12,33 +36,15 @@ function HeroSection() {
             Api
           </h2>
           <p className="mt-6 text-sm leading-relaxed max-sm:text-center">
-          Our Pakistan Location API provides precise and comprehensive location data for users across Pakistan. Whether you need details about cities, provinces,  our API ensures fast, reliable, and up-to-date results. Easily integrate our service to access accurate area-based information, making location-based applications seamless and efficient.
+            Our Pakistan Location API provides precise and comprehensive location data for users across Pakistan. Whether you need details about cities, provinces, our API ensures fast, reliable, and up-to-date results. Easily integrate our service to access accurate area-based information, making location-based applications seamless and efficient.
           </p>
-          {/* <div className="grid sm:grid-cols-3 gap-6 items-center mt-12">
-            <div className="flex flex-col items-center text-center">
-              <h5 className="font-bold text-2xl text-blue-600 mb-2">10+</h5>
-              <p className=" text-sm font-semibold">
-                Years Experience
-              </p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <h5 className="font-bold text-2xl text-blue-600 mb-2">890</h5>
-              <p className=" text-sm font-semibold">Cases Solved</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <h5 className="font-bold text-2xl text-blue-600 mb-2">250</h5>
-              <p className=" text-sm font-semibold">
-                Business Partners
-              </p>
-            </div>
-          </div> */}
           <div className="mt-20 flex gap-x-6 gap-y-4 justify-center max-sm:flex-col max-sm:mx-4">
             <button
-              onClick={() => navigate('/register')}
+              onClick={handleStartTrial}
               type="button"
-              className="bg-blue-600 hover:bg-transparent hover:text-blue-600 border border-blue-600 transition-all text-white font-bold text-sm rounded px-6 py-3 max-sm:w-full"
+              className={`bg-blue-600 hover:bg-transparent hover:text-blue-600 border border-blue-600 transition-all text-white font-bold text-sm rounded px-6 py-3 max-sm:w-full`}
             >
-              Start a free trial
+              {isAdmin ? 'Go to Dashboard' : isUser ? 'Go to Dashboard' : 'Start a free trial'}
             </button>
             <button
               type="button"
@@ -47,12 +53,11 @@ function HeroSection() {
               API documentation
             </button>
           </div>
-
         </div>
       </div>
       <br /><br />
     </div>
-  )
+  );
 }
 
-export default HeroSection
+export default HeroSection;

@@ -11,7 +11,7 @@ import {
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { UserContext } from "../../Context/UserContext";
-import userInterceptor from "../../Api/userInterceptor";
+import userInterceptor from "../../Api/userInterceptor.js";
 import logo from "../../assets/logo.png";
 const { Header, Sider, Content } = Layout;
 import VerifyAlert from '../../Component/PublicCom/VerifyAlert'
@@ -29,9 +29,8 @@ console.log(user)
 
   const handleLogout = async () => {
     try {
-      await userInterceptor.get(`/users/logout`, {
-        withCredentials: true,
-      });
+      await userInterceptor.get(`/users/logout`, { withCredentials: true });
+     
       localStorage.removeItem("user");
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
