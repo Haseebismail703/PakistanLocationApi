@@ -21,7 +21,6 @@ const UserSidebar = ({ children }) => {
   const [selectedKey, setSelectedKey] = useState("dashboard");
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
-console.log(user)
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
@@ -29,20 +28,25 @@ console.log(user)
 
   const handleLogout = async () => {
     try {
-      await userInterceptor.get(`/users/logout`, { withCredentials: true });
-     
+      console.log("Logging out...");
+      const response = await userInterceptor.get(`/users/logout`, { withCredentials: true });
+      console.log("Logout Response:", response);
+  
       localStorage.removeItem("user");
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+  
       document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
+  
       message.success("Logged out successfully!");
       navigate("/login");
     } catch (error) {
-      message.error("Logout error!");
+      console.error("Logout Error:", error.response?.data.message);
+      message.error( error.response?.data.message || "Failed to logout!");
     }
   };
+  
 
 
   const toggleCollapse = () => setCollapsed(!collapsed);

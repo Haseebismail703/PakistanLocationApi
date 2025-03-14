@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Steps, Spin, message  } from "antd"; // Ant Design Steps and Spin Import
+import { Steps, Spin, message } from "antd"; // Ant Design Steps and Spin Import
 import userInterceptor from '../../Api/userInterceptor.js'
+import { useNavigate } from "react-router-dom";
 
 const currencies = {
   usd: 1,
@@ -21,7 +22,8 @@ const PaymentPage = () => {
   const [paymentData, setPaymentData] = useState(null);
   const [theme, setTheme] = useState("light");
   const [isLoading, setIsLoading] = useState(false);
-
+  let user = JSON.parse(localStorage.getItem('user'))
+  let navigate = useNavigate()
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme) {
@@ -81,7 +83,7 @@ const PaymentPage = () => {
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center p-6 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
       <div className="mb-6 w-full max-w-4xl">
-        <Steps 
+        <Steps
           current={showConfirmation ? 1 : 0}
           items={[
             { title: <span className={theme === "dark" ? "text-white" : "text-black"}>Payment</span> },
@@ -148,9 +150,12 @@ const PaymentPage = () => {
                   />
                 </div>
               </div>
-              <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">
-                {isLoading ? <Spin /> : "Pay Now"}
-              </button>
+              {!user ? <button onClick={() => navigate('/login')} className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">
+                {"First Login to Proceed"}
+              </button> :
+                <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">
+                  {isLoading ? <Spin /> : "Pay Now"}
+                </button>}
             </form>
           </div>
         ) : (
@@ -193,7 +198,10 @@ const PaymentPage = () => {
         {/* Summary Section */}
         {!showConfirmation && (
           <div className={`p-6 rounded-2xl shadow-xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
-            <h2 className={`text-2xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Summary</h2>
+            <h2 className={`text-2xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>
+              Summary
+            </h2>
+
             <div className={`space-y-3 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
               <div className="flex justify-between">
                 <span>Plan</span>
@@ -212,6 +220,14 @@ const PaymentPage = () => {
                 <span>
                   {(selectedPlan?.amount * currencies[currency]).toFixed(2)} {currency.toUpperCase()}
                 </span>
+              </div>
+              <div style={{ marginTop: 80 }} className="mt-6 flex items-center justify-center gap-8">
+                <img className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal.svg" alt="" />
+                <img className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal-dark.svg" alt="" />
+                <img className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa.svg" alt="" />
+                <img className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa-dark.svg" alt="" />
+                <img className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard.svg" alt="" />
+                <img className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard-dark.svg" alt="" />
               </div>
             </div>
           </div>

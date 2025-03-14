@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const pricingPlans = [
   {
     title: "Free Plan",
-    price: "$0",
+    price: "0$",
     duration: "Month",
     icons: "🆓", 
     features: [
@@ -16,30 +16,43 @@ const pricingPlans = [
     path : "/register"
   },
   {
-    title: "Basic Plan",
-    price: "$9",
+    title: "Pro",
+    price: "50$",
     duration: "Month",
     icons: "⭐", 
     features: [
       { text: "Expanded location coverage", icon: "🗺️" },
       { text: "Faster API response time", icon: "⚡" },
-      { text: "5,000 API requests per day", icon: "📈" },
+      { text: "Unlimited API requests per day", icon: "📈" },
     ],
     button: "Purchase Plan",
-    path : "/"
+    path : "/payment"
   },
+  // {
+  //   title: "Pro Max",
+  //   price: "100$",
+  //   duration: "Month",
+  //   icons: "🚀",
+  //   features: [
+  //     { text: "Full location database access", icon: "🌍" },
+  //     { text: "Ultra-fast API response", icon: "🚀" },
+  //     { text: "Unlimited API requests", icon: "♾️" },
+  //   ],
+  //   button: "Purchase Plan",
+  //   path : "/"
+  // },
   {
-    title: "Pro Plan",
-    price: "$49",
-    duration: "Month",
-    icons: "🚀",
+    title: "B2B",
+    price: "Contact Us",
+    duration: "",
+    icons: "🏢",
     features: [
-      { text: "Full location database access", icon: "🌍" },
-      { text: "Ultra-fast API response", icon: "🚀" },
-      { text: "Unlimited API requests", icon: "♾️" },
+      { text: "Custom location solutions", icon: "🔧" },
+      { text: "Dedicated support", icon: "📞" },
+      { text: "Flexible API limits", icon: "🔄" },
     ],
-    button: "Purchase Plan",
-    path : "/"
+    button: "Contact Admin",
+    path : "/contact"
   },
 ];
 

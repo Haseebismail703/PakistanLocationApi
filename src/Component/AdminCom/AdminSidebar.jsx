@@ -32,7 +32,7 @@ const AdminSidebar = ({ children }) => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
-    document.body.style.backgroundColor = darkMode ? "#121212" : "#f4f6f8";
+    document.body.style.backgroundColor =  "#f4f6f8";
   }, [location.pathname, darkMode]);
 
   const handleLogout = async () => {
@@ -116,7 +116,7 @@ console.log(admin)
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor: darkMode ? "#121212" : "#f4f6f8" }}>
+    <Layout style={{ minHeight: "100vh", backgroundColor:  "#f4f6f8" }}>
       <Sider
         collapsible
         collapsed={collapsed}
