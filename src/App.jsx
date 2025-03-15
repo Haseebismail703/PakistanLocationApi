@@ -76,7 +76,7 @@ function App() {
 
           {/* Admin forgot and reset Route */}
           <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-          <Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
+          <Route path="/admins/reset-password/:token" element={<AdminResetPassword />} />
 
           {/* User forgot reset route */}
           <Route path="/forgot-password" element={<UserForgotPass />} />
