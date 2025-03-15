@@ -119,18 +119,18 @@ const UserSidebar = ({ children }) => {
 
 
         <div style={{ textAlign: "center", padding: "20px" }}>
-          {!collapsed && (
+          {/* {!collapsed && ( */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
               <img
                 src={logo}
                 alt="Logo"
                 style={{ width: "50px", height: "auto", marginRight: "10px" }}
               />
-              <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+              {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
                 User dashboard
-              </p>
+              </p> */}
             </div>
-          )}
+          {/* )} */}
         </div>
 
 
@@ -171,6 +171,9 @@ const UserSidebar = ({ children }) => {
               style={{ fontSize: "18px", cursor: "pointer", color: "#000" }}
             />
           )}
+           <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+                User dashboard
+              </p>
           <Dropdown menu={userMenu} placement="bottomRight">
             <Avatar
               size={40}

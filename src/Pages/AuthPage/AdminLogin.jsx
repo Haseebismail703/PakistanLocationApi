@@ -44,7 +44,7 @@ function AdminLogin() {
         <Bacground>
         <div className={`relative ml-5 mr-5 z-10 max-w-md w-full mx-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-lg p-8 rounded-xl`}>
             <div className={`text-center text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                <Spin spinning={loading}>
+                {/* <Spin spinning={loading}> */}
                     {/* Heading */}
                     <h1 className={`text-center text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                         Admin login
@@ -84,7 +84,7 @@ function AdminLogin() {
                         {/* Submit Button */}
                         <div className="mt-6">
                             <button type="submit" className="w-full py-3 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-                                Login
+                              {loading ? <Spin/> : "Login"}  
                             </button>
                         </div>
                     </form>
@@ -96,7 +96,7 @@ function AdminLogin() {
                             Click here
                         </button>
                     </p>
-                </Spin>
+                {/* </Spin> */}
             </div>
         </div>
         </Bacground>

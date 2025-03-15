@@ -72,10 +72,10 @@ function App() {
 
           {/* Verify Email Route */}
           <Route path="/admin/verify-email" element={<VerifyEmail />} />
-          <Route path="/user/verify-email" element={<VerifyEmail />} />
+          <Route path="/users/verify-email" element={<VerifyEmail />} />
 
           {/* Admin forgot and reset Route */}
-          <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+          <Route path="/admins/forgot-password" element={<AdminForgotPassword />} />
           <Route path="/admins/reset-password/:token" element={<AdminResetPassword />} />
 
           {/* User forgot reset route */}

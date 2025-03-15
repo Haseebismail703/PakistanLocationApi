@@ -133,18 +133,18 @@ console.log(admin)
         }}
       >
         <div style={{ textAlign: "center", padding: "20px" }}>
-          {!collapsed && (
+          {/* {!collapsed && ( */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
               <img
                 src={logo}
                 alt="Logo"
                 style={{ width: "50px", height: "auto", marginRight: "15px" }}
               />
-              <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+              {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
                 Admin Panel
-              </p>
+              </p> */}
             </div>
-          )}
+          {/* )} */}
         </div>
 
         <Menu
@@ -158,6 +158,7 @@ console.log(admin)
       </Sider>
 
       <Layout>
+        
         <Header
           style={{
             position: "fixed",
@@ -170,12 +171,15 @@ console.log(admin)
             borderBottom: "1px solid #e2e8f0",
             zIndex: 1000,
           }}
-        >
+        > 
           {collapsed ? (
             <MenuUnfoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           ) : (
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
+           <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+                Admin Panel
+              </p>
           <div style={{ display: "flex", alignItems: "center" }}>
             {/* <Switch
               checked={darkMode}
@@ -184,6 +188,7 @@ console.log(admin)
               unCheckedChildren="Light"
               style={{ marginRight: 40 }}
             /> */}
+            
             <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
               <Avatar
                 size={40}
