@@ -1,95 +1,109 @@
-import React, { useEffect, useState } from "react";
-import { Table, Pagination, message } from "antd";
-import adminInterceptor from "../../Api/adminInterceptor.js";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Table, Select } from "antd";
 
-const DivisionList = () => {
-  const [divisions, setDivisions] = useState([]);
-  const [tableLoading, setTableLoading] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
+const { Option } = Select;
 
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+// Dummy Data
+const allData = [
+  { id: 1, division: "Karachi", district: "South", city: "Saddar", area: "Clifton", name: "Location A" },
+  { id: 2, division: "Karachi", district: "East", city: "Gulshan", area: "Johar", name: "Location B" },
+  { id: 3, division: "Lahore", district: "Lahore", city: "DHA", area: "Phase 6", name: "Location C" },
+  { id: 4, division: "Mumbai", district: "Mumbai", city: "Andheri", area: "Lokhandwala", name: "Location D" },
+  { id: 5, division: "New Delhi", district: "Central", city: "Connaught", area: "Circle", name: "Location E" },
+];
 
-  // Get currentPage and pageSize from URL or default to 1 and 10
-  const currentPage = parseInt(searchParams.get("page")) || 1;
-  const pageSize = parseInt(searchParams.get("size")) || 10;
+const DivisionFilter = () => {
+  // Filters State
+  const [selectedDivision, setSelectedDivision] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
 
-  const getAlldivisions = async () => {
-    setTableLoading(true);
-    try {
-      console.log(`Fetching divisions: Page ${currentPage}, Limit ${pageSize}`);
-      const response = await adminInterceptor.get(
-        `/admins/divisions?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`
-      );
+  // Extract unique values for dropdowns
+  const divisions = [...new Set(allData.map((item) => item.division))];
 
-      const divisionsData = response.data?.data?.map((data, index) => ({
-        key: index + 1,
-        id: data._id,
-        name: data.name || "N/A",
-        createdAt: data.createdAt?.substring(0, 10) || "N/A",
-        details: data.details || "N/A",
-        countryId: data.countryId || "N/A",
-      }));
+  const districts = selectedDivision
+    ? [...new Set(allData.filter((item) => item.division === selectedDivision).map((item) => item.district))]
+    : [];
 
-      console.log("Response Data:", response.data?.data);
+  const cities = selectedDistrict
+    ? [...new Set(allData.filter((item) => item.district === selectedDistrict).map((item) => item.city))]
+    : [];
 
-      setDivisions(divisionsData);
-      setTotalItems(divisionsData?.total || 300);
-    } catch (error) {
-      message.error("Failed to fetch divisions!");
-    } finally {
-      setTableLoading(false);
-    }
-  };
+  const areas = selectedCity
+    ? [...new Set(allData.filter((item) => item.city === selectedCity).map((item) => item.area))]
+    : [];
 
-  useEffect(() => {
-    getAlldivisions();
-  }, [currentPage, pageSize]);
+  // Filtered Table Data
+  const filteredData = allData.filter((item) => {
+    return (
+      (!selectedDivision || item.division === selectedDivision) &&
+      (!selectedDistrict || item.district === selectedDistrict) &&
+      (!selectedCity || item.city === selectedCity)
+    );
+  });
 
+  // Table Columns
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Created At", dataIndex: "createdAt", key: "createdAt" },
-    { title: "Details", dataIndex: "details", key: "details" },
-    { title: "Country ID", dataIndex: "countryId", key: "countryId" },
+    { title: "Division", dataIndex: "division", key: "division" },
+    { title: "District", dataIndex: "district", key: "district" },
+    { title: "City", dataIndex: "city", key: "city" },
+    { title: "Area", dataIndex: "area", key: "area" },
   ];
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Division List</h2>
+      <h2>Division-based Filtering</h2>
 
-      <Table
-        loading={tableLoading}
-        columns={columns}
-        dataSource={divisions}
-        pagination={false}
-        rowKey="id"
-        scroll={{ x: "100" }}
-        bordered
-        style={{ marginBottom: "16px" }}
-      />
+      {/* Dropdown Filters */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+        <Select
+          placeholder="Select Division"
+          style={{ width: 200 }}
+          onChange={setSelectedDivision}
+          value={selectedDivision}
+        >
+          {divisions.map((division) => (
+            <Option key={division} value={division}>
+              {division}
+            </Option>
+          ))}
+        </Select>
 
-      <Pagination
-        current={currentPage}
-        total={totalItems}
-        pageSize={pageSize}
-        onChange={(page, size) => {
-          if (page < currentPage || divisions.length === pageSize) {
-            navigate(`?page=${page}&size=${size}`);
-          } else {
-            message.warning("No more data to display.");
-          }
-        }}
-        showSizeChanger
-        pageSizeOptions={["10", "20", "50", "100"]}
-        style={{ textAlign: "center" }}
-        showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-        hideOnSinglePage={true}
-        showLessItems={true}
-      />
+        <Select
+          placeholder="Select District"
+          style={{ width: 200 }}
+          onChange={setSelectedDistrict}
+          value={selectedDistrict}
+          disabled={!selectedDivision}
+        >
+          {districts.map((district) => (
+            <Option key={district} value={district}>
+              {district}
+            </Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Select City"
+          style={{ width: 200 }}
+          onChange={setSelectedCity}
+          value={selectedCity}
+          disabled={!selectedDistrict}
+        >
+          {cities.map((city) => (
+            <Option key={city} value={city}>
+              {city}
+            </Option>
+          ))}
+        </Select>
+      </div>
+
+      {/* Table */}
+      <Table columns={columns} dataSource={filteredData} rowKey="id" bordered />
     </div>
   );
 };
 
-export default DivisionList;
+export default DivisionFilter;

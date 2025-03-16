@@ -59,7 +59,7 @@ const pricingPlans = [
 function Pricing() {
   const navigate = useNavigate()
   return (
-    <div id="pricing" className="bg-white  dark:bg-base-100">
+    <div id="pricing" className="bg-white dark:bg-base-100">
     <section className="py-24 relative">
       <div className="absolute h-[36.5rem] w-full top-0 bg-gradient-to-r from-violet-500 to-violet-600 -z-10" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

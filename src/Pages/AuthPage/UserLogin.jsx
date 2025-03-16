@@ -33,7 +33,8 @@ function UserLogin() {
         setFormData({ email: '', password: '' });
       }
     } catch (error) {
-      message.error(error.response.data?.message);    
+      message.error(error.response.data?.message);   
+      console.log(error.response.data) 
     } finally {
       setLoading(false);
     }

@@ -2,8 +2,6 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Spin } from "antd";
 import DivisionTable from "./Pages/PublicPages/Tab";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 // Auth pages
 const UserRegister = lazy(() => import("./Pages/AuthPage/UserRegister"));
 const UserLogin = lazy(() => import("./Pages/AuthPage/UserLogin"));
@@ -30,6 +28,7 @@ const ManageDivision = lazy(() => import("./Pages/AdminPage/ManageDivision"));
 const ManageCity = lazy(() => import("./Pages/AdminPage/ManageCity"));
 const ManageDistrics = lazy(() => import("./Pages/AdminPage/ManageDistrics"));
 const ManageArea = lazy(() => import("./Pages/AdminPage/ManageArea"));
+const AdminPageNotFound = lazy(() => import("./Pages/AdminPage/AdminPageNotFound"));
 
 // User Pages
 const UserSidebar = lazy(() => import("./Component/UserComp/UserSidebar"));
@@ -38,6 +37,8 @@ const GenerateApiKey = lazy(() => import("./Pages/UserPages/ApiKey"));
 const UserDashboard = lazy(() => import("./Pages/UserPages/UserDashboard"));
 const UserContact = lazy(() => import("./Pages/UserPages/Contact"));
 const Payment = lazy(() => import("./Pages/UserPages/Payment"));
+const UserPageNotFound = lazy(() => import("./Pages/UserPages/UserPageNotFound"));
+
 // Authentication Check
 const isAdminAuthenticated = () => {
   const admin = localStorage.getItem("admin");
@@ -57,7 +58,7 @@ const AdminProtectedRoute = ({ children }) => {
 const UserProtectedRoute = ({ children }) => {
   return isUserAuthenticated() ? children : <Navigate to="/login" />;
 };
-const stripePromise = loadStripe("pk_test_51R1j9WLr27OCkBRrCnJhQCWhT1nCbX29jcJN00t26hUE0uxkSa2eTj8QVgHZCk");
+
 function App() {
   return (
     <BrowserRouter>
@@ -83,7 +84,7 @@ function App() {
           <Route path="/users/reset-password/:token" element={<UserResetPass />} />
           
           {/* payment */}
-          <Route path="/payment" element={ <Elements stripe={stripePromise}><Payment /></Elements>}/>
+          <Route path="/payment" element={<Payment />}/>
 
           <Route path="/table" element={<DivisionTable />} />
           <Route path="/form" element={<UserForm />} />
@@ -102,6 +103,7 @@ function App() {
                     <Route path="manage-cities" element={<ManageCity />} />
                     <Route path="manage-district" element={<ManageDistrics />} />
                     <Route path="manage-area" element={<ManageArea />} />
+                    <Route path="*" element={<AdminPageNotFound />} />
                   </Routes>
                 </AdminSidebar>
               </AdminProtectedRoute>
@@ -119,6 +121,7 @@ function App() {
                     <Route path="api" element={<GenerateApiKey />} />
                     <Route path="dashboard" element={<UserDashboard />} />
                     <Route path="contact" element={<UserContact />} />
+                    <Route path="*" element={<UserPageNotFound />} />
                   </Routes>
                 </UserSidebar>
               </UserProtectedRoute>

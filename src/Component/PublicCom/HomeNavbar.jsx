@@ -51,13 +51,13 @@ const HomeNavbar = () => {
               <a onClick={() => handleMenuClick("home")}>Home</a>
             </li>
             <li>
-              <a onClick={() => handleMenuClick("about")}>About</a>
+            <a onClick={() => handleMenuClick("feature")}>Feature</a>
             </li>
             <li>
-              <a onClick={() => handleMenuClick("services")}>Services</a>
+            <a onClick={() => handleMenuClick("how its work")}>How It Works</a>
             </li>
             <li>
-              <a onClick={() => handleMenuClick("contact")}>Contact</a>
+            <a onClick={() => handleMenuClick("pricing")}>Pricing</a>
             </li>
           </ul>
         </div>
