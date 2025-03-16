@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Input, Button, Card, Typography, Spin } from "antd";
 import { motion } from "framer-motion";
 import axios from "axios";
-import api from "../../Api/api.js";
-
+import api from '../../Api/api.js'
 const { Title } = Typography;
+const API_BASE = `${api}/public`;
 
 const LocationForm = () => {
-  const [step, setStep] = useState("country");
+  const [step, setStep] = useState("province");
   const [location, setLocation] = useState({
-    country: "",
     province: "",
     division: "",
     district: "",
@@ -27,24 +26,27 @@ const LocationForm = () => {
   const fetchData = async () => {
     setLoading(true);
     let url = "";
-
-    if (step === "country") url = `${api}/admins/country`;
-    else if (step === "province") url = `${api}/admins/provinces`;
-    else if (step === "division") url = `${api}/admins/divisions`;
-    else if (step === "district") url = `${api}/admins/districts`;
-    else if (step === "city") url = `${api}/admins/cities`;
-    else if (step === "area") url = `${api}/admins/areas`;
-
-    let token = JSON.parse(localStorage.getItem("admin"));
-
+  
+    const API_KEY = "YZ4iC85hw2GZzcKzkLm2lC6pKffs3c0S"; // API Key
+  
+    if (step === "province") 
+      url = `${API_BASE}/provinces?limit=5&apiKey=${API_KEY}`;
+    else if (step === "division" && location.province)
+      url = `${API_BASE}/divisions/${location.province}?apiKey=${API_KEY}`;
+    else if (step === "district" && location.division)
+      url = `${API_BASE}/districts/${location.division}?apiKey=${API_KEY}`;
+    else if (step === "city" && location.district)
+      url = `${API_BASE}/cities/${location.district}?apiKey=${API_KEY}`;
+    else if (step === "area" && location.city)
+      url = `${API_BASE}/areas/${location.city}?limit=5&apiKey=${API_KEY}`;
+  
+    if (!url) {
+      setLoading(false);
+      return;
+    }
+  
     try {
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token?.accessToken}`,
-        },
-      });
-
-      // Ensure options is an array of objects and store them correctly
+      const response = await axios.get(url);
       setOptions(Array.isArray(response.data?.data) ? response.data?.data : []);
     } catch (error) {
       console.error(`Error fetching ${step} data:`, error);
@@ -53,13 +55,13 @@ const LocationForm = () => {
       setLoading(false);
     }
   };
+  
 
-  const handleNext = (field, value) => {
-    setLocation((prev) => ({ ...prev, [field]: value }));
+  const handleNext = (field, value, id) => {
+    setLocation((prev) => ({ ...prev, [field]: id })); // Store ID
     setSearch("");
 
-    if (field === "country") setStep("province");
-    else if (field === "province") setStep("division");
+    if (field === "province") setStep("division");
     else if (field === "division") setStep("district");
     else if (field === "district") setStep("city");
     else if (field === "city") setStep("area");
@@ -67,16 +69,14 @@ const LocationForm = () => {
   };
 
   const handleBack = () => {
-    if (step === "province") setStep("country");
-    else if (step === "division") setStep("province");
+    if (step === "division") setStep("province");
     else if (step === "district") setStep("division");
     else if (step === "city") setStep("district");
     else if (step === "area") setStep("city");
-    else setStep("area");
+
     setSearch("");
   };
 
-  // Ensure `filteredOptions` uses `name` instead of an object
   const filteredOptions = options?.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -125,12 +125,12 @@ const LocationForm = () => {
             ) : (
               filteredOptions.map((item) => (
                 <motion.div
-                  key={item._id} // Use _id as a unique key
+                  key={item._id}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button
-                    onClick={() => handleNext(step, item.name)} // Store name only
+                    onClick={() => handleNext(step, item.name, item._id)}
                     block
                     style={{
                       marginBottom: 5,
@@ -139,13 +139,13 @@ const LocationForm = () => {
                       border: "1px solid black",
                     }}
                   >
-                    {item.name} {/* Display name */}
+                    {item.name}
                   </Button>
                 </motion.div>
               ))
             )}
 
-            {step !== "country" && (
+            {step !== "province" && (
               <Button
                 onClick={handleBack}
                 block
@@ -165,9 +165,6 @@ const LocationForm = () => {
             <Title level={4} style={{ color: "black" }}>
               Review Your Selection
             </Title>
-            <p>
-              <strong>Country:</strong> {location.country}
-            </p>
             <p>
               <strong>Province:</strong> {location.province}
             </p>
