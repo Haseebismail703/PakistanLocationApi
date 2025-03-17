@@ -9,7 +9,7 @@ const AdminLogin = lazy(() => import("./Pages/AuthPage/AdminLogin"));
 
 // public pages 
 const Home = lazy(() => import("./Pages/PublicPages/Home"));
-const UserForm = lazy(() => import("./Pages/PublicPages/UserForm"));
+const AdminForm = lazy(() => import("./Pages/AdminPage/AdminForm"));
 const NotFound = lazy(() => import("./Pages/PublicPages/NotFound"));
 const AdminForgotPassword = lazy(() => import("./Pages/PublicPages/AdminForgotPass"));
 const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass"));
@@ -87,7 +87,7 @@ function App() {
           <Route path="/payment" element={<Payment />}/>
 
           <Route path="/table" element={<DivisionTable />} />
-          <Route path="/form" element={<UserForm />} />
+          {/* <Route path="/form" element={<UserForm />} /> */}
           {/* Admin Routes (Protected) */}
           <Route
             path="/admin/*"
@@ -104,6 +104,7 @@ function App() {
                     <Route path="manage-district" element={<ManageDistrics />} />
                     <Route path="manage-area" element={<ManageArea />} />
                     <Route path="*" element={<AdminPageNotFound />} />
+                    <Route path="/form" element={<AdminForm />} />
                   </Routes>
                 </AdminSidebar>
               </AdminProtectedRoute>

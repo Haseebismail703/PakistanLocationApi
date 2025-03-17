@@ -8,7 +8,7 @@ const { Search } = Input;
 const API_BASE = `${api}/public`;
 const API_KEY = "YZ4iC85hw2GZzcKzkLm2lC6pKffs3c0S";
 
-const LocationTable = () => {
+const AdminForm = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState("country");
@@ -160,4 +160,4 @@ const LocationTable = () => {
   );
 };
 
-export default LocationTable;
+export default AdminForm;

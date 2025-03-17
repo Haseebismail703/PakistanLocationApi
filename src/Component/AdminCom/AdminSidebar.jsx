@@ -100,6 +100,11 @@ const AdminSidebar = ({ children }) => {
       label: <Link to="/admin/manage-area">Manage Area</Link>,
     },
     {
+      key: "Location Table",
+      icon: <ClusterOutlined />,
+      label: <Link to="/admin/form">Location Table</Link>,
+    },
+    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
