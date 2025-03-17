@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Steps, Spin, message } from "antd"; // Ant Design Steps and Spin Import
 import userInterceptor from '../../Api/userInterceptor.js'
 import { useNavigate } from "react-router-dom";
-
+import { UserContext } from '../../Context/UserContext.jsx'
 const currencies = {
   usd: 1,
   PKR: 278,
@@ -22,7 +22,11 @@ const PaymentPage = () => {
   const [paymentData, setPaymentData] = useState(null);
   const [theme, setTheme] = useState("light");
   const [isLoading, setIsLoading] = useState(false);
-  let user = JSON.parse(localStorage.getItem('user'))
+  const [cardNumber, setCardNumber] = useState("");
+  const [expMonth, setExpMonth] = useState("");
+  const [expYear, setExpYear] = useState("");
+  const { user } = useContext(UserContext);
+  let getUser = JSON.parse(localStorage.getItem('user'))
   let navigate = useNavigate()
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
@@ -33,6 +37,11 @@ const PaymentPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(user?.data?.plan)
+    if (user?.data?.plan === "paid") {
+      message.info("You already have a paid plan.");
+      return;
+    }
     setIsLoading(true);
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
@@ -42,13 +51,16 @@ const PaymentPage = () => {
         currency: selectedPlan.currency,
       });
       if (res.data.data?.paymentIntentId) {
+        setCardNumber("")
+        setExpMonth("")
+        setExpYear("")
         setShowConfirmation(true);
         setPaymentData(res.data.data?.paymentIntentId);
-        message.success(res.data.message)
+        message.success(res.data.message);
       }
       console.log('Payment response:', res.data.data?.paymentIntentId);
     } catch (error) {
-      message.error(error?.response.data?.message || "Payment  Error:");
+      message.error(error?.response.data?.message || "Payment Error:");
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +91,26 @@ const PaymentPage = () => {
       setIsLoading(false);
     }
   };
-
+  const formatCardNumber = (value) => {
+    return value
+      .replace(/\D/g, "") // Remove non-numeric characters
+      .replace(/(\d{4})/g, "$1 ") // Add space every 4 digits
+      .trim(); // Remove trailing space
+  };
+  const handleExpYear = (value) => {
+    const cleaned = value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (cleaned.length <= 4) {
+      setExpYear(cleaned);
+    }
+  };
+  const handleExpMonth = (value) => {
+    const cleaned = value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (cleaned.length <= 2) {
+      if (cleaned === "" || (parseInt(cleaned) >= 1 && parseInt(cleaned) <= 12)) {
+        setExpMonth(cleaned);
+      }
+    }
+  };
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center p-6 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
       <div className="mb-6 w-full max-w-4xl">
@@ -104,53 +135,96 @@ const PaymentPage = () => {
             <h2 className={`text-2xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Payment</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Full Name*</label>
+                {/* <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Full Name*</label>
                 <input
                   name="fullName"
                   type="text"
                   required
                   className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
-                />
+                /> */}
               </div>
+
+
               <div>
-                <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Card Number*</label>
-                <input
-                  name="cardNumber"
-                  type="text"
-                  required
-                  className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
+                {/* Card Number Input */}
                 <div>
-                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Exp Month*</label>
+                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>
+                    Card Number*
+                  </label>
                   <input
-                    name="expMonth"
+                    name="cardNumber"
                     type="text"
                     required
-                    className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    maxLength={19} // Max length for "XXXX XXXX XXXX XXXX"
+                    placeholder="1234 5678 9012 3456"
+                    className={`w-full p-3 rounded-lg ${theme === "dark"
+                      ? "bg-gray-700 text-white border-gray-600"
+                      : "bg-white text-black border-gray-300"
+                      }`}
                   />
                 </div>
-                <div>
-                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>Exp Year*</label>
-                  <input
-                    name="expYear"
-                    type="text"
-                    required
-                    className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
-                  />
-                </div>
-                <div>
-                  <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>CVC*</label>
-                  <input
-                    name="cvc"
-                    type="password"
-                    required
-                    className={`w-full p-3 rounded-lg ${theme === "dark" ? "bg-gray-700 text-white border-gray-600" : "bg-white text-black border-gray-300"}`}
-                  />
+
+                {/* Expiry Date & CVC */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>
+                      Exp Month*
+                    </label>
+                    <input
+                      name="expMonth"
+                      type="text"
+                      required
+                      placeholder="MM"
+                      maxLength={2}
+                      value={expMonth}
+                      onChange={(e) => handleExpMonth(e.target.value)}
+                      className={`w-full p-3 rounded-lg ${theme === "dark"
+                        ? "bg-gray-700 text-white border-gray-600"
+                        : "bg-white text-black border-gray-300"
+                        }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>
+                      Exp Year*
+                    </label>
+                    <input
+                      name="expYear"
+                      type="text"
+                      required
+                      placeholder="YYYY"
+                      maxLength={4}
+                      value={expYear}
+                      onChange={(e) => handleExpYear(e.target.value)}
+                      className={`w-full p-3 rounded-lg ${theme === "dark"
+                        ? "bg-gray-700 text-white border-gray-600"
+                        : "bg-white text-black border-gray-300"
+                        }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-700"}`}>
+                      CVC*
+                    </label>
+                    <input
+                      name="cvc"
+                      type="password"
+                      required
+                      maxLength={4}
+                      placeholder="•••"
+                      className={`w-full p-3 rounded-lg ${theme === "dark"
+                        ? "bg-gray-700 text-white border-gray-600"
+                        : "bg-white text-black border-gray-300"
+                        }`}
+                    />
+                  </div>
                 </div>
               </div>
-              {!user ? <button onClick={() => navigate('/login')} className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">
+
+
+              {!getUser ? <button onClick={() => navigate('/login')} className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">
                 {"First Login to Proceed"}
               </button> :
                 <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">

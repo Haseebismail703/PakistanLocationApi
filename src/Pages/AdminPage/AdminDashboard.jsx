@@ -41,7 +41,8 @@ function Home() {
         const users = usersResponse.data.data?.users || [];
         setUserData(users.length);
         setFreePlan(users.filter((item) => item.plan === "free").length);
-        setPaidPlan(users.filter((item) => item.plan === "pro").length);
+        setPaidPlan(users.filter((item) => item.plan === "paid").length);
+        console.log(usersResponse)
       } catch (error) {
         console.error("Error fetching users data:", error);
       }

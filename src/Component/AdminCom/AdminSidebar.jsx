@@ -112,7 +112,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-console.log(admin)
+// console.log(admin)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -203,7 +203,7 @@ console.log(admin)
             </Dropdown>
           </div>
         </Header>
-        {admin?.data?.isVerified === true ?
+        {admin?.data.isVerified  ?
           <Content
             style={{
               margin: "80px 16px 16px",
