@@ -23,6 +23,7 @@ const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("dashboard");
   const { admin } = useContext(AdminContext);
+  const [varify,setVerify] = useState(JSON.parse(localStorage.getItem('admin')))
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
@@ -100,11 +101,6 @@ const AdminSidebar = ({ children }) => {
       label: <Link to="/admin/manage-area">Manage Area</Link>,
     },
     {
-      key: "Location Table",
-      icon: <ClusterOutlined />,
-      label: <Link to="/admin/form">Location Table</Link>,
-    },
-    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
@@ -112,7 +108,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-// console.log(admin)
+console.log(admin)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -203,7 +199,7 @@ const AdminSidebar = ({ children }) => {
             </Dropdown>
           </div>
         </Header>
-        {admin?.data.isVerified  ?
+        {varify.isVerified === true ?
           <Content
             style={{
               margin: "80px 16px 16px",

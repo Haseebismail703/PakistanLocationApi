@@ -23,13 +23,13 @@ function UserLogin() {
     setLoading(true);
     try {
       const response = await axios.post(`${api}/users/login`, formData, { withCredentials: true });
-
       if (response.data.success) {
         message.success(response.data.message);
         localStorage.setItem("user", JSON.stringify(response.data.data?.user));
         localStorage.setItem('accessToken', response.data.data?.accessToken);
         localStorage.setItem('refreshToken', response.data.data?.refreshToken);
-        window.location.href = '/user/dashboard';
+        // window.location.href = '';
+        navigate('/user/dashboard')
         setFormData({ email: '', password: '' });
       }
     } catch (error) {
