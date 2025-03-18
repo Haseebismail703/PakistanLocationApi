@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Menu, Avatar, Dropdown, message, Switch } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -22,8 +22,8 @@ const { Header, Sider, Content } = Layout;
 const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("dashboard");
-  const { admin } = useContext(AdminContext);
-  const [varify,setVerify] = useState(JSON.parse(localStorage.getItem('admin')))
+  // const { admin } = useContext(AdminContext);
+  const [admin,setAdmin] = useState(JSON.parse(localStorage.getItem('admin')))
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
@@ -199,7 +199,7 @@ console.log(admin)
             </Dropdown>
           </div>
         </Header>
-        {varify.isVerified === true ?
+        {admin.isVerified === true ?
           <Content
             style={{
               margin: "80px 16px 16px",
@@ -208,7 +208,7 @@ console.log(admin)
               borderRadius: "10px",
               boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             }}
-          >
+          >                 
             {children}
           </Content> : <VerifyAlert />}
       </Layout>
