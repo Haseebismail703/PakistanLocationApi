@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Menu, Avatar, Dropdown, message } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -10,7 +10,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
-import { UserContext } from "../../Context/UserContext";
+// import { UserContext } from "../../Context/UserContext";
 import userInterceptor from "../../Api/userInterceptor.js";
 import logo from "../../assets/logo.png";
 const { Header, Sider, Content } = Layout;
@@ -19,7 +19,8 @@ const UserSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const [selectedKey, setSelectedKey] = useState("dashboard");
-  const { user } = useContext(UserContext);
+  const [user,setUser] = useState(JSON.parse(localStorage.getItem('user')))
+  // const { user } = useContext(UserContext);
   const navigate = useNavigate();
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
@@ -31,7 +32,6 @@ const UserSidebar = ({ children }) => {
       console.log("Logging out...");
       const response = await userInterceptor.get(`/users/logout`, { withCredentials: true });
       console.log("Logout Response:", response);
-  
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
@@ -184,7 +184,7 @@ const UserSidebar = ({ children }) => {
         </Header>
 
         {/* Content Area */}
-        {user.data?.isVerified === true ?
+        {user?.isVerified === true ?
           <Content
             style={{
               margin: "80px 16px 16px",

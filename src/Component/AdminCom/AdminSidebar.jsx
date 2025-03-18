@@ -16,7 +16,7 @@ import {
 import adminInterceptor from "../../Api/adminInterceptor";
 import logo from "../../assets/logo.png";
 import VerifyAlert from "../PublicCom/VerifyAlert";
-import { AdminContext } from "../../Context/AdminContext";
+// import { AdminContext } from "../../Context/AdminContext";
 const { Header, Sider, Content } = Layout;
 
 const AdminSidebar = ({ children }) => {
