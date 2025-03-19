@@ -33,7 +33,7 @@ const AdminSidebar = ({ children }) => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
-    document.body.style.backgroundColor =  "#f4f6f8";
+    // document.body.style.backgroundColor =  "#f4f6f8";
     setVerify(admin?.data?.isVerified)
   }, [admin]);
 
