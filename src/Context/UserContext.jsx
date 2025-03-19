@@ -14,7 +14,7 @@ const UserProvider = ({ children }) => {
                     withCredentials: true,
                 });
                 setUser(response.data);
-                // localStorage.setItem("user", JSON.stringify(response.data)); // ✅ Save updated user
+                localStorage.setItem("isVerified", response.data?.isVerified);
             } catch (error) {
                 console.error("Failed to fetch user", error);
                 localStorage.removeItem("user"); // ✅ If API fails, remove old user data

@@ -16,14 +16,14 @@ import {
 import adminInterceptor from "../../Api/adminInterceptor";
 import logo from "../../assets/logo.png";
 import VerifyAlert from "../PublicCom/VerifyAlert";
-import { AdminContext } from "../../Context/AdminContext";
+// import { AdminContext } from "../../Context/AdminContext";
 const { Header, Sider, Content } = Layout;
 
 const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("dashboard");
-  const { admin } = useContext(AdminContext);
-  const [verify,setVerify] = useState(null)
+  // const { admin } = useContext(AdminContext);
+  const [verify, setIsVerified] = useState(localStorage.getItem("isVerified") === "true");
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
@@ -33,9 +33,8 @@ const AdminSidebar = ({ children }) => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
-    // document.body.style.backgroundColor =  "#f4f6f8";
-    setVerify(admin?.data?.isVerified)
-  }, [admin]);
+    document.body.style.backgroundColor =  "#f4f6f8";
+  }, [location.pathname, darkMode]);
 
   const handleLogout = async () => {
     try {
@@ -109,7 +108,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-console.log(admin?.data.isVerified)
+console.log(verify)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -200,7 +199,7 @@ console.log(admin?.data.isVerified)
             </Dropdown>
           </div>
         </Header>
-        {verify === true ?
+        {verify ?
           <Content
             style={{
               margin: "80px 16px 16px",
