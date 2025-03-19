@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Input, message, Typography, Space } from "antd";
-import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
-import axios from "axios";
-// import api from "../../Api/api.js";
+import { Button, Table, Input, message, Typography, Modal } from "antd";
+import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import userInterceptor from "../../Api/userInterceptor.js";
-const { Title, Text } = Typography;
+
+const { Title } = Typography;
+const { confirm } = Modal;
 
 const GenerateApiKey = () => {
   const [apiKey, setApiKey] = useState(null);
@@ -13,11 +13,9 @@ const GenerateApiKey = () => {
 
   // Fetch API Key from Profile
   const fetchApiKey = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
     try {
       setLoading(true);
-      const res = await userInterceptor.get(`/users/profile`);
-
+      const res = await userInterceptor.get("/users/profile");
       if (res?.data?.data?.apiKey) {
         setApiKey(res.data.data.apiKey);
       } else {
@@ -34,13 +32,25 @@ const GenerateApiKey = () => {
     fetchApiKey();
   }, []);
 
+  // Confirm before generating new API Key
+  const showConfirm = () => {
+    confirm({
+      title: "Are you sure you want to regenerate your API key?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Your previous API key will no longer work if you have used it elsewhere.",
+      okText: "Yes, Regenerate",
+      cancelText: "Cancel",
+      onOk() {
+        generateKey();
+      },
+    });
+  };
+
   // Generate API Key and Refresh Profile
   const generateKey = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
     try {
       setLoading(true);
-      const res = await userInterceptor.get(`/users/generate-api-key`);
-
+      const res = await userInterceptor.get("/users/generate-api-key");
       if (res) {
         message.success(res.data?.message);
         fetchApiKey(); // Refresh API key after generation
@@ -60,55 +70,59 @@ const GenerateApiKey = () => {
     }
   };
 
+  const columns = [
+    {
+      title: "API Key",
+      dataIndex: "apiKey",
+      key: "apiKey",
+      render: (text) => (
+        <Input
+          value={text}
+          readOnly
+          type={isApiKeyVisible ? "text" : "password"}
+          className="flex-1"
+        />
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: () => (
+        <>
+          <Button
+            type="text"
+            icon={isApiKeyVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+            onClick={() => setIsApiKeyVisible((prev) => !prev)}
+          />
+          <Button type="default" onClick={copyToClipboard} icon={<CopyOutlined />}>
+            Copy
+          </Button>
+        </>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center p-6 ">
-      <Card className="shadow-lg p-6 w-full max-w-lg bg-white rounded-xl">
-        <Title level={3} className="text-center">API Key</Title>
-        <Text type="secondary" className="block text-center mb-4">
-          Generate, view, and copy your API key securely.
-        </Text>
+    <div className="p-6">
+      <Title level={3} className="text-center">API Key</Title>
 
-        {/* Generate API Key Button */}
-        <Button
-          type="primary"
-          onClick={generateKey}
-          icon={<KeyOutlined />}
-          block
-          loading={loading}
-        >
-          Generate API Key
-        </Button>
+      <Button
+        type="primary"
+        onClick={apiKey ? showConfirm : generateKey}
+        icon={<KeyOutlined />}
+        loading={loading}
+        className="mb-4"
+      >
+        {loading ? "Getting API Key..." : apiKey ? "Regenerate API Key" : "Generate Now"}
+      </Button>
 
-        {/* API Key Display Section */}
-        {apiKey && (
-          <Card className="shadow-md p-4 mt-6 border rounded-lg">
-            <Text strong>API Key</Text>
-            <div className="flex items-center gap-2 mt-2">
-              <Input
-                value={apiKey}
-                readOnly
-                type={isApiKeyVisible ? "text" : "password"}
-                className="flex-1"
-              />
-              <Button
-                type="text"
-                icon={isApiKeyVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                onClick={() => setIsApiKeyVisible((prev) => !prev)}
-              />
-            </div>
-
-            <Button
-              type="default"
-              onClick={copyToClipboard}
-              icon={<CopyOutlined />}
-              block
-              className="mt-3"
-            >
-              Copy API Key
-            </Button>
-          </Card>
-        )}
-      </Card>
+      <Table
+        dataSource={apiKey ? [{ key: 1, apiKey }] : []}
+        columns={columns}
+        pagination={false}
+        bordered
+        scroll={{x : "100%"}}
+      />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  KeyOutlined
 } from "@ant-design/icons";
 // import { UserContext } from "../../Context/UserContext";
 import userInterceptor from "../../Api/userInterceptor.js";
@@ -67,7 +68,7 @@ const UserSidebar = ({ children }) => {
     {
       key: "api",
       label: <Link to="/user/api">API Key</Link>,
-      icon: <ShoppingCartOutlined />,
+      icon: <KeyOutlined />,
     },
     {
       key: "support",
