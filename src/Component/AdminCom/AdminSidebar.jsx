@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Layout, Menu, Avatar, Dropdown, message, Spin} from "antd";
+import { Layout, Menu, Avatar, Dropdown, message, Spin } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -198,9 +198,9 @@ const AdminSidebar = ({ children }) => {
             </Dropdown>
           </div>
         </Header>
-        {admin === undefined ? (
+        {admin === undefined || admin === null ? (
           <div style={{ textAlign: "center", padding: "20px", fontSize: "18px" }}>
-           <Spin/>
+            Loading...
           </div>
         ) : admin?.data?.isVerified ? (
           <Content
