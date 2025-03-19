@@ -200,7 +200,7 @@ const AdminSidebar = ({ children }) => {
         </Header>
         {admin === undefined || admin === null ? (
           <div style={{ textAlign: "center", padding: "20px", fontSize: "18px" }}>
-            Loading...
+            <Spin size="large"/>
           </div>
         ) : admin?.data?.isVerified ? (
           <Content
