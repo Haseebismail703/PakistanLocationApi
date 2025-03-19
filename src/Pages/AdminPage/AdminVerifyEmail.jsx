@@ -30,6 +30,7 @@ const AdminVerifyEmail = () => {
 
                 if (response.data.success) {
                     message.success(response.data.message);
+                    localStorage.setItem("isVerified", true);
                     window.location.href = "/admin/dashboard";
                 }
             } catch (error) {

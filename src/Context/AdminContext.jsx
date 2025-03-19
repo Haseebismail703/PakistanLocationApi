@@ -10,9 +10,11 @@ const AdminProvider = ({ children }) => {
         const fetchAdmin = async () => {
             try {
                 const response = await adminInterceptor.get(`/admins/profile`);
-                setAdmin(response.data);
-                console.log(response.data)
                 localStorage.setItem("isVerified", response.data?.data?.isVerified);
+                setAdmin(response.data);
+                
+                // console.log(response.data)
+                
             } catch (error) {
                 console.error("Failed to fetch Admin", error);
             } finally {

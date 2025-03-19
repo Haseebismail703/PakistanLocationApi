@@ -10,11 +10,10 @@ const UserProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await userInterceptor.get(`/users/profile`, {
-                    withCredentials: true,
-                });
+                const response = await userInterceptor.get(`/users/profile`);
+                localStorage.setItem("isVerified", response.data?.data?.isVerified);
                 setUser(response.data);
-                localStorage.setItem("isVerified", response.data?.isVerified);
+                
             } catch (error) {
                 console.error("Failed to fetch user", error);
                 localStorage.removeItem("user"); // ✅ If API fails, remove old user data

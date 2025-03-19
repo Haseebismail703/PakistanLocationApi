@@ -29,6 +29,7 @@ const UserVerifyEmail = () => {
                 console.log("User API Response:", response.data);
 
                 if (response.data.success) {
+                    localStorage.setItem("isVerified", true);
                     message.success(response.data.message);
                     window.location.href = "/user/dashboard";
                 }

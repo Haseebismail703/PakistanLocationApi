@@ -10,7 +10,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
-import { UserContext } from "../../Context/UserContext";
+// import { UserContext } from "../../Context/UserContext";
 import userInterceptor from "../../Api/userInterceptor.js";
 import logo from "../../assets/logo.png";
 const { Header, Sider, Content } = Layout;
@@ -19,7 +19,8 @@ const UserSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const [selectedKey, setSelectedKey] = useState("dashboard");
-  const { user } = useContext(UserContext);
+  const [verify, setIsVerified] = useState(localStorage.getItem("isVerified") === "true");
+  // const { user } = useContext(UserContext);
   const navigate = useNavigate();
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
@@ -184,7 +185,7 @@ const UserSidebar = ({ children }) => {
         </Header>
 
         {/* Content Area */}
-        {user.data?.isVerified === true ?
+        {verify ?
           <Content
             style={{
               margin: "80px 16px 16px",
