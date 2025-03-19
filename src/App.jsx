@@ -15,8 +15,8 @@ const AdminForgotPassword = lazy(() => import("./Pages/PublicPages/AdminForgotPa
 const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass"));
 const UserResetPass = lazy(() => import("./Pages/PublicPages/UserResetPass"));
 const UserForgotPass = lazy(() => import("./Pages/PublicPages/UserForgotPass"));
-const VerifyEmail = lazy(() => import("./Pages/PublicPages/VerifyEmail"));
-
+const UserVerifyEmail = lazy(() => import("./Pages/UserPages/UserVerifyEmail"));
+const AdminVerifyEmail = lazy(() => import("./Pages/AdminPage/AdminVerifyEmail"));
 
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
@@ -71,20 +71,16 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="*" element={<NotFound />} />
 
-          {/* Verify Email Route */}
-          <Route path="/admins/verify-email" element={<VerifyEmail />} />
-          <Route path="/users/verify-email" element={<VerifyEmail />} />
-
-          {/* Admin forgot and reset Route */}
+          {/* Admin forgot , verify email and reset Route */}
           <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
           <Route path="/admins/reset-password/:token" element={<AdminResetPassword />} />
-
-          {/* User forgot reset route */}
+          <Route path="/admins/verify-email" element={<AdminVerifyEmail />} />
+          {/* User forgot , verify email and  reset route */}
           <Route path="/forgot-password" element={<UserForgotPass />} />
           <Route path="/users/reset-password/:token" element={<UserResetPass />} />
-          
+          <Route path="/users/verify-email" element={<UserVerifyEmail />} />
           {/* payment */}
-          <Route path="/payment" element={<Payment />}/>
+          <Route path="/payment" element={<Payment />} />
 
           <Route path="/table" element={<DivisionTable />} />
           {/* <Route path="/form" element={<UserForm />} /> */}

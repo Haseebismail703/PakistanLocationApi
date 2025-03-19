@@ -65,8 +65,8 @@ userInterceptor.interceptors.response.use(
         localStorage.setItem('refreshToken', data.data?.refreshToken);
 
         // ✅ Original request ko dobara bhejna with new token
-        userInterceptor.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
-        onRrefreshed(data.accessToken);
+        userInterceptor.defaults.headers.common.Authorization = `Bearer ${data.data?.accessToken}`;
+        onRrefreshed(data.data?.accessToken);
         
         return userInterceptor(originalRequest);
       } catch (err) {

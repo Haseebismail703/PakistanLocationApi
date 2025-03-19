@@ -1,16 +1,28 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-import '@ant-design/v5-patch-for-react-19';
-import UserProvider from './Context/UserContext.jsx';
-import AdminProvider from './Context/AdminContext.jsx';
-createRoot(document.getElementById('root')).render(
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import "@ant-design/v5-patch-for-react-19";
+import UserProvider from "./Context/UserContext.jsx";
+import AdminProvider from "./Context/AdminContext.jsx";
+
+const userData = localStorage.getItem("user");
+const adminData = localStorage.getItem("admin");
+
+const root = createRoot(document.getElementById("root"));
+
+root.render(
   <StrictMode>
-    <UserProvider>
+    {userData ? (
+      <UserProvider>
+        <App />
+      </UserProvider>
+    ) : adminData ? (
       <AdminProvider>
         <App />
       </AdminProvider>
-    </UserProvider>
-  </StrictMode>,
-)
+    ) : (
+      <App />
+    )}
+  </StrictMode>
+);

@@ -4,7 +4,7 @@ import axios from "axios";
 import api from "../../Api/api.js";
 import { message, Spin } from "antd";
 
-const AdminVerifyEmail = () => {
+const UserVerifyEmail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
@@ -20,20 +20,20 @@ const AdminVerifyEmail = () => {
 
             if (!token) {
                 message.error("Token is missing!");
-                navigate("/admin/login");
+                navigate("/login");
                 return;
             }
 
             try {
-                const response = await axios.get(`${api}/admins/verify-email?token=${encodeURIComponent(token)}`);
-                console.log("Admin API Response:", response.data);
+                const response = await axios.get(`${api}/users/verify-email?token=${encodeURIComponent(token)}`);
+                console.log("User API Response:", response.data);
 
                 if (response.data.success) {
                     message.success(response.data.message);
-                    window.location.href = "/admin/dashboard";
+                    window.location.href = "/user/dashboard";
                 }
             } catch (error) {
-                console.error("Admin API Error:", error.response?.data || error.message);
+                console.error("User API Error:", error.response?.data || error.message);
                 message.error(error.response?.data?.message || "Verification failed! Try again.");
             } finally {
                 setLoading(false);
@@ -46,10 +46,10 @@ const AdminVerifyEmail = () => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <Spin spinning={loading} size="large">
-                <h2 className="text-xl font-semibold">Verifying Admin Email...</h2>
+                <h2 className="text-xl font-semibold">Verifying User Email...</h2>
             </Spin>
         </div>
     );
 };
 
-export default AdminVerifyEmail;
+export default UserVerifyEmail;

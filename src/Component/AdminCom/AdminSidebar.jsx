@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Layout, Menu, Avatar, Dropdown, message, Switch } from "antd";
+import React, { useState, useEffect, useContext } from "react";
+import { Layout, Menu, Avatar, Dropdown, message, Spin} from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -16,14 +16,13 @@ import {
 import adminInterceptor from "../../Api/adminInterceptor";
 import logo from "../../assets/logo.png";
 import VerifyAlert from "../PublicCom/VerifyAlert";
-// import { AdminContext } from "../../Context/AdminContext";
+import { AdminContext } from "../../Context/AdminContext";
 const { Header, Sider, Content } = Layout;
 
 const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("dashboard");
-  // const { admin } = useContext(AdminContext);
-  const [admin,setAdmin] = useState(JSON.parse(localStorage.getItem('admin')))
+  const { admin } = useContext(AdminContext);
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
@@ -33,7 +32,7 @@ const AdminSidebar = ({ children }) => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
-    document.body.style.backgroundColor =  "#f4f6f8";
+    document.body.style.backgroundColor = "#f4f6f8";
   }, [location.pathname, darkMode]);
 
   const handleLogout = async () => {
@@ -108,7 +107,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-console.log(admin)
+  console.log(admin)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -117,7 +116,7 @@ console.log(admin)
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor:  "#f4f6f8" }}>
+    <Layout style={{ minHeight: "100vh", backgroundColor: "#f4f6f8" }}>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -135,16 +134,16 @@ console.log(admin)
       >
         <div style={{ textAlign: "center", padding: "20px" }}>
           {/* {!collapsed && ( */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <img
-                src={logo}
-                alt="Logo"
-                style={{ width: "50px", height: "auto", marginRight: "15px" }}
-              />
-              {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ width: "50px", height: "auto", marginRight: "15px" }}
+            />
+            {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
                 Admin Panel
               </p> */}
-            </div>
+          </div>
           {/* )} */}
         </div>
 
@@ -159,7 +158,7 @@ console.log(admin)
       </Sider>
 
       <Layout>
-        
+
         <Header
           style={{
             position: "fixed",
@@ -172,15 +171,15 @@ console.log(admin)
             borderBottom: "1px solid #e2e8f0",
             zIndex: 1000,
           }}
-        > 
+        >
           {collapsed ? (
             <MenuUnfoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           ) : (
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
-           <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
-                Admin Panel
-              </p>
+          <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+            Admin Panel
+          </p>
           <div style={{ display: "flex", alignItems: "center" }}>
             {/* <Switch
               checked={darkMode}
@@ -189,7 +188,7 @@ console.log(admin)
               unCheckedChildren="Light"
               style={{ marginRight: 40 }}
             /> */}
-            
+
             <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
               <Avatar
                 size={40}
@@ -199,7 +198,11 @@ console.log(admin)
             </Dropdown>
           </div>
         </Header>
-        {admin.isVerified === true ?
+        {admin === undefined ? (
+          <div style={{ textAlign: "center", padding: "20px", fontSize: "18px" }}>
+           <Spin/>
+          </div>
+        ) : admin?.data?.isVerified ? (
           <Content
             style={{
               margin: "80px 16px 16px",
@@ -208,9 +211,13 @@ console.log(admin)
               borderRadius: "10px",
               boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             }}
-          >                 
+          >
             {children}
-          </Content> : <VerifyAlert />}
+          </Content>
+        ) : (
+          <VerifyAlert />
+        )}
+
       </Layout>
     </Layout>
   );
