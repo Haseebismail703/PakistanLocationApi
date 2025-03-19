@@ -34,7 +34,7 @@ const AdminSidebar = ({ children }) => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
     document.body.style.backgroundColor =  "#f4f6f8";
-    setVerify(admin.data?.isVerified)
+    setVerify(admin?.data?.isVerified)
   }, [admin]);
 
   const handleLogout = async () => {
@@ -109,7 +109,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-console.log(admin)
+console.log(admin?.data.isVerified)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
