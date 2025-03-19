@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Layout, Menu, Avatar, Dropdown, message, Spin } from "antd";
+import { Layout, Menu, Avatar, Dropdown, message, Switch } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
@@ -23,6 +23,7 @@ const AdminSidebar = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("dashboard");
   const { admin } = useContext(AdminContext);
+  const [verify,setVerify] = useState(null)
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
@@ -32,8 +33,9 @@ const AdminSidebar = ({ children }) => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
-    document.body.style.backgroundColor = "#f4f6f8";
-  }, [location.pathname, darkMode]);
+    document.body.style.backgroundColor =  "#f4f6f8";
+    setVerify(admin.data?.isVerified)
+  }, [admin]);
 
   const handleLogout = async () => {
     try {
@@ -107,7 +109,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-  console.log(admin)
+console.log(admin)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -116,7 +118,7 @@ const AdminSidebar = ({ children }) => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor: "#f4f6f8" }}>
+    <Layout style={{ minHeight: "100vh", backgroundColor:  "#f4f6f8" }}>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -134,16 +136,16 @@ const AdminSidebar = ({ children }) => {
       >
         <div style={{ textAlign: "center", padding: "20px" }}>
           {/* {!collapsed && ( */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <img
-              src={logo}
-              alt="Logo"
-              style={{ width: "50px", height: "auto", marginRight: "15px" }}
-            />
-            {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ width: "50px", height: "auto", marginRight: "15px" }}
+              />
+              {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
                 Admin Panel
               </p> */}
-          </div>
+            </div>
           {/* )} */}
         </div>
 
@@ -158,7 +160,7 @@ const AdminSidebar = ({ children }) => {
       </Sider>
 
       <Layout>
-
+        
         <Header
           style={{
             position: "fixed",
@@ -171,15 +173,15 @@ const AdminSidebar = ({ children }) => {
             borderBottom: "1px solid #e2e8f0",
             zIndex: 1000,
           }}
-        >
+        > 
           {collapsed ? (
             <MenuUnfoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           ) : (
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
-          <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
-            Admin Panel
-          </p>
+           <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+                Admin Panel
+              </p>
           <div style={{ display: "flex", alignItems: "center" }}>
             {/* <Switch
               checked={darkMode}
@@ -188,7 +190,7 @@ const AdminSidebar = ({ children }) => {
               unCheckedChildren="Light"
               style={{ marginRight: 40 }}
             /> */}
-
+            
             <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
               <Avatar
                 size={40}
@@ -198,11 +200,7 @@ const AdminSidebar = ({ children }) => {
             </Dropdown>
           </div>
         </Header>
-        {admin === undefined || admin === null ? (
-          <div style={{ textAlign: "center", padding: "20px", fontSize: "18px" }}>
-            <Spin size="large"/>
-          </div>
-        ) : admin?.data?.isVerified ? (
+        {verify === true ?
           <Content
             style={{
               margin: "80px 16px 16px",
@@ -213,11 +211,7 @@ const AdminSidebar = ({ children }) => {
             }}
           >
             {children}
-          </Content>
-        ) : (
-          <VerifyAlert />
-        )}
-
+          </Content> : <VerifyAlert />}
       </Layout>
     </Layout>
   );
