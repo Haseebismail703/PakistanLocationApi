@@ -25,6 +25,7 @@ function UserLogin() {
       const response = await axios.post(`${api}/users/login`, formData, { withCredentials: true });
       if (response.data.success) {
         message.success(response.data.message);
+        localStorage.setItem("isVerified",response.data.data?.user?.isVerified );
         localStorage.setItem("user", JSON.stringify(response.data.data?.user));
         localStorage.setItem('accessToken', response.data.data?.accessToken);
         localStorage.setItem('refreshToken', response.data.data?.refreshToken);

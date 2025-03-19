@@ -25,6 +25,7 @@ function AdminLogin() {
 
             if (response.data.success) {
                 message.success(response.data.message);
+                localStorage.setItem("isVerified",response.data.data?.admin?.isVerified );
                 localStorage.setItem("admin", JSON.stringify(response.data.data?.admin));
                 localStorage.setItem('accessToken', response.data.data?.accessToken);
                 localStorage.setItem('refreshToken', response.data.data?.refreshToken);
