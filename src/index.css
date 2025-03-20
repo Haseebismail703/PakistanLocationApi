@@ -3,3 +3,22 @@
 @tailwind utilities;
 
 
+.responsive-pagination {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;  /* ✅ Wrap elements for smaller screens */
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .responsive-pagination .ant-pagination-item {
+      display: none; /* ✅ Hide specific page numbers */
+    }
+  
+    .responsive-pagination .ant-pagination-prev,
+    .responsive-pagination .ant-pagination-next {
+      display: inline-block; /* ✅ Show only Prev & Next buttons */
+    }
+  }
+  

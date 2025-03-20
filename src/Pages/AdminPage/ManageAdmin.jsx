@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Form, Input, Table, Switch, Select, message, Pagination } from "antd";
+import { Button, Modal, Form, Input, Table, Switch, Select, message, Pagination,Spin } from "antd";
 import adminInterceptor from "../../Api/adminInterceptor.js";
 import usePermission from '../../Hooks/usePermission.js'
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -25,6 +25,7 @@ const ManageAdmin = () => {
     const [admin, setAdmin] = useState([]);
     const [selectedAdmin, setSelectedAdmin] = useState(null);
     const [tableLoader, setTableLoader] = useState(false)
+    const [loader,setLoader] = useState(false)
     const [totalItems, setTotalItems] = useState(0);
     const [form] = Form.useForm();
     const [updateForm] = Form.useForm();
@@ -46,6 +47,7 @@ const ManageAdmin = () => {
     };
 
     const handleSubmit = async (values) => {
+        setLoader(true)
         try {
             const response = await adminInterceptor.post(
                 `/admins/register`,
@@ -59,8 +61,11 @@ const ManageAdmin = () => {
             }
 
         } catch (error) {
+            setLoader(false)
             message.error(error.response?.data?.message || "Admin failed!");
             console.log("error: ", error);
+        } finally{
+            setLoader(false)
         }
     };
 
@@ -111,6 +116,7 @@ const ManageAdmin = () => {
 
     // Handle form submission for updating permissions
     const handleUpdateSubmit = async (values) => {
+        setLoader(true)
         console.log("Selected Permissions:", values.permissions);
         if (!selectedAdmin) return message.error("No admin selected")
 
@@ -131,8 +137,11 @@ const ManageAdmin = () => {
             setIsUpdateModalVisible(false);
             updateForm.resetFields();
         } catch (error) {
+            setLoader(false)
             console.log("Permission error: ", error);
             message.error("Failed to update permissions");
+        } finally{
+            setLoader(false)
         }
     };
 
@@ -199,11 +208,32 @@ const ManageAdmin = () => {
             )
         },
         {
-            title: "Status", dataIndex: "status", key: "status",
-            render: (status, record) => (
-                <span style={{ color: status === "active" ? "green" : "red" }}>
-                    {read ? status : "_"}
-                </span>
+            title: "Status",
+            key: "status",
+            render: (_, record) => (
+                <Spin spinning={record.loading || false}>
+                    <Switch
+                        checked={record.status === "active"}
+                        onChange={async () => {
+                            setAdmin((prevAdmin) =>
+                                prevAdmin.map((user) =>
+                                    user.key === record.key ? { ...user, loading: true } : user
+                                )
+                            );
+                            await toggleStatus(record);
+                            setAdmin((prevAdmin) =>
+                                prevAdmin.map((user) =>
+                                    user.key === record.key ? { ...user, loading: false } : user
+                                )
+                            );
+                        }}
+                        checkedChildren="Active"
+                        unCheckedChildren="Inactive"
+                        style={{
+                            backgroundColor: record.status === "active" ? "green" : "red",
+                        }}
+                    />
+                </Spin>
             )
         },
         {
@@ -212,25 +242,18 @@ const ManageAdmin = () => {
             render: (_, record) => (
                 <>
                     {update ? (
-                        <>
-                            <Switch
-                                checked={record.status === "active"}
-                                onChange={() => toggleStatus(record)}
-                            />
-                            <Button
-                                type="primary"
-                                onClick={() => showUpdateModal(record)}
-                                style={{ marginLeft: "20px" }}
-                            >
-                                Update
-                            </Button>
-                        </>
+                        <Button
+                            type="primary"
+                            onClick={() => showUpdateModal(record)}
+                        >
+                            Update
+                        </Button>
                     ) : (
                         <p>{"You have no permission"}</p>
                     )}
                 </>
-            ),
-        },
+            )
+        }
     ];
 
     return (
@@ -241,7 +264,7 @@ const ManageAdmin = () => {
             </center>
             <div style={{ padding: "20px" }}>
                 <Button disabled={create ? false : true} type="primary" onClick={showModal}>
-                    Create Admin
+                 Create Admin
                 </Button>
                 <Modal
                     title="Create Admin"
@@ -275,8 +298,8 @@ const ManageAdmin = () => {
                             <Input.Password />
                         </Form.Item>
                         <Form.Item>
-                            <Button disabled={manageAdmin ? false : true}  type="primary" htmlType="submit">
-                                Create now
+                            <Button loading={loader} disabled={manageAdmin ? false : true} type="primary" htmlType="submit">
+                            Create now
                             </Button>
                         </Form.Item>
                     </Form>
@@ -306,8 +329,8 @@ const ManageAdmin = () => {
                             </Select>
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit">
-                                Update
+                            <Button type="primary" htmlType="submit" loading={loader}>
+                            Update
                             </Button>
                         </Form.Item>
                     </Form>
@@ -317,31 +340,34 @@ const ManageAdmin = () => {
                 <Table
                     columns={columns}
                     dataSource={admin}
-                    pagination={{ pageSize: 5 }}
+                    pagination={false}
                     style={{ marginTop: "20px" }}
                     scroll={{ x: true }}
                     loading={tableLoader}
                     locale={{ emptyText: "No data available" }}
 
                 />
-                 <Pagination
-                        current={currentPage}
-                        total={totalItems}
-                        pageSize={pageSize}
-                        onChange={(page, size) => {
-                          if (page < currentPage || admin.length === pageSize) {
+                <Pagination
+                    current={currentPage}
+                    total={totalItems}
+                    pageSize={pageSize}
+                    onChange={(page, size) => {
+                        if (page < currentPage || admin.length === pageSize) {
                             navigate(`?page=${page}&size=${size}`);
-                          } else {
+                        } else {
                             message.warning("No more data to display.");
-                          }
-                        }}
-                        showSizeChanger
-                        pageSizeOptions={["10", "20", "50", "100"]}
-                        style={{ textAlign: "center" }}
-                        showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-                        hideOnSinglePage={true}
-                        showLessItems={true}
-                      />
+                        }
+                    }}
+                    showSizeChanger
+                    pageSizeOptions={["10", "20", "50", "100",totalItems.toString()]}
+                    className="responsive-pagination"
+                    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                    hideOnSinglePage={true}
+                    showLessItems={true}
+                    responsive // ✅ Automatically adjusts layout for smaller screens
+                    simple={window.innerWidth < 768} // ✅ Shows compact pagination on small screens
+                />
+
             </div>
         </>
     );

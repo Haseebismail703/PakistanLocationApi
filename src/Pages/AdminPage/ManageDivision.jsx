@@ -14,9 +14,15 @@ const ManageDivision = () => {
     const [updateImagesModalVisible, setUpdateImagesModalVisible] = useState(false);
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
-    const [division, setdivisions] = useState([]);
     const [selectdivision, setselectdivision] = useState(null);
-    const [province, setprovince] = useState('');
+
+    const [country, setCountry] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [province, setprovince] = useState([]);
+    const [selectedProvince, setSelectedProvince] = useState(null);
+    const [division, setdivisions] = useState([]);
+    const [newDivision, setNewDivisions] = useState([]);
+
     const [fileList, setFileList] = useState([])
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -35,42 +41,118 @@ const ManageDivision = () => {
     // Get currentPage and pageSize from URL or default to 1 and 10
     const currentPage = parseInt(searchParams.get("page")) || 1;
     const pageSize = parseInt(searchParams.get("size")) || 10;
+
     useEffect(() => {
-        getProvince();
+
+        console.log("Selected Province:", selectedProvince)
+
+        const getAlldivisions = async () => {
+            setTableLoading(true)
+            try {
+                const response = await adminInterceptor.get(`/admins/divisions${!selectedProvince ? "": `/get-by-province/${selectedProvince}` }?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
+                console.log("Response in divisions: ", response);
+                const divisionsData = response.data?.data?.map((data, index) => ({
+                    key: index + 1 + (currentPage - 1) * pageSize,
+                    id: data._id,
+                    name: data.name,
+                    createdAt: data.createdAt?.substring(0, 10),
+                    pictures: data.pictures,
+                    details: data.details,
+                    provinceId: data.province || null,
+
+                }));
+                setdivisions(response?.data.data);
+                setTotalItems(response?.data.data.total || 1000);
+            } catch (error) {
+                message.error("Failed to fetch divisions!");
+            } finally {
+                setTableLoading(false)
+            }
+        };
+
         getAlldivisions();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, selectedProvince]);
 
-    const getProvince = async () => {
-        try {
-            const response = await adminInterceptor.get(`/admins/provinces`);
-            console.log(response.data?.data);
-            setprovince(response.data?.data);
-        } catch (error) {
-            message.error("Failed to fetch province!");
+    useEffect(() => {
+
+        const getAllCountry = async () => {
+            try {
+                setTableLoading(true);
+                const response = await adminInterceptor.get(`/admins/country`);
+                const countryData = [{
+                    key: 1,
+                    id: response.data.data._id || "",
+                    name: response.data.data.name || "N/A",
+                    createdAt: response.data.data.createdAt ? response.data.data.createdAt.substring(0, 10) : "N/A",
+                    pictures: response.data.data.pictures || [],
+                    details: response.data.data.details || "No details available",
+                }];
+                // console.log("Response country: ", countryData);
+
+                setCountry(countryData);
+
+            } catch (error) {
+                message.error("Failed to fetch country!");
+            } finally {
+                setTableLoading(false);
+            }
+        };
+
+        getAllCountry()
+
+    }, [])
+
+    // ✅ Handle Country Selection
+    const handleCountryChange = async (countryId) => {
+        console.log("handleCountryChange: ", countryId);
+        const selected = country.find((c) => c.id === countryId);
+        //  console.log("handleCountryChange:", selected);
+
+        if (!selected) {
+            console.error("Selected country not found!");
+            return;
         }
-    };
 
-    const getAlldivisions = async () => {
-        setTableLoading(true)
+        setSelectedCountry(selected);
+        setprovince([]); // Reset previous provinces
+        setSelectedProvince(null);
+
+
         try {
-            const response = await adminInterceptor.get(`/admins/divisions?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            const divisionsData = response.data?.data?.map((data, index) => ({
-                key:index + 1 + (currentPage - 1) * pageSize,
-                id: data._id,
-                name: data.name,
-                createdAt: data.createdAt?.substring(0, 10),
-                pictures: data.pictures,
-                details: data.details,
-                countryId: data.countryId,
-            }));
-            console.log(response.data?.data);
-            setdivisions(divisionsData);
-            setTotalItems(divisionsData.total || 1000);
+            setLoading(true);
+            try {
+                const response = await adminInterceptor.get(`/admins/provinces/?country=${selected._id}`);
+                // console.log("Response in provinces: ", response);
+                setprovince(response.data?.data);
+            } catch (error) {
+                message.error("Failed to fetch province!");
+            }
         } catch (error) {
-            message.error("Failed to fetch divisions!");
+            console.error("Error fetching provinces:", error);
+
         } finally {
-            setTableLoading(false)
+            setLoading(false);
         }
+
+
+    }
+
+    // ✅ Handle Province Selection
+    const handleProvinceChange = async (provinceId) => {
+        console.log("handleProvinceChange: ", provinceId);
+
+
+        setSelectedProvince(provinceId);
+
+        // Frontend pe filter karo
+        const filteredDivisions = division.filter((div) => {
+            return div.province._id === provinceId;
+        });
+        // console.log("Filtered Divisions: ", filteredDivisions);
+        console.log("division: ", division);
+
+
+        setdivisions(filteredDivisions)
     };
 
     const handleCreate = async (values) => {
@@ -213,6 +295,41 @@ const ManageDivision = () => {
         <>
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
+                <br />
+                <br />
+                {/* Filter start */}
+                <div style={{ width: 400, margin: "20px" }}>
+                    <Select
+                        placeholder="Select Country"
+                        style={{ width: "100%", marginBottom: 10 }}
+                        onChange={(value) => handleCountryChange(value)}
+                        value={selectedCountry?.id} // Ensure only ID is passed
+                        loading={loading}
+                    >
+                        {country.map((c) => (
+                            <Option key={c.id} value={c.id}> {/* Pass only the ID */}
+                                {c.name}
+                            </Option>
+                        ))}
+                    </Select>
+
+
+                    <Select
+                        placeholder="Select Province"
+                        style={{ width: "100%", marginBottom: 10 }}
+                        onChange={handleProvinceChange}
+                        value={selectedProvince}
+                        disabled={!selectedCountry || loading}
+                    >
+                        {province.map((c) => (
+                            <Option key={c._id} value={c._id}>
+                                {c.name}
+                            </Option>
+                        ))}
+                    </Select>
+
+                </div>
+                {/* Filter end */}
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={division} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
@@ -241,10 +358,10 @@ const ManageDivision = () => {
                         borderRadius: "8px",
                     }}
                 />
-            </div>
+            </div >
 
             { /* Create Division Modal */}
-            <Modal
+            < Modal
                 title="Create Division"
                 open={createModalVisible}
                 onCancel={() => setCreateModalVisible(false)}
@@ -279,10 +396,10 @@ const ManageDivision = () => {
                         Submit
                     </Button>
                 </Form>
-            </Modal>
+            </Modal >
 
             {/* Update Details Modal */}
-            <Modal
+            < Modal
                 title="Update Division Details"
                 open={updateDetailsModalVisible}
                 onCancel={() => setUpdateDetailsModalVisible(false)}
@@ -299,10 +416,10 @@ const ManageDivision = () => {
                         Update
                     </Button>
                 </Form>
-            </Modal>
+            </Modal >
 
             {/* Update Images Modal */}
-            <Modal
+            < Modal
                 title="Add Division Images"
                 open={updateImagesModalVisible}
                 onCancel={() => setUpdateImagesModalVisible(false)}
@@ -324,10 +441,10 @@ const ManageDivision = () => {
                         Update
                     </Button>
                 </Form>
-            </Modal>
+            </Modal >
 
             {/* View Modal */}
-            <Modal
+            < Modal
                 title="Division Details"
                 open={viewModalVisible}
                 onCancel={() => setViewModalVisible(false)}
@@ -347,11 +464,11 @@ const ManageDivision = () => {
                         )}
                     </div>
                 )}
-            </Modal>
+            </Modal >
 
 
             {/* Delete model  */}
-            <Modal
+            < Modal
                 title="Delete Divsion Images"
                 open={deleteImagesModalVisible}
                 onCancel={() => setDeleteImagesModalVisible(false)}
@@ -384,10 +501,12 @@ const ManageDivision = () => {
                 ) : (
                     <p>No images available.</p>
                 )}
-            </Modal>
+            </Modal >
 
         </>
     );
 };
 
 export default ManageDivision;
+
+

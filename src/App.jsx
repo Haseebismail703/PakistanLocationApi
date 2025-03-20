@@ -38,7 +38,9 @@ const UserDashboard = lazy(() => import("./Pages/UserPages/UserDashboard"));
 const UserContact = lazy(() => import("./Pages/UserPages/Contact"));
 const Payment = lazy(() => import("./Pages/UserPages/Payment"));
 const UserPageNotFound = lazy(() => import("./Pages/UserPages/UserPageNotFound"));
-
+//context user and admin
+import UserProvider from "./Context/UserContext";
+import AdminProvider from "./Context/AdminContext";
 // Authentication Check
 const isAdminAuthenticated = () => {
   const admin = localStorage.getItem("admin");
@@ -52,11 +54,11 @@ const isUserAuthenticated = () => {
 
 // Protected Routes
 const AdminProtectedRoute = ({ children }) => {
-  return isAdminAuthenticated() ? children : <Navigate to="/" />;
+  return isAdminAuthenticated() ?<AdminProvider>{ children }</AdminProvider>  : <Navigate to="/" />;
 };
 
 const UserProtectedRoute = ({ children }) => {
-  return isUserAuthenticated() ? children : <Navigate to="/login" />;
+  return isUserAuthenticated() ?<UserProvider>{children}</UserProvider> : <Navigate to="/login" />;
 };
 
 function App() {

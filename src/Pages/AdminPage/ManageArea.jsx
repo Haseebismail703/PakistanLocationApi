@@ -56,7 +56,7 @@ const ManageArea = () => {
         try {
             const response = await adminInterceptor.get(`/admins/areas?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
             const areaData = response.data?.data?.map((data, index) => ({
-                key:index + 1 + (currentPage - 1) * pageSize,
+                key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
@@ -213,33 +213,25 @@ const ManageArea = () => {
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Area</Button>
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={area} pagination={false} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
-    current={currentPage}
-    total={totalItems}
-    pageSize={pageSize}
-    onChange={(page, size) => {
-        if (page < currentPage || area.length === pageSize) {
-            navigate(`?page=${page}&size=${size}`);
-        } else {
-            message.warning("No more data to display.");
-        }
-    }}
-    showSizeChanger
-    pageSizeOptions={["10", "20", "50", "100"]}
-    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-    hideOnSinglePage
-    showLessItems
-    prevIcon={<LeftOutlined />}
-    nextIcon={<RightOutlined />}
-    style={{
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        padding: "10px",
-        backgroundColor: "#f5f5f5",
-        borderRadius: "8px",
-        marginTop: "20px",
-    }}
-/>
+                    current={currentPage}
+                    total={totalItems}
+                    pageSize={pageSize}
+                    onChange={(page, size) => {
+                        if (page < currentPage || area.length === pageSize) {
+                            navigate(`?page=${page}&size=${size}`);
+                        } else {
+                            message.warning("No more data to display.");
+                        }
+                    }}
+                    showSizeChanger
+                    pageSizeOptions={["10", "20", "50", "100" ,totalItems.toString()]}
+                    className="responsive-pagination"
+                    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                    hideOnSinglePage={true}
+                    showLessItems={true}
+                    responsive // ✅ Automatically adjusts layout for smaller screens
+                    simple={window.innerWidth < 768} // ✅ Shows compact pagination on small screens
+                />
             </div>
 
             { /* Create Area Modal */}

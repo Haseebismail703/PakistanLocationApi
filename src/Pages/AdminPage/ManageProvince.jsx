@@ -228,34 +228,26 @@ const ManageProvince = () => {
                         bordered
                         style={{marginTop : 20 }}
                       />
-               <Pagination
-    current={currentPage}
-    total={totalItems}
-    pageSize={pageSize}
-    onChange={(page, size) => {
-        if (page < currentPage || provinces.length === pageSize) {
-            navigate(`?page=${page}&size=${size}`);
-        } else {
-            message.warning("No more data to display.");
-        }
-    }}
-    showSizeChanger
-    pageSizeOptions={["10", "20", "50", "100"]}
-    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-    hideOnSinglePage
-    showLessItems
-    prevIcon={<LeftOutlined />}
-    nextIcon={<RightOutlined />}
-    style={{
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        padding: "10px",
-        backgroundColor: "#f5f5f5",
-        borderRadius: "8px",
-        marginTop: "20px",
-    }}
-/>
+                <Pagination
+                    current={currentPage}
+                    total={totalItems}
+                    pageSize={pageSize}
+                    onChange={(page, size) => {
+                        if (page < currentPage || provinces.length === pageSize) {
+                            navigate(`?page=${page}&size=${size}`);
+                        } else {
+                            message.warning("No more data to display.");
+                        }
+                    }}
+                    showSizeChanger
+                    pageSizeOptions={["10", "20", "50", "100",totalItems.toString()]}
+                    className="responsive-pagination"
+                    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                    hideOnSinglePage={true}
+                    showLessItems={true}
+                    responsive // ✅ Automatically adjusts layout for smaller screens
+                    simple={window.innerWidth < 768} // ✅ Shows compact pagination on small screens
+                />
             </div>
 
             {/* Create Province Modal */}

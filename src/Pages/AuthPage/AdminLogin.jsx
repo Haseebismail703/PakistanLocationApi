@@ -29,7 +29,8 @@ function AdminLogin() {
                 localStorage.setItem("admin", JSON.stringify(response.data.data?.admin));
                 localStorage.setItem('accessToken', response.data.data?.accessToken);
                 localStorage.setItem('refreshToken', response.data.data?.refreshToken);
-                window.location.href = '/admin/dashboard';
+                // window.location.href = '/admin/dashboard';
+                navigate("/admin/dashboard")
                 setFormData({ email: '', password: '' });
             }
         } catch (error) {
