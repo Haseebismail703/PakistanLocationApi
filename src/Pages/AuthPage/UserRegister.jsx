@@ -20,6 +20,7 @@ function UserRegister() {
   };
 
   const handleSubmit = async (e) => {
+    message.loading("Loading...", 0); 
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       message.error("Passwords do not match!");
@@ -29,13 +30,16 @@ function UserRegister() {
     try {
       const response = await axios.post(`${api}/users/register`, formData, { withCredentials: true });
       if (response.data.success) {
+        message.destroy();
         message.success(response.data.message);
         navigate('/user/dashboard');
       }
     } catch (error) {
+      message.destroy();
       console.log("Registration error: ", error);
       message.error(error.response.data?.message);
     } finally {
+      message.destroy();
       setLoading(false);
     }
   };

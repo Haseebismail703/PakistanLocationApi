@@ -12,6 +12,7 @@ import {
   ClusterOutlined,
   EnvironmentOutlined,
   LogoutOutlined,
+  FundOutlined
 } from "@ant-design/icons";
 import adminInterceptor from "../../Api/adminInterceptor";
 import logo from "../../assets/logo.png";
@@ -33,10 +34,11 @@ const AdminSidebar = ({ children }) => {
   useEffect(() => {
     const currentPath = location.pathname.split("/")[2];
     setSelectedKey(currentPath || "dashboard");
-    document.body.style.backgroundColor =  "#f4f6f8";
+    document.body.style.backgroundColor = "#f4f6f8";
   }, [location.pathname, darkMode]);
 
   const handleLogout = async () => {
+    message.loading("Logging out...", 0);
     try {
       await adminInterceptor.get(`/admins/logout`, { withCredentials: true });
       localStorage.removeItem("admin");
@@ -44,9 +46,11 @@ const AdminSidebar = ({ children }) => {
       localStorage.removeItem('refreshToken');
       document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      message.destroy();
       message.success("Logged out successfully!");
       navigate("/admin/login");
     } catch (error) {
+      message.destroy();
       message.error("Logout error!");
     }
   };
@@ -101,6 +105,11 @@ const AdminSidebar = ({ children }) => {
       label: <Link to="/admin/manage-area">Manage Area</Link>,
     },
     {
+      key: "All payments",
+      icon: <FundOutlined />,
+      label: <Link to="/admin/all-payment">All payments</Link>,
+    },
+    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
@@ -108,7 +117,7 @@ const AdminSidebar = ({ children }) => {
       danger: true,
     },
   ];
-console.log(verify)
+  // console.log(verify)
   const userMenu = {
     items: [
       { key: "profile", label: <Link to="/user/profile">Profile</Link> },
@@ -117,7 +126,7 @@ console.log(verify)
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor:  "#f4f6f8" }}>
+    <Layout style={{ minHeight: "100vh", backgroundColor: "#f4f6f8" }}>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -135,16 +144,16 @@ console.log(verify)
       >
         <div style={{ textAlign: "center", padding: "20px" }}>
           {/* {!collapsed && ( */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <img
-                src={logo}
-                alt="Logo"
-                style={{ width: "50px", height: "auto", marginRight: "15px" }}
-              />
-              {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ width: "50px", height: "auto", marginRight: "15px" }}
+            />
+            {/* <p style={{ color: "#fff", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
                 Admin Panel
               </p> */}
-            </div>
+          </div>
           {/* )} */}
         </div>
 
@@ -159,7 +168,7 @@ console.log(verify)
       </Sider>
 
       <Layout>
-        
+
         <Header
           style={{
             position: "fixed",
@@ -172,15 +181,15 @@ console.log(verify)
             borderBottom: "1px solid #e2e8f0",
             zIndex: 1000,
           }}
-        > 
+        >
           {collapsed ? (
             <MenuUnfoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           ) : (
             <MenuFoldOutlined onClick={toggleCollapse} style={{ fontSize: "18px", cursor: "pointer", color: darkMode ? "#fff" : "#000" }} />
           )}
-           <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
-                Admin Panel
-              </p>
+          <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", margin: "0" }}>
+            Admin Panel
+          </p>
           <div style={{ display: "flex", alignItems: "center" }}>
             {/* <Switch
               checked={darkMode}
@@ -189,7 +198,7 @@ console.log(verify)
               unCheckedChildren="Light"
               style={{ marginRight: 40 }}
             /> */}
-            
+
             <Dropdown menu={{ items: userMenu.items }} placement="bottomRight">
               <Avatar
                 size={40}

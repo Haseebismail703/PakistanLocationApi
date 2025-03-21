@@ -29,6 +29,7 @@ const ManageCity = lazy(() => import("./Pages/AdminPage/ManageCity"));
 const ManageDistrics = lazy(() => import("./Pages/AdminPage/ManageDistrics"));
 const ManageArea = lazy(() => import("./Pages/AdminPage/ManageArea"));
 const AdminPageNotFound = lazy(() => import("./Pages/AdminPage/AdminPageNotFound"));
+const AllPayments = lazy(() => import("./Pages/AdminPage/AllPayment"));
 
 // User Pages
 const UserSidebar = lazy(() => import("./Component/UserComp/UserSidebar"));
@@ -41,6 +42,7 @@ const UserPageNotFound = lazy(() => import("./Pages/UserPages/UserPageNotFound")
 //context user and admin
 import UserProvider from "./Context/UserContext";
 import AdminProvider from "./Context/AdminContext";
+
 // Authentication Check
 const isAdminAuthenticated = () => {
   const admin = localStorage.getItem("admin");
@@ -101,6 +103,7 @@ function App() {
                     <Route path="manage-cities" element={<ManageCity />} />
                     <Route path="manage-district" element={<ManageDistrics />} />
                     <Route path="manage-area" element={<ManageArea />} />
+                    <Route path="all-payment" element={<AllPayments/>} />
                     <Route path="*" element={<AdminPageNotFound />} />
                     <Route path="/form" element={<AdminForm />} />
                   </Routes>

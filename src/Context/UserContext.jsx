@@ -12,6 +12,8 @@ const UserProvider = ({ children }) => {
             try {
                 const response = await userInterceptor.get(`/users/profile`);
                 localStorage.setItem("isVerified", response.data?.data?.isVerified);
+                localStorage.setItem("user", JSON.stringify(response.data?.data));
+                // console.log(response.data)
                 setUser(response.data);
                 
             } catch (error) {

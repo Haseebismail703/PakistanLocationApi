@@ -19,11 +19,13 @@ function UserLogin() {
   };
 
   const handleSubmit = async (e) => {
+    message.loading("Loading...", 0); 
     e.preventDefault();
     setLoading(true);
     try {
       const response = await axios.post(`${api}/users/login`, formData, { withCredentials: true });
       if (response.data.success) {
+        message.destroy();
         message.success(response.data.message);
         localStorage.setItem("isVerified",response.data.data?.user?.isVerified );
         localStorage.setItem("user", JSON.stringify(response.data.data?.user));
@@ -34,9 +36,11 @@ function UserLogin() {
         setFormData({ email: '', password: '' });
       }
     } catch (error) {
+      message.destroy();
       message.error(error.response.data?.message);   
       console.log(error.response.data) 
     } finally {
+      message.destroy();
       setLoading(false);
     }
   };

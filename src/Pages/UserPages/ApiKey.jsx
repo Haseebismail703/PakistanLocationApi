@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button, Table, Input, message, Typography, Modal } from "antd";
-import { CopyOutlined, KeyOutlined, EyeInvisibleOutlined, EyeOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import {
+  CopyOutlined,
+  KeyOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import userInterceptor from "../../Api/userInterceptor.js";
 
 const { Title } = Typography;
@@ -10,29 +16,31 @@ const GenerateApiKey = () => {
   const [apiKey, setApiKey] = useState(null);
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
-  // Fetch API Key from Profile
+
   const fetchApiKey = async () => {
     try {
-      setLoading(true);
-      const res = await userInterceptor.get("/users/profile");
-      if (res?.data?.data?.apiKey) {
-        setApiKey(res.data.data.apiKey);
+      setFetching(true);
+      const res = await userInterceptor.get("/users/get-api-key");
+      console.log(res.data?.data)
+      if (res.data?.data) {
+        setApiKey(res.data?.data);
+        message.success("API Key fetched successfully!");
       } else {
         setApiKey(null);
+        message.warning("No API Key found.");
       }
     } catch (error) {
       message.error("Failed to fetch API key");
     } finally {
-      setLoading(false);
+      setFetching(false);
     }
   };
 
-  useEffect(() => {
-    fetchApiKey();
-  }, []);
 
-  // Confirm before generating new API Key
+
+ 
   const showConfirm = () => {
     confirm({
       title: "Are you sure you want to regenerate your API key?",
@@ -46,17 +54,17 @@ const GenerateApiKey = () => {
     });
   };
 
-  // Generate API Key and Refresh Profile
+  // Generate API Key
   const generateKey = async () => {
     try {
       setLoading(true);
       const res = await userInterceptor.get("/users/generate-api-key");
-      if (res) {
+      if (res?.data?.message) {
         message.success(res.data?.message);
-        fetchApiKey(); // Refresh API key after generation
+        fetchApiKey(); 
       }
     } catch (error) {
-      message.error("Something went wrong");
+      message.error("Something went wrong while generating API key");
     } finally {
       setLoading(false);
     }
@@ -104,24 +112,34 @@ const GenerateApiKey = () => {
 
   return (
     <div className="p-6">
-      <Title level={3} className="text-center">API Key</Title>
+      <Title level={3} className="text-center">API Key Management</Title>
 
-      <Button
-        type="primary"
-        onClick={apiKey ? showConfirm : generateKey}
-        icon={<KeyOutlined />}
-        loading={loading}
-        className="mb-4"
-      >
-        {loading ? "Getting API Key..." : apiKey ? "Regenerate API Key" : "Generate Now"}
-      </Button>
+      <div className="flex gap-4 mb-4">
+        <Button
+          type="primary"
+          onClick={fetchApiKey}
+          icon={<KeyOutlined />}
+          loading={fetching}
+        >
+          {fetching ? "Getting API Key..." : "Get API Key"}
+        </Button>
+
+        <Button
+          type="danger"
+          onClick={showConfirm}
+          icon={<KeyOutlined />}
+          loading={loading}
+        >
+          {loading ? "Generating..." : "Generate New API Key"}
+        </Button>
+      </div>
 
       <Table
         dataSource={apiKey ? [{ key: 1, apiKey }] : []}
         columns={columns}
         pagination={false}
         bordered
-        scroll={{x : "100%"}}
+        scroll={{ x: "100%" }}
       />
     </div>
   );

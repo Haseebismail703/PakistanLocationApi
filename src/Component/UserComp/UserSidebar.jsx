@@ -30,9 +30,11 @@ const UserSidebar = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      console.log("Logging out...");
+      message.loading("Logging out...", 0); 
+  
+      // console.log("Logging out...");
       const response = await userInterceptor.get(`/users/logout`, { withCredentials: true });
-      console.log("Logout Response:", response);
+      // console.log("Logout Response:", response);
   
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
@@ -41,13 +43,16 @@ const UserSidebar = ({ children }) => {
       document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   
-      message.success("Logged out successfully!");
+      message.destroy(); // Remove loading message
+      message.success("Logged out successfully!"); // Show success message
       navigate("/login");
     } catch (error) {
+      message.destroy(); 
       console.error("Logout Error:", error.response?.data.message);
-      message.error( error.response?.data.message || "Failed to logout!");
+      message.error(error.response?.data.message || "Failed to logout!");
     }
   };
+  
   
 
 

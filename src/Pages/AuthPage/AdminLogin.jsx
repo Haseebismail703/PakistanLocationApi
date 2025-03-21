@@ -18,12 +18,14 @@ function AdminLogin() {
     };
 
     const handleSubmit = async (e) => {
+        message.loading("Loading...", 0); 
         e.preventDefault();
         setLoading(true);
         try {
             const response = await axios.post(`${api}/admins/login`, formData, { withCredentials: true });
 
             if (response.data.success) {
+                message.destroy();
                 message.success(response.data.message);
                 localStorage.setItem("isVerified",response.data.data?.admin?.isVerified );
                 localStorage.setItem("admin", JSON.stringify(response.data.data?.admin));
@@ -34,9 +36,11 @@ function AdminLogin() {
                 setFormData({ email: '', password: '' });
             }
         } catch (error) {
+            message.destroy();
             console.log("Login error: ", error);
             message.error(error?.response.data.message);    
         } finally {
+            message.destroy();
             setLoading(false);
         }
     };

@@ -25,7 +25,7 @@ const PaymentPage = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expMonth, setExpMonth] = useState("");
   const [expYear, setExpYear] = useState("");
-  const { user } = useContext(UserContext);
+  // const { user } = useContext(UserContext) || {}
   let getUser = JSON.parse(localStorage.getItem('user'))
   let navigate = useNavigate()
   useEffect(() => {
@@ -37,8 +37,8 @@ const PaymentPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user?.data?.plan)
-    if (user?.data?.plan === "paid") {
+    // console.log(user?.data?.plan)
+    if (getUser.plan === "paid") {
       message.info("You already have a paid plan.");
       return;
     }
@@ -296,12 +296,12 @@ const PaymentPage = () => {
                 </span>
               </div>
               <div style={{ marginTop: 80 }} className="mt-6 flex items-center justify-center gap-8">
-                <img className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal.svg" alt="" />
-                <img className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal-dark.svg" alt="" />
-                <img className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa.svg" alt="" />
-                <img className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa-dark.svg" alt="" />
-                <img className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard.svg" alt="" />
-                <img className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard-dark.svg" alt="" />
+                <img loading="lazy" className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal.svg" alt="" />
+                <img loading="lazy" className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/paypal-dark.svg" alt="" />
+                <img loading="lazy" className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa.svg" alt="" />
+                <img loading="lazy" className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/visa-dark.svg" alt="" />
+                <img loading="lazy" className="h-8 w-auto dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard.svg" alt="" />
+                <img loading="lazy" className="hidden h-8 w-auto dark:flex" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/brand-logos/mastercard-dark.svg" alt="" />
               </div>
             </div>
           </div>
