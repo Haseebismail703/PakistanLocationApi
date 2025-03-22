@@ -75,6 +75,11 @@ const AdminSidebar = ({ children }) => {
       label: <Link to="/admin/manage-admin">Manage Admin</Link>,
     },
     {
+      key: "all-users",
+      icon: <UserOutlined />,
+      label: <Link to="/admin/all-users">All Users</Link>,
+    },
+    {
       key: "manage-country",
       icon: <GlobalOutlined />,
       label: <Link to="/admin/manage-country">Manage Country</Link>,
