@@ -43,9 +43,9 @@ const ManageDistrics = () => {
 
     const getdivisions = async () => {
         try {
-            const response = await adminInterceptor.get(`/admins/divisions`);
-            console.log(response.data?.data);
-            setdivisions(response.data?.data);
+            const response = await adminInterceptor.get(`/admins/divisions?limit=0`);
+            // console.log(response.data?.data.divisions);
+            setdivisions(response.data?.data.divisions);
         } catch (error) {
             message.error("Failed to fetch divisions!");
         }
@@ -55,7 +55,9 @@ const ManageDistrics = () => {
         setTableLoading(true)
         try {
             const response = await adminInterceptor.get(`/admins/districts?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            const districtsData = response.data?.data?.map((data, index) => ({
+            console.log(response.data.data.districts
+            )
+            const districtsData = response.data?.data?.districts.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
@@ -65,7 +67,7 @@ const ManageDistrics = () => {
                 countryId: data.countryId,
             }));
             setdistricts(districtsData);
-            setTotalItems(districtsData.total || 1000);
+            setTotalItems(response.data.data?.totalDistricts || 1000);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {

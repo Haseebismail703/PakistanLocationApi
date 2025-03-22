@@ -44,8 +44,8 @@ const ManageArea = () => {
 
     const getCity = async () => {
         try {
-            const response = await adminInterceptor.get(`/admins/cities`);
-            setCity(response.data?.data);
+            const response = await adminInterceptor.get(`/admins/cities?limit=0`);
+            setCity(response.data?.data?.cities);
         } catch (error) {
             message.error("Failed to fetch divisions!");
         }
@@ -55,7 +55,8 @@ const ManageArea = () => {
         setTableLoading(true);
         try {
             const response = await adminInterceptor.get(`/admins/areas?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            const areaData = response.data?.data?.map((data, index) => ({
+            // console.log(response.data.data)
+            const areaData = response.data?.data?.areas.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
@@ -65,7 +66,7 @@ const ManageArea = () => {
                 countryId: data.countryId,
             }));
             setArea(areaData);
-            setTotalItems(areaData?.total || 1000);
+            setTotalItems(response.data?.data?.totalAreas || 1000);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {

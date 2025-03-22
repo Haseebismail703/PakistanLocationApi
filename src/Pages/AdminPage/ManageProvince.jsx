@@ -44,7 +44,7 @@ const ManageProvince = () => {
         try {
             const response = await adminInterceptor.get(`/admins/country?limit=0`);
 
-            setCountries(response.data?.data);
+            setCountries(response.data?.data.country);
 
         } catch (error) {
             message.error("Failed to fetch countries!");
@@ -55,6 +55,7 @@ const ManageProvince = () => {
         setTableLoading(true);
         try {
             const response = await adminInterceptor.get(`/admins/provinces?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
+            // console.log(response.data?.data)
             const provincesData = response.data?.data?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
@@ -65,7 +66,7 @@ const ManageProvince = () => {
                 countryId: data.countryId,
             }));
             setProvinces(provincesData);
-            setTotalItems(provincesData.total || 1000);
+            setTotalItems(provincesData.total || 10);
         } catch (error) {
             message.error("Failed to fetch provinces!");
         } finally {

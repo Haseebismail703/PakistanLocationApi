@@ -44,9 +44,9 @@ const ManageCity = () => {
 
     const getDistricts = async () => {
         try {
-            const response = await adminInterceptor.get(`/admins/districts`);
+            const response = await adminInterceptor.get(`/admins/districts?limit=0`);
             // console.log(response.data?.data);
-            setDistricts(response.data?.data);
+            setDistricts(response.data.data?.districts);
         } catch (error) {
             message.error("Failed to fetch District!");
         }
@@ -56,7 +56,8 @@ const ManageCity = () => {
         setTableLoading(true)
         try {
             const response = await adminInterceptor.get(`/admins/cities?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            const cityData = response.data?.data?.map((data, index) => ({
+            // console.log(response.data.data)
+            const cityData = response.data?.data?.cities.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
@@ -67,7 +68,7 @@ const ManageCity = () => {
                 areaType: data.areaType
             }));
             setCity(cityData);
-            setTotalItems(cityData.total || 1000);
+            setTotalItems(response.data?.data?.totalCities);
         } catch (error) {
             message.error("Failed to fetch citys!");
         } finally {
@@ -243,26 +244,26 @@ const ManageCity = () => {
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={city} scroll={{ "x": "100%" }} pagination={false} style={{ marginTop: 20 }} />
-                 <Pagination
-                                    current={currentPage}
-                                    total={totalItems}
-                                    pageSize={pageSize}
-                                    onChange={(page, size) => {
-                                        if (page < currentPage || city.length === pageSize) {
-                                            navigate(`?page=${page}&size=${size}`);
-                                        } else {
-                                            message.warning("No more data to display.");
-                                        }
-                                    }}
-                                    showSizeChanger
-                                    pageSizeOptions={["10", "20", "50", "100",totalItems.toString()]}
-                                    className="responsive-pagination"
-                                    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-                                    hideOnSinglePage={true}
-                                    showLessItems={true}
-                                    responsive // ✅ Automatically adjusts layout for smaller screens
-                                    simple={window.innerWidth < 768} // ✅ Shows compact pagination on small screens
-                                />
+                <Pagination
+                    current={currentPage}
+                    total={totalItems}
+                    pageSize={pageSize}
+                    onChange={(page, size) => {
+                        if (page < currentPage || city.length === pageSize) {
+                            navigate(`?page=${page}&size=${size}`);
+                        } else {
+                            message.warning("No more data to display.");
+                        }
+                    }}
+                    showSizeChanger
+                    pageSizeOptions={["10", "20", "50", "100", totalItems.toString()]}
+                    className="responsive-pagination"
+                    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+                    hideOnSinglePage={true}
+                    showLessItems={true}
+                    responsive // ✅ Automatically adjusts layout for smaller screens
+                    simple={window.innerWidth < 768} // ✅ Shows compact pagination on small screens
+                />
 
             </div>
 
