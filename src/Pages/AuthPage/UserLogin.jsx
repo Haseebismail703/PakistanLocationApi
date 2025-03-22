@@ -19,28 +19,25 @@ function UserLogin() {
   };
 
   const handleSubmit = async (e) => {
-    message.loading("Loading...", 0); 
     e.preventDefault();
     setLoading(true);
+    const hideLoadingMessage = message.loading('Logging in...', 0); 
     try {
       const response = await axios.post(`${api}/users/login`, formData, { withCredentials: true });
       if (response.data.success) {
-        message.destroy();
-        message.success(response.data.message);
-        localStorage.setItem("isVerified",response.data.data?.user?.isVerified );
+        localStorage.setItem("isVerified", response.data.data?.user?.isVerified);
         localStorage.setItem("user", JSON.stringify(response.data.data?.user));
         localStorage.setItem('accessToken', response.data.data?.accessToken);
         localStorage.setItem('refreshToken', response.data.data?.refreshToken);
-        // window.location.href = '';
-        navigate('/user/dashboard')
+        message.success(response.data.message);
+        navigate('/user/dashboard');
         setFormData({ email: '', password: '' });
       }
     } catch (error) {
-      message.destroy();
-      message.error(error.response.data?.message);   
-      console.log(error.response.data) 
+      console.log(error.response.data?.message);
+      message.error(error.response.data?.message || "somthing went wrong");
     } finally {
-      message.destroy();
+      hideLoadingMessage(); 
       setLoading(false);
     }
   };

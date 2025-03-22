@@ -20,7 +20,7 @@ function UserRegister() {
   };
 
   const handleSubmit = async (e) => {
-    message.loading("Loading...", 0); 
+    const hideLoadingMessage = message.loading('Logging in...', 0); 
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       message.error("Passwords do not match!");
@@ -29,17 +29,20 @@ function UserRegister() {
     setLoading(true);
     try {
       const response = await axios.post(`${api}/users/register`, formData, { withCredentials: true });
-      if (response.data.success) {
-        message.destroy();
-        message.success(response.data.message);
-        navigate('/user/dashboard');
-      }
+       if (response.data.success) {
+              localStorage.setItem("isVerified", response.data.data?.user?.isVerified);
+              localStorage.setItem("user", JSON.stringify(response.data.data?.user));
+              localStorage.setItem('accessToken', response.data.data?.accessToken);
+              localStorage.setItem('refreshToken', response.data.data?.refreshToken);
+              message.success(response.data.message);
+              navigate('/user/dashboard');
+              setFormData({ email: '', password: '' });
+            }
     } catch (error) {
-      message.destroy();
       console.log("Registration error: ", error);
       message.error(error.response.data?.message);
     } finally {
-      message.destroy();
+      hideLoadingMessage(); 
       setLoading(false);
     }
   };

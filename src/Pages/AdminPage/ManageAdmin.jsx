@@ -5,13 +5,9 @@ import usePermission from '../../Hooks/usePermission.js'
 import { useNavigate, useSearchParams } from "react-router-dom";
 const ManageAdmin = () => {
     const getUser = {
-        _id: "67b2f10457c5b0f20e561417",
-        name: "admin",
-        email: "admin@gmail.com",
-        role: "admin",
         permission: [
             // "manage-permissions",
-            // "manage-admins",
+            "manage-admins",
             // "manage-admin",
             "create-operations",
             "read-operations",
@@ -138,8 +134,8 @@ const ManageAdmin = () => {
             updateForm.resetFields();
         } catch (error) {
             setLoader(false)
-            console.log("Permission error: ", error);
-            message.error("Failed to update permissions");
+            console.log(error.response.data.message || "Permission error: ");
+            message.error(error.response.data.message || "Permission error: ");
         } finally{
             setLoader(false)
         }

@@ -1,36 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Select, Row, Col, message, Tag, Pagination } from 'antd';
+import { Table, Input, Select, Row, Col, message, Tag, Empty, Spin } from 'antd';
 import adminInterceptor from '../../Api/adminInterceptor.js';
-import { useNavigate, useSearchParams } from "react-router-dom";
+import usePermission from "../../Hooks/usePermission";
 const { Option } = Select;
 
 const AllPayments = () => {
     const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [searchText, setSearchText] = useState('');
+    const [userSearch, setUserSearch] = useState('');
+    const [userIdSearch, setUserIdSearch] = useState('');
     const [planFilter, setPlanFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
-    const [totalItems, setTotalItems] = useState(0);
-
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-
-    // Get currentPage and pageSize from URL or default to 1 and 10
-    const currentPage = parseInt(searchParams.get("page")) || 1;
-    const pageSize = parseInt(searchParams.get("size")) || 10;
+    let canRead = usePermission("read-operations");
 
     useEffect(() => {
         const fetchPayments = async () => {
             setLoading(true);
             try {
-                const response = await adminInterceptor.get(`/payment/all-payments?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
+                const response = await adminInterceptor.get(`/payment/all-payments?limit=0`);
                 console.log(response.data.data);
 
                 const paymentData = response.data?.data.map((record, index) => ({
-                    key: index.toString(),
+                    key: index + 1,
                     userName: record?.user?.name || 'N/A',
                     userId: record?.user?._id || 'N/A',
-                    plan: record?.user?.plan || 'Free', // Default to 'Free' if plan is missing
+                    plan: record?.user?.plan || 'Free',
                     paymentType: record?.paymentType || 'Unknown',
                     createdAt: record?.createdAt?.substring(0, 10) || 'N/A',
                     amount: `${record?.amount}$` || '0$',
@@ -38,7 +31,6 @@ const AllPayments = () => {
                 }));
 
                 setPayments(paymentData);
-                setTotalItems(paymentData?.total || 1000);
             } catch (error) {
                 message.error('Failed to fetch payment data.');
             } finally {
@@ -47,34 +39,36 @@ const AllPayments = () => {
         };
 
         fetchPayments();
-    }, [currentPage, pageSize]);
+    }, []);
 
-    // **Filtering Logic**
     const filteredPayments = payments.filter((record) =>
-        (record.userName.toLowerCase().includes(searchText.toLowerCase()) ||
-            record.userId.includes(searchText) || !searchText) &&
-        (planFilter ? record.plan === planFilter : true) &&
-        (statusFilter ? record.status.toLowerCase() === statusFilter.toLowerCase() : true)
+        (record.userName.toLowerCase().includes(userSearch.toLowerCase()) || !userSearch) &&
+        (record.userId.includes(userIdSearch) || !userIdSearch) &&
+        (planFilter ? record.plan === planFilter : true)
     );
 
     return (
-        <>
+        <Spin spinning={loading}>
             <center>
                 <h1 style={{ fontSize: "24px", margin: 10 }}>All Payments</h1>
             </center>
+            {canRead ? 
             <div style={{ padding: '20px' }}>
-
                 <Row gutter={16} style={{ marginBottom: 16 }}>
-                    {/* Search by User Name or ID */}
                     <Col xs={24} sm={12} md={8}>
                         <Input
-                            placeholder="Search User Name or ID"
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
+                            placeholder="Search User Name"
+                            value={userSearch}
+                            onChange={(e) => setUserSearch(e.target.value)}
                         />
                     </Col>
-
-                    {/* Filter by Plan (Free / Paid) */}
+                    <Col xs={24} sm={12} md={8}>
+                        <Input
+                            placeholder="Search User ID"
+                            value={userIdSearch}
+                            onChange={(e) => setUserIdSearch(e.target.value)}
+                        />
+                    </Col>
                     <Col xs={24} sm={12} md={8}>
                         <Select
                             placeholder="Select Plan"
@@ -87,50 +81,16 @@ const AllPayments = () => {
                             <Option value="Paid">Paid</Option>
                         </Select>
                     </Col>
-
-                    {/* Filter by Status (Complete / Incomplete) */}
-                    <Col xs={24} sm={12} md={8}>
-                        <Select
-                            placeholder="Select Status"
-                            onChange={(value) => setStatusFilter(value)}
-                            style={{ width: '100%' }}
-                            allowClear
-                        >
-                            <Option value="">All</Option>
-                            <Option value="Complete">Complete</Option>
-                            <Option value="Incomplete">Incomplete</Option>
-                        </Select>
-                    </Col>
                 </Row>
-
-                {/* Payment Table */}
                 <Table
                     dataSource={filteredPayments}
                     loading={loading}
-                    pagination={false}
+                    pagination={{ pageSize: 10 }}
                     bordered
                     style={{ width: '100%' }}
-                    scroll={{"x" : "100%"}}
+                    scroll={{ "x": "100%" }}
                 >
-                    <Pagination
-                        current={currentPage}
-                        total={totalItems}
-                        pageSize={pageSize}
-                        onChange={(page, size) => {
-                            if (page < currentPage || payments.length === pageSize) {
-                                navigate(`?page=${page}&size=${size}`);
-                            } else {
-                                message.warning("No more data to display.");
-                            }
-                        }}
-                        showSizeChanger
-                        pageSizeOptions={["10", "20", "50", "100", totalItems.toString()]}
-                        className="responsive-pagination"
-                        showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-                        hideOnSinglePage
-                        showLessItems
-                        simple={window.innerWidth < 768} // ✅ Compact pagination on small screens
-                    />
+                    <Table.Column title="No" dataIndex="key" key="key" />
                     <Table.Column title="User Name" dataIndex="userName" key="userName" />
                     <Table.Column title="User ID" dataIndex="userId" key="userId" />
                     <Table.Column
@@ -157,8 +117,8 @@ const AllPayments = () => {
                         )}
                     />
                 </Table>
-            </div>
-        </>
+            </div> : <Empty description="You don't have read permission" />}
+        </Spin>
     );
 };
 

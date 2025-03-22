@@ -18,29 +18,25 @@ function AdminLogin() {
     };
 
     const handleSubmit = async (e) => {
-        message.loading("Loading...", 0); 
         e.preventDefault();
         setLoading(true);
+        message.loading({ content: 'Logging in...', key: 'login' });
         try {
             const response = await axios.post(`${api}/admins/login`, formData, { withCredentials: true });
 
             if (response.data.success) {
-                message.destroy();
-                message.success(response.data.message);
-                localStorage.setItem("isVerified",response.data.data?.admin?.isVerified );
+                localStorage.setItem("isVerified", response.data.data?.admin?.isVerified);
                 localStorage.setItem("admin", JSON.stringify(response.data.data?.admin));
                 localStorage.setItem('accessToken', response.data.data?.accessToken);
                 localStorage.setItem('refreshToken', response.data.data?.refreshToken);
-                // window.location.href = '/admin/dashboard';
-                navigate("/admin/dashboard")
+                message.success({ content: response.data.message, key: 'login', duration: 2 });
+                navigate("/admin/dashboard");
                 setFormData({ email: '', password: '' });
             }
         } catch (error) {
-            message.destroy();
             console.log("Login error: ", error);
-            message.error(error?.response.data.message);    
+            message.error({ content: error?.response.data.message, key: 'login', duration: 2 });
         } finally {
-            message.destroy();
             setLoading(false);
         }
     };
