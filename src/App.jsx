@@ -30,6 +30,7 @@ const ManageDistrics = lazy(() => import("./Pages/AdminPage/ManageDistrics"));
 const ManageArea = lazy(() => import("./Pages/AdminPage/ManageArea"));
 const AdminPageNotFound = lazy(() => import("./Pages/AdminPage/AdminPageNotFound"));
 const AllPayments = lazy(() => import("./Pages/AdminPage/AllPayment"));
+const AllUsers = lazy(() => import("./Pages/AdminPage/AllUsers"));
 
 // User Pages
 const UserSidebar = lazy(() => import("./Component/UserComp/UserSidebar"));
@@ -104,6 +105,7 @@ function App() {
                     <Route path="manage-district" element={<ManageDistrics />} />
                     <Route path="manage-area" element={<ManageArea />} />
                     <Route path="all-payment" element={<AllPayments/>} />
+                    <Route path="all-users" element={<AllUsers/>} />
                     <Route path="*" element={<AdminPageNotFound />} />
                     <Route path="/form" element={<AdminForm />} />
                   </Routes>

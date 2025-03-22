@@ -83,6 +83,7 @@ const ManageAdmin = () => {
                 role: record.role,
                 status: record.status,
                 permissions: record.permissions || []
+                
             }));
 
             setAdmin(admins);
