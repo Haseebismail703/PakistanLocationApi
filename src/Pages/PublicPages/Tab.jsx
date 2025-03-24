@@ -1,41 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { Table, Pagination, message } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, message } from "antd";
+import Filter from "../../Component/AdminCom/Filter.jsx";
 import adminInterceptor from "../../Api/adminInterceptor.js";
-import { useNavigate, useSearchParams } from "react-router-dom";
 
 const DivisionList = () => {
   const [divisions, setDivisions] = useState([]);
+  const [allDivisions, setAllDivisions] = useState([]); // Store all data
   const [tableLoading, setTableLoading] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
+  const [selectedProvinceId, setSelectedProvinceId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Get currentPage and pageSize from URL or default to 1 and 10
-  const currentPage = parseInt(searchParams.get("page")) || 1;
-  const pageSize = parseInt(searchParams.get("size")) || 10;
-
-  const getAlldivisions = async () => {
+  // Fetch all divisions
+  const getAllDivisions = async () => {
     setTableLoading(true);
     try {
-      console.log(`Fetching divisions: Page ${currentPage}, Limit ${pageSize}`);
-      const response = await adminInterceptor.get(
-        `/admins/divisions?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`
-      );
-
-      const divisionsData = response.data?.data?.map((data, index) => ({
+      const response = await adminInterceptor.get(`/admins/divisions?limit=0`);
+      let divisionsData = response.data?.data?.divisions.map((data, index) => ({
         key: index + 1,
         id: data._id,
         name: data.name || "N/A",
         createdAt: data.createdAt?.substring(0, 10) || "N/A",
         details: data.details || "N/A",
-        countryId: data.countryId || "N/A",
+        provinceId: data.province?._id || null,
+        province: data.province?.name || "N/A",
       }));
 
-      console.log("Response Data:", response.data?.data);
-
+      setAllDivisions(divisionsData);
       setDivisions(divisionsData);
-      setTotalItems(divisionsData?.total || 300);
     } catch (error) {
       message.error("Failed to fetch divisions!");
     } finally {
@@ -43,50 +35,46 @@ const DivisionList = () => {
     }
   };
 
+  // Filter divisions when selectedProvinceId changes
   useEffect(() => {
-    getAlldivisions();
-  }, [currentPage, pageSize]);
+    if (selectedProvinceId) {
+      const filteredDivisions = allDivisions.filter(
+        (division) => division.provinceId === selectedProvinceId
+      );
+      setDivisions(filteredDivisions);
+    } else {
+      setDivisions(allDivisions);
+    }
+  }, [selectedProvinceId, allDivisions]);
 
-  const columns = [
-    { title: "ID", dataIndex: "id", key: "id" },
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Created At", dataIndex: "createdAt", key: "createdAt" },
-    { title: "Details", dataIndex: "details", key: "details" },
-    { title: "Country ID", dataIndex: "countryId", key: "countryId" },
-  ];
+  
+console.log(selectedProvinceId)
+  useEffect(() => {
+    getAllDivisions();
+  }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Division List</h2>
+    <div>
+      <Filter  onFilterChange={(provinceId) => setSelectedProvinceId(provinceId)} />
 
       <Table
-        loading={tableLoading}
-        columns={columns}
         dataSource={divisions}
-        pagination={false}
-        rowKey="id"
-        scroll={{ x: "100" }}
-        bordered
-        style={{ marginBottom: "16px" }}
-      />
-
-      <Pagination
-        current={currentPage}
-        total={totalItems}
-        pageSize={pageSize}
-        onChange={(page, size) => {
-          if (page < currentPage || divisions.length === pageSize) {
-            navigate(`?page=${page}&size=${size}`);
-          } else {
-            message.warning("No more data to display.");
-          }
+        loading={tableLoading}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          onChange: (page, size) => {
+            setCurrentPage(page);
+            setPageSize(size);
+          },
         }}
-        showSizeChanger
-        pageSizeOptions={["10", "20", "50", "100"]}
-        style={{ textAlign: "center" }}
-        showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-        hideOnSinglePage={true}
-        showLessItems={true}
+        columns={[
+          { title: "ID", dataIndex: "id", key: "id" },
+          { title: "Name", dataIndex: "name", key: "name" },
+          { title: "Created At", dataIndex: "createdAt", key: "createdAt" },
+          { title: "Details", dataIndex: "details", key: "details" },
+          { title: "Province", dataIndex: "province", key: "province" },
+        ]}
       />
     </div>
   );
