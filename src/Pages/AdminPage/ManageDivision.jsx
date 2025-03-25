@@ -74,6 +74,7 @@ const ManageDivision = () => {
                 pictures: data.pictures,
                 details: data.details,
                 provinceId: data.province._id || null,
+                provinceName: data.province.name || null,
             }));
 
             setAllDivisions(divisionsData);
