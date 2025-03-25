@@ -4,7 +4,7 @@ import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, LeftOutlined, 
 import { useNavigate, useSearchParams } from "react-router-dom";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
-
+import DistrictFilter from '../../Component/Filter/DistrictFilter'
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -21,6 +21,9 @@ const ManageDistrics = () => {
     const [loading, setLoading] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
     const [tableLoading, setTableLoading] = useState(false);
+    // filter
+    const [selectedDivisionId, setselectedDivisionId] = useState(null);
+    const [allDistrict, setallDistrict] = useState([]);
     const [createForm] = Form.useForm();
     const [updateDetailsForm] = Form.useForm();
     const [updateImagesForm] = Form.useForm();
@@ -39,7 +42,7 @@ const ManageDistrics = () => {
     useEffect(() => {
         getdivisions();
         getAlldistricts();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, selectedDivisionId]);
 
     const getdivisions = async () => {
         try {
@@ -51,29 +54,52 @@ const ManageDistrics = () => {
         }
     };
 
+
+    // Filter districts when selectedDivisionId changes
+    useEffect(() => {
+        if (selectedDivisionId) {
+            // Filter only for UI
+            const filteredDistricts = allDistrict.filter(
+                (district) => district.divisionId === selectedDivisionId
+            );
+            setdistricts(filteredDistricts);
+        } else {
+            setdistricts(allDistrict);
+        }
+    }, [selectedDivisionId, allDistrict]);
+
     const getAlldistricts = async () => {
-        setTableLoading(true)
+        setTableLoading(true);
+        setdistricts([]);
+
         try {
-            const response = await adminInterceptor.get(`/admins/districts?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            console.log(response.data.data.districts
-            )
-            const districtsData = response.data?.data?.districts.map((data, index) => ({
+            const response = await adminInterceptor.get(
+                `/admins/districts${selectedDivisionId ? `/get-by-division/${selectedDivisionId}` : ""}?skip=${selectedDivisionId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedDivisionId ? 0 : pageSize}`
+            );
+
+            console.log("Response in districts:", response?.data.data.districts);
+
+            const districtsData = response.data?.data?.districts?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
                 pictures: data.pictures,
                 details: data.details,
-                countryId: data.countryId,
+                divisionId: data.division?._id || null, 
+                divisionName: data.division?.name || null, 
             }));
+
+            setallDistrict(districtsData);
             setdistricts(districtsData);
-            setTotalItems(response.data.data?.totalDistricts || 1000);
+            setTotalItems(response.data?.data.totalItems || 1000);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {
-            setTableLoading(false)
+            setTableLoading(false);
         }
     };
+
 
     const handleCreate = async (values) => {
         setLoading(true);
@@ -153,7 +179,7 @@ const ManageDistrics = () => {
             if (response.data) {
                 message.success("District images updated successfully!");
                 setUpdateImagesModalVisible(false);
-                getAlldistricts();
+                getAlldistrictss();
                 setFileList([])
             } else {
                 message.error("Failed to update District images!");
@@ -175,7 +201,7 @@ const ManageDistrics = () => {
 
             if (response.status === 200) {
                 message.success("District image deleted successfully!");
-                getAlldistricts();
+                getAlldistrictss();
                 setDeleteImagesModalVisible(false)
             } else {
                 message.error("Failed to delete District image!");
@@ -195,6 +221,7 @@ const ManageDistrics = () => {
                 </>
             )
         },
+        { title: "Division Name", dataIndex: "divisionName", key: "divisionName" },
         {
             title: "Actions",
             key: "action",
@@ -216,6 +243,8 @@ const ManageDistrics = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
+                <br /><br />
+                <DistrictFilter onFilterChange={(provinceId) => setselectedDivisionId(provinceId)} />
                 <Table pagination={false} locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={districts} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}
@@ -229,7 +258,7 @@ const ManageDistrics = () => {
                         }
                     }}
                     showSizeChanger
-                    pageSizeOptions={["10", "20", "50", "100",totalItems.toString()]}
+                    pageSizeOptions={["10", "20", "50", "100", totalItems.toString()]}
                     className="responsive-pagination"
                     showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
                     hideOnSinglePage={true}

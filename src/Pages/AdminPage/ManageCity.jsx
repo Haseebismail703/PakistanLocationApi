@@ -4,6 +4,7 @@ import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, LeftOutlined, 
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import CityFilter from "../../Component/Filter/CityFilter";
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -15,6 +16,8 @@ const ManageCity = () => {
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [areaTypeModalVisible, setAreaTypeModalVisible] = useState(false);
     const [city, setCity] = useState([]);
+    const [allCities, setAllCities] = useState([]); // Stores full data
+    const [selectedDistrictId, setSelectedDistrictId] = useState(null);
     const [selectCity, setselectCity] = useState(null);
     const [districts, setDistricts] = useState('');
     const [fileList, setFileList] = useState([])
@@ -40,7 +43,56 @@ const ManageCity = () => {
     useEffect(() => {
         getDistricts();
         getAllCities();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, selectedDistrictId]);
+
+
+
+    // Filter cities when selectedDistrictId changes
+    useEffect(() => {
+        if (selectedDistrictId) {
+            // Filter only for UI
+            const filteredCities = allCities.filter(
+                (city) => city.districtId === selectedDistrictId
+            );
+            setCity(filteredCities);
+        } else {
+            setCity(allCities);
+        }
+    }, [selectedDistrictId, allCities]);
+
+    const getAllCities = async () => {
+        setTableLoading(true);
+        setCity([]);
+
+        try {
+            const response = await adminInterceptor.get(
+                `/admins/cities${selectedDistrictId ? `/get-by-district/${selectedDistrictId}` : ""}?skip=${selectedDistrictId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedDistrictId ? 0 : pageSize}`
+            );
+
+            console.log("Response in cities:", response?.data.data.cities);
+
+            const citiesData = response.data?.data?.cities?.map((data, index) => ({
+                key: index + 1 + (currentPage - 1) * pageSize,
+                id: data._id,
+                name: data.name,
+                createdAt: data.createdAt?.substring(0, 10),
+                pictures: data.pictures,
+                details: data.details,
+                areaType: data.areaType,
+                districtId: data.district?._id || null,
+                districtName: data.district?.name || null,
+            }));
+
+            setAllCities(citiesData); // Store full data for filtering
+            setCity(citiesData); // Show in UI
+            setTotalItems(response.data?.data.totalItems || 1000);
+        } catch (error) {
+            message.error("Failed to fetch cities!");
+        } finally {
+            setTableLoading(false);
+        }
+    };
+
 
     const getDistricts = async () => {
         try {
@@ -51,31 +103,6 @@ const ManageCity = () => {
             message.error("Failed to fetch District!");
         }
     };
-
-    const getAllCities = async () => {
-        setTableLoading(true)
-        try {
-            const response = await adminInterceptor.get(`/admins/cities?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            // console.log(response.data.data)
-            const cityData = response.data?.data?.cities.map((data, index) => ({
-                key: index + 1 + (currentPage - 1) * pageSize,
-                id: data._id,
-                name: data.name,
-                createdAt: data.createdAt?.substring(0, 10),
-                pictures: data.pictures,
-                details: data.details,
-                countryId: data.countryId,
-                areaType: data.areaType
-            }));
-            setCity(cityData);
-            setTotalItems(response.data?.data?.totalCities);
-        } catch (error) {
-            message.error("Failed to fetch citys!");
-        } finally {
-            setTableLoading(false)
-        }
-    };
-
     const handleCreate = async (values) => {
         console.log(values)
         setLoading(true);
@@ -203,6 +230,7 @@ const ManageCity = () => {
                 </>
             )
         },
+        { title: "District Name", dataIndex: "districtName", key: "districtName" },
         {
             title: "Actions",
             key: "action",
@@ -243,6 +271,22 @@ const ManageCity = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
+                <br /><br />
+                <CityFilter onFilterChange={(districtId) => setSelectedDistrictId(districtId)} />
+                    <Select
+                    className="select-dropdown"
+                        placeholder="Select Area Type"
+                        onChange={(value) => {
+                            const filteredCities = allCities.filter(city => city.areaType === value);
+                            setCity(filteredCities);
+                        }}
+                        style={{ width: 200, marginBottom: 20 }}
+                    >
+                        <Option value="Urban">Urban</Option>
+                        <Option value="Rural">Rural</Option>
+                    </Select>
+
+
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={city} scroll={{ "x": "100%" }} pagination={false} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}

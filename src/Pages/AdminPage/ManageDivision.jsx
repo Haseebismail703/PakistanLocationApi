@@ -15,6 +15,7 @@ const ManageDivision = () => {
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [division, setDivisions] = useState([]);
+    const [allDivisions, setAllDivisions] = useState([]);
     const [selectdivision, setselectdivision] = useState(null);
     const [province, setprovince] = useState('');
     const [fileList, setFileList] = useState([])
@@ -39,19 +40,54 @@ const ManageDivision = () => {
     useEffect(() => {
         getProvince();
         getAlldivisions();
-    }, [currentPage, pageSize]);
-    // Filter divisions when selectedProvinceId changes
+    }, [currentPage, pageSize, selectedProvinceId]);
+
+
     useEffect(() => {
         if (selectedProvinceId) {
-            const filteredDivisions = division.filter(
+            // Filter frontend par sirf UI ke liye
+            const filteredDivisions = allDivisions.filter(
                 (division) => division.provinceId === selectedProvinceId
             );
-            console.log(division)
             setDivisions(filteredDivisions);
         } else {
-            setDivisions(division);
+            setDivisions(allDivisions);
         }
-    }, [selectedProvinceId]);
+    }, [selectedProvinceId, allDivisions]);
+
+    const getAlldivisions = async () => {
+        setTableLoading(true);
+        setDivisions([]);
+
+        try {
+            const response = await adminInterceptor.get(
+                `/admins/divisions${selectedProvinceId ? `/get-by-province/${selectedProvinceId}` : ""}?skip=${selectedProvinceId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedProvinceId ? 0 : pageSize}`
+            );
+
+            console.log("Response in divisions: ", response?.data.data.divisions);
+
+            const divisionsData = response.data?.data?.divisions?.map((data, index) => ({
+                key: index + 1 + (currentPage - 1) * pageSize,
+                id: data._id,
+                name: data.name,
+                createdAt: data.createdAt?.substring(0, 10),
+                pictures: data.pictures,
+                details: data.details,
+                provinceId: data.province._id || null,
+            }));
+
+            setAllDivisions(divisionsData);
+            setDivisions(divisionsData);
+            setTotalItems(response.data?.data.totalItems || 1000);
+        } catch (error) {
+            message.error("Failed to fetch divisions!");
+        } finally {
+            setTableLoading(false);
+        }
+    };
+
+
+
 
     const getProvince = async () => {
         try {
@@ -62,32 +98,6 @@ const ManageDivision = () => {
             message.error("Failed to fetch province!");
         }
     };
-
-    const getAlldivisions = async () => {
-        setTableLoading(true)
-        try {
-            const response = await adminInterceptor.get(`/admins/divisions?limit=0`);
-            // console.log(response.data?.data.divisions);
-            const divisionsData = response.data?.data.divisions.map((data, index) => ({
-                key: index + 1 + (currentPage - 1) * pageSize,
-                id: data._id,
-                name: data.name,
-                createdAt: data.createdAt?.substring(0, 10),
-                pictures: data.pictures,
-                details: data.details,
-                provinceId: data.province._id,
-                provinceName: data.province.name,
-            }));
-            // console.log(response.data?.data);
-            setDivisions(divisionsData);
-            setTotalItems(response.data?.data.totalDivisions || 1000);
-        } catch (error) {
-            message.error("Failed to fetch divisions!");
-        } finally {
-            setTableLoading(false)
-        }
-    };
-
     const handleCreate = async (values) => {
         setLoading(true);
         const formData = new FormData();
@@ -237,7 +247,7 @@ const ManageDivision = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
-
+                <br /><br />
                 <DivisionFilter onFilterChange={(provinceId) => setSelectedProvinceId(provinceId)} />
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={division} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination

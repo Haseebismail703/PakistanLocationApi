@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/* table pagination css */
 .responsive-pagination {
     display: flex;
     justify-content: center;
@@ -19,6 +19,30 @@
     .responsive-pagination .ant-pagination-prev,
     .responsive-pagination .ant-pagination-next {
       display: inline-block; /* ✅ Show only Prev & Next buttons */
+    }
+  }
+  
+  /* Drop down css */
+  .filter-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .select-dropdown {
+    min-width: 200px;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  /* Small Screens */
+  @media (max-width: 600px) {
+    .filter-container {
+      flex-direction: column;
+      gap: 15px;
+      align-items: stretch;
     }
   }
   

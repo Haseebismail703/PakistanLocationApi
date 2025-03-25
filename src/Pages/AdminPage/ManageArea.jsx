@@ -3,6 +3,7 @@ import { Button, Modal, Form, Input, Table, Upload, message, Select, Image, Spin
 import { PlusOutlined, DeleteOutlined, EyeOutlined, EditOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import adminInterceptor from "../../Api/adminInterceptor";
 import usePermission from "../../Hooks/usePermission";
+import AreaFilter from "../../Component/Filter/AreaFilter";
 import { useNavigate, useSearchParams } from "react-router-dom";
 const { TextArea } = Input;
 const { Option } = Select;
@@ -14,6 +15,8 @@ const ManageArea = () => {
     const [deleteImagesModalVisible, setDeleteImagesModalVisible] = useState(false);
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [area, setArea] = useState([]);
+    const [allArea, setAllArea] = useState([]);
+    const [selectedCityId, setSelectedCityId] = useState(null);
     const [selectArea, setselectArea] = useState(null);
     const [city, setCity] = useState('');
     const [loading, setLoading] = useState(false);
@@ -40,7 +43,7 @@ const ManageArea = () => {
     useEffect(() => {
         getCity();
         getAllArea();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, setSelectedCityId]);
 
     const getCity = async () => {
         try {
@@ -51,28 +54,52 @@ const ManageArea = () => {
         }
     };
 
+    // Filter areas when selectedCityId changes
+    useEffect(() => {
+        if (selectedCityId) {
+            // Filter only for UI
+            const filteredAreas = allArea.filter(
+                (area) => area.cityId === selectedCityId
+            );
+            setArea(filteredAreas);
+        } else {
+            setArea(allArea);
+        }
+    }, [selectedCityId, allArea]);
+
     const getAllArea = async () => {
         setTableLoading(true);
+        setArea([]);
         try {
-            const response = await adminInterceptor.get(`/admins/areas?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
-            // console.log(response.data.data)
-            const areaData = response.data?.data?.areas.map((data, index) => ({
+            const response = await adminInterceptor.get(
+                `/admins/areas${selectedCityId ? `/get-by-city/${selectedCityId}` : ""}?skip=${selectedCityId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedCityId ? 0 : pageSize}`
+            );
+
+            console.log("API Response:", response.data); // 🔍 Debugging
+
+            const areaData = response.data?.data?.areas?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
                 name: data.name,
                 createdAt: data.createdAt?.substring(0, 10),
                 pictures: data.pictures,
                 details: data.details,
-                countryId: data.countryId,
+                cityId: data.city?._id || null,
+                cityName: data.city?.name || "Unknown"
             }));
+
+            // console.log("Formatted Data:", areaData); // ✅ Check if data is correctly formatted
+
+            setAllArea(areaData);
             setArea(areaData);
             setTotalItems(response.data?.data?.totalAreas || 1000);
         } catch (error) {
-            message.error("Failed to fetch districts!");
+            message.error("Failed to fetch areas!");
         } finally {
             setTableLoading(false);
         }
     };
+
 
     const handleCreate = async (values) => {
         setLoading(true);
@@ -191,6 +218,7 @@ const ManageArea = () => {
     const columns = [
         { title: "No", dataIndex: "key", key: "key" },
         { title: "Name", dataIndex: "name", key: "name" },
+        { title: "City Name", dataIndex: "cityName", key: "cityName" },
         {
             title: "Actions",
             key: "action",
@@ -212,6 +240,8 @@ const ManageArea = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Area</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Area</Button>
+                <br /><br />
+                <AreaFilter onFilterChange={(cityId) => setSelectedCityId(cityId)} />
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={area} pagination={false} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}
@@ -225,7 +255,7 @@ const ManageArea = () => {
                         }
                     }}
                     showSizeChanger
-                    pageSizeOptions={["10", "20", "50", "100" ,totalItems.toString()]}
+                    pageSizeOptions={["10", "20", "50", "100", totalItems.toString()]}
                     className="responsive-pagination"
                     showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
                     hideOnSinglePage={true}
