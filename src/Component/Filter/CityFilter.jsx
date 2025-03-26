@@ -4,7 +4,7 @@ import adminInterceptor from "../../Api/adminInterceptor.js";
 
 const { Option } = Select;
 
-const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
+const CityFilter = ({ onFilterChange, onareTypeChange }) => {
   const [countries, setCountries] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [divisions, setDivisions] = useState([]);
@@ -20,6 +20,12 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDivision, setSelectedDivision] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedAreaType, setSelectedAreaType] = useState("All");
+
+  const handleChange = (value) => {
+    setSelectedAreaType(value || "All");
+    onareTypeChange(value || "All");
+  };
 
   // Fetch Countries
   useEffect(() => {
@@ -43,9 +49,7 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       const fetchProvinces = async () => {
         setLoading((prev) => ({ ...prev, provinces: true }));
         try {
-          const res = await adminInterceptor.get(
-            `/admins/provinces`
-          );
+          const res = await adminInterceptor.get("/admins/provinces");
           setProvinces(res.data?.data || []);
         } catch (error) {
           console.error("Error fetching provinces", error);
@@ -61,6 +65,7 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       setSelectedDivision(null);
       setDistricts([]);
       setSelectedDistrict(null);
+      handleChange(null); // Reset Area Type
     }
   }, [selectedCountry]);
 
@@ -86,6 +91,7 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       setSelectedDivision(null);
       setDistricts([]);
       setSelectedDistrict(null);
+      handleChange(null); // Reset Area Type
     }
   }, [selectedProvince]);
 
@@ -109,6 +115,7 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
     } else {
       setDistricts([]);
       setSelectedDistrict(null);
+      handleChange(null); // Reset Area Type
     }
   }, [selectedDivision]);
 
@@ -123,21 +130,13 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       <Select
         placeholder="Select Country"
         className="select-dropdown"
-        onChange={(id) =>
-          setSelectedCountry(countries.find((c) => c._id === id))
-        }
+        onChange={(id) => setSelectedCountry(countries.find((c) => c._id === id) || null)}
         value={selectedCountry?._id || undefined}
         allowClear
-        showSearch
-        filterOption={(input, option) =>
-          option.children.toLowerCase().includes(input.toLowerCase())
-        }
         notFoundContent={loading.countries ? <Spin size="small" /> : "No Data"}
       >
         {countries.map((country) => (
-          <Option key={country._id} value={country._id}>
-            {country.name}
-          </Option>
+          <Option key={country._id} value={country._id}>{country.name}</Option>
         ))}
       </Select>
 
@@ -145,22 +144,14 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       <Select
         placeholder="Select Province"
         className="select-dropdown"
-        onChange={(id) =>
-          setSelectedProvince(provinces.find((p) => p._id === id))
-        }
+        onChange={(id) => setSelectedProvince(provinces.find((p) => p._id === id) || null)}
         value={selectedProvince?._id || undefined}
         allowClear
-        showSearch
         disabled={!selectedCountry}
-        filterOption={(input, option) =>
-          option.children.toLowerCase().includes(input.toLowerCase())
-        }
         notFoundContent={loading.provinces ? <Spin size="small" /> : "No Data"}
       >
         {provinces.map((province) => (
-          <Option key={province._id} value={province._id}>
-            {province.name}
-          </Option>
+          <Option key={province._id} value={province._id}>{province.name}</Option>
         ))}
       </Select>
 
@@ -168,22 +159,14 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       <Select
         placeholder="Select Division"
         className="select-dropdown"
-        onChange={(id) =>
-          setSelectedDivision(divisions.find((d) => d._id === id))
-        }
+        onChange={(id) => setSelectedDivision(divisions.find((d) => d._id === id))}
         value={selectedDivision?._id || undefined}
         allowClear
-        showSearch
         disabled={!selectedProvince}
-        filterOption={(input, option) =>
-          option.children.toLowerCase().includes(input.toLowerCase())
-        }
         notFoundContent={loading.divisions ? <Spin size="small" /> : "No Data"}
       >
         {divisions.map((division) => (
-          <Option key={division._id} value={division._id}>
-            {division.name}
-          </Option>
+          <Option key={division._id} value={division._id}>{division.name}</Option>
         ))}
       </Select>
 
@@ -191,38 +174,30 @@ const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
       <Select
         placeholder="Select District"
         className="select-dropdown"
-        onChange={(id) =>
-          setSelectedDistrict(districts.find((d) => d._id === id))
-        }
+        onChange={(id) => setSelectedDistrict(districts.find((d) => d._id === id))}
         value={selectedDistrict?._id || undefined}
         allowClear
-        showSearch
         disabled={!selectedDivision}
-        filterOption={(input, option) =>
-          option.children.toLowerCase().includes(input.toLowerCase())
-        }
         notFoundContent={loading.districts ? <Spin size="small" /> : "No Data"}
       >
         {districts.map((district) => (
-          <Option key={district._id} value={district._id}>
-            {district.name}
-          </Option>
+          <Option key={district._id} value={district._id}>{district.name}</Option>
         ))}
       </Select>
-      {/* Urban or Roral */}
+
+      {/* Urban or Rural */}
       <Select
-        className="select-dropdown"
         placeholder="Select Area Type"
-        disabled={!selectedDivision}
-        onChange={(value) => onareTypeChange(value)}
+        className="select-dropdown"
+        value={selectedAreaType}
+        onChange={handleChange}
         allowClear
-        showSearch
+        
       >
+        <Option value="All">All</Option>
         <Option value="Urban">Urban</Option>
         <Option value="Rural">Rural</Option>
       </Select>
-
-
     </div>
   );
 };

@@ -50,19 +50,19 @@ const ManageCity = () => {
 
     useEffect(() => {
         let filteredCities = allCities;
-    
+
         if (selectedDistrictId) {
             filteredCities = filteredCities.filter(
                 (city) => city.districtId === selectedDistrictId
             );
         }
-    
-        if (selectedareaType) {
+
+        if (selectedareaType && selectedareaType !== "All") {
             filteredCities = filteredCities.filter(
                 (city) => city.areaType === selectedareaType
             );
         }
-    
+
         setCity(filteredCities);
     }, [selectedDistrictId, selectedareaType, allCities]);
     
