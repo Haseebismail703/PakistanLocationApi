@@ -18,6 +18,7 @@ const ManageCity = () => {
     const [city, setCity] = useState([]);
     const [allCities, setAllCities] = useState([]); // Stores full data
     const [selectedDistrictId, setSelectedDistrictId] = useState(null);
+    const[selectedareaType,setSelectedareaType]=useState(null);
     const [selectCity, setselectCity] = useState(null);
     const [districts, setDistricts] = useState('');
     const [fileList, setFileList] = useState([])
@@ -47,18 +48,24 @@ const ManageCity = () => {
 
 
 
-    // Filter cities when selectedDistrictId changes
     useEffect(() => {
+        let filteredCities = allCities;
+    
         if (selectedDistrictId) {
-            // Filter only for UI
-            const filteredCities = allCities.filter(
+            filteredCities = filteredCities.filter(
                 (city) => city.districtId === selectedDistrictId
             );
-            setCity(filteredCities);
-        } else {
-            setCity(allCities);
         }
-    }, [selectedDistrictId, allCities]);
+    
+        if (selectedareaType) {
+            filteredCities = filteredCities.filter(
+                (city) => city.areaType === selectedareaType
+            );
+        }
+    
+        setCity(filteredCities);
+    }, [selectedDistrictId, selectedareaType, allCities]);
+    
 
     const getAllCities = async () => {
         setTableLoading(true);
@@ -272,8 +279,8 @@ const ManageCity = () => {
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
                 <br /><br />
-                <CityFilter onFilterChange={(districtId) => setSelectedDistrictId(districtId)} />
-                    <Select
+                <CityFilter onareTypeChange={(value)=> setSelectedareaType(value)} onFilterChange={(districtId) => setSelectedDistrictId(districtId)} />
+                    {/* <Select
                     className="select-dropdown"
                         placeholder="Select Area Type"
                         onChange={(value) => {
@@ -284,7 +291,7 @@ const ManageCity = () => {
                     >
                         <Option value="Urban">Urban</Option>
                         <Option value="Rural">Rural</Option>
-                    </Select>
+                    </Select> */}
 
 
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={city} scroll={{ "x": "100%" }} pagination={false} style={{ marginTop: 20 }} />

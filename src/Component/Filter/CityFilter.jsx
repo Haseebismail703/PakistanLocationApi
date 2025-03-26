@@ -4,7 +4,7 @@ import adminInterceptor from "../../Api/adminInterceptor.js";
 
 const { Option } = Select;
 
-const CityFilter = ({ onFilterChange }) => {
+const CityFilter = ({ onFilterChange ,onareTypeChange }) => {
   const [countries, setCountries] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [divisions, setDivisions] = useState([]);
@@ -209,6 +209,20 @@ const CityFilter = ({ onFilterChange }) => {
           </Option>
         ))}
       </Select>
+      {/* Urban or Roral */}
+      <Select
+        className="select-dropdown"
+        placeholder="Select Area Type"
+        disabled={!selectedDivision}
+        onChange={(value) => onareTypeChange(value)}
+        allowClear
+        showSearch
+      >
+        <Option value="Urban">Urban</Option>
+        <Option value="Rural">Rural</Option>
+      </Select>
+
+
     </div>
   );
 };
