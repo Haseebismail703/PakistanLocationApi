@@ -11,33 +11,31 @@ const AllPayments = () => {
     const [userIdSearch, setUserIdSearch] = useState('');
     const [planFilter, setPlanFilter] = useState('');
     let canRead = usePermission("read-operations");
+    const fetchPayments = async () => {
+        setLoading(true);
+        try {
+            const response = await adminInterceptor.get(`/payment/all-payments?limit=0`);
 
+
+            const paymentData = response.data?.data.map((record, index) => ({
+                key: index + 1,
+                userName: record?.user?.name || 'N/A',
+                userId: record?.user?._id || 'N/A',
+                plan: record?.user?.plan || 'Free',
+                paymentType: record?.paymentType || 'Unknown',
+                createdAt: record?.createdAt?.substring(0, 10) || 'N/A',
+                amount: `${record?.amount}$` || '0$',
+                status: record?.status || 'pending',
+            }));
+            console.log(paymentData);
+            setPayments(paymentData);
+        } catch (error) {
+            message.error('Failed to fetch payment data.');
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const fetchPayments = async () => {
-            setLoading(true);
-            try {
-                const response = await adminInterceptor.get(`/payment/all-payments?limit=0`);
-                console.log(response.data.data);
-
-                const paymentData = response.data?.data.map((record, index) => ({
-                    key: index + 1,
-                    userName: record?.user?.name || 'N/A',
-                    userId: record?.user?._id || 'N/A',
-                    plan: record?.user?.plan || 'Free',
-                    paymentType: record?.paymentType || 'Unknown',
-                    createdAt: record?.createdAt?.substring(0, 10) || 'N/A',
-                    amount: `${record?.amount}$` || '0$',
-                    status: record?.status || 'pending',
-                }));
-
-                setPayments(paymentData);
-            } catch (error) {
-                message.error('Failed to fetch payment data.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchPayments();
     }, []);
 
@@ -47,7 +45,7 @@ const AllPayments = () => {
         (planFilter ? record.plan === planFilter : true)
     );
 
-    const columns =  [
+    const columns = [
         {
             title: "No",
             dataIndex: "key",
