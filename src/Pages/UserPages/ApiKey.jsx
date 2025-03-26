@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Input, message, Typography, Modal } from "antd";
+import { Button, Table, message, Typography, Modal } from "antd";
 import {
   CopyOutlined,
   KeyOutlined,
@@ -18,12 +18,10 @@ const GenerateApiKey = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
 
-
   const fetchApiKey = async () => {
     try {
       setFetching(true);
       const res = await userInterceptor.get("/users/get-api-key");
-      console.log(res.data?.data)
       if (res.data?.data) {
         setApiKey(res.data?.data);
         message.success("API Key fetched successfully!");
@@ -38,14 +36,12 @@ const GenerateApiKey = () => {
     }
   };
 
-
-
- 
   const showConfirm = () => {
     confirm({
       title: "Are you sure you want to regenerate your API key?",
       icon: <ExclamationCircleOutlined />,
-      content: "Your previous API key will no longer work if you have used it elsewhere.",
+      content:
+        "Your previous API key will no longer work if you have used it elsewhere.",
       okText: "Yes, Regenerate",
       cancelText: "Cancel",
       onOk() {
@@ -54,14 +50,13 @@ const GenerateApiKey = () => {
     });
   };
 
-  // Generate API Key
   const generateKey = async () => {
     try {
       setLoading(true);
       const res = await userInterceptor.get("/users/generate-api-key");
       if (res?.data?.message) {
         message.success(res.data?.message);
-        fetchApiKey(); 
+        fetchApiKey();
       }
     } catch (error) {
       message.error("Something went wrong while generating API key");
@@ -70,7 +65,6 @@ const GenerateApiKey = () => {
     }
   };
 
-  // Copy API Key to Clipboard
   const copyToClipboard = () => {
     if (apiKey) {
       navigator.clipboard.writeText(apiKey);
@@ -84,28 +78,25 @@ const GenerateApiKey = () => {
       dataIndex: "apiKey",
       key: "apiKey",
       render: (text) => (
-        <Input
-          value={text}
-          readOnly
-          type={isApiKeyVisible ? "text" : "password"}
-          className="flex-1"
-        />
+        <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {isApiKeyVisible ? text : "•".repeat(16)}
+        </span>
       ),
     },
     {
       title: "Actions",
       key: "actions",
       render: () => (
-        <>
+        <div className="flex gap-2">
           <Button
-            type="text"
+            type="primary"
             icon={isApiKeyVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
             onClick={() => setIsApiKeyVisible((prev) => !prev)}
           />
           <Button type="default" onClick={copyToClipboard} icon={<CopyOutlined />}>
             Copy
           </Button>
-        </>
+        </div>
       ),
     },
   ];
@@ -114,21 +105,24 @@ const GenerateApiKey = () => {
     <div className="p-6">
       <Title level={3} className="text-center">API Key Management</Title>
 
-      <div className="flex gap-4 mb-4">
+      {/* Responsive Button Container */}
+      <div className="flex flex-wrap gap-4 mb-4">
         <Button
-          type="primary"
+          type="default"
           onClick={fetchApiKey}
           icon={<KeyOutlined />}
           loading={fetching}
+          style={{ backgroundColor: "#1890ff", borderColor: "#1890ff", minWidth: "180px" }}
         >
           {fetching ? "Getting API Key..." : "Get API Key"}
         </Button>
 
         <Button
-          type="danger"
+          type="dashed"
           onClick={showConfirm}
           icon={<KeyOutlined />}
           loading={loading}
+          style={{ minWidth: "220px" }}
         >
           {loading ? "Generating..." : "Generate New API Key"}
         </Button>
