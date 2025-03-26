@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Select, Row, Col, message, Tag, Empty, Spin } from 'antd';
+import { Table, Input, Select, Row, Col, message, Tag, Empty } from 'antd';
 import adminInterceptor from '../../Api/adminInterceptor.js';
 import usePermission from "../../Hooks/usePermission";
 const { Option } = Select;
@@ -47,12 +47,106 @@ const AllPayments = () => {
         (planFilter ? record.plan === planFilter : true)
     );
 
+    const columns =  [
+        {
+            title: "No",
+            dataIndex: "key",
+            key: "key",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.key : "_"}
+                    </span>
+                </>
+            ),
+        },
+        {
+            title: "User Name",
+            dataIndex: "userName",
+            key: "userName",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.userName : "_"}
+                    </span>
+                </>
+            ),
+        },
+        {
+            title: "User ID",
+            dataIndex: "userId",
+            key: "userId",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.userId : "_"}
+                    </span>
+                </>
+            ),
+        },
+        {
+            title: "Plan",
+            dataIndex: "plan",
+            key: "plan",
+            render: (plan) => (
+                <Tag color={canRead ? (plan === 'Paid' ? 'gold' : 'blue') : 'gray'}>
+                    {canRead ? plan : "_"}
+                </Tag>
+            ),
+        },
+        {
+            title: "Payment Type",
+            dataIndex: "paymentType",
+            key: "paymentType",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.paymentType : "_"}
+                    </span>
+                </>
+            ),
+        },
+        {
+            title: "Date",
+            dataIndex: "createdAt",
+            key: "createdAt",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.createdAt : "_"}
+                    </span>
+                </>
+            ),
+        },
+        {
+            title: "Amount",
+            dataIndex: "amount",
+            key: "amount",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.amount : "_"}
+                    </span>
+                </>
+            ),
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (status) => (
+                <Tag color={canRead ? (status === 'Complete' ? 'green' : status === 'Incomplete' ? 'red' : 'orange') : 'gray'}>
+                    {canRead ? status : "_"}
+                </Tag>
+            ),
+        },
+    ];
+
     return (
-        <Spin spinning={loading}>
+        <div>
             <center>
                 <h1 style={{ fontSize: "24px", margin: 10 }}>All Payments</h1>
             </center>
-            {canRead ? 
             <div style={{ padding: '20px' }}>
                 <Row gutter={16} style={{ marginBottom: 16 }}>
                     <Col xs={24} sm={12} md={8}>
@@ -84,41 +178,15 @@ const AllPayments = () => {
                 </Row>
                 <Table
                     dataSource={filteredPayments}
+                    columns={columns}
                     loading={loading}
                     pagination={{ pageSize: 10 }}
                     bordered
                     style={{ width: '100%' }}
                     scroll={{ "x": "100%" }}
-                >
-                    <Table.Column title="No" dataIndex="key" key="key" />
-                    <Table.Column title="User Name" dataIndex="userName" key="userName" />
-                    <Table.Column title="User ID" dataIndex="userId" key="userId" />
-                    <Table.Column
-                        title="Plan"
-                        dataIndex="plan"
-                        key="plan"
-                        render={(plan) => (
-                            <Tag color={plan === 'Paid' ? 'gold' : 'blue'}>
-                                {plan}
-                            </Tag>
-                        )}
-                    />
-                    <Table.Column title="Payment Type" dataIndex="paymentType" key="paymentType" />
-                    <Table.Column title="Date" dataIndex="createdAt" key="createdAt" />
-                    <Table.Column title="Amount" dataIndex="amount" key="amount" />
-                    <Table.Column
-                        title="Status"
-                        dataIndex="status"
-                        key="status"
-                        render={(status) => (
-                            <Tag color={status === 'Complete' ? 'green' : status === 'Incomplete' ? 'red' : 'orange'}>
-                                {status}
-                            </Tag>
-                        )}
-                    />
-                </Table>
-            </div> : <Empty description="You don't have read permission" />}
-        </Spin>
+                />
+            </div>
+        </div>
     );
 };
 
