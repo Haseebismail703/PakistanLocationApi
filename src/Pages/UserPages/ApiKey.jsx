@@ -106,9 +106,9 @@ const GenerateApiKey = () => {
       <Title level={3} className="text-center">API Key Management</Title>
 
       {/* Responsive Button Container */}
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-4 mb-4 ">
         <Button
-          type="default"
+          type="primary"
           onClick={fetchApiKey}
           icon={<KeyOutlined />}
           loading={fetching}
@@ -122,11 +122,12 @@ const GenerateApiKey = () => {
           onClick={showConfirm}
           icon={<KeyOutlined />}
           loading={loading}
-          style={{ minWidth: "220px" }}
+          style={{  whiteSpace: "nowrap", minWidth: "180px" }}
         >
           {loading ? "Generating..." : "Generate New API Key"}
         </Button>
       </div>
+
 
       <Table
         dataSource={apiKey ? [{ key: 1, apiKey }] : []}
