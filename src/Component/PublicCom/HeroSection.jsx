@@ -8,11 +8,11 @@ function HeroSection() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
+    const admin = JSON.parse(localStorage.getItem('admin'));
     if (user) {
       setIsUser(true);
-      if (user.role === 'admin') {
+    } else if (admin) {
         setIsAdmin(true);
-      }
     }
   }, []);
 
