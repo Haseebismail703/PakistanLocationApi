@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Form, Input, Table, Switch, Select, message, Pagination,Spin } from "antd";
+import { Button, Modal, Form, Input, Table, Switch, Select, message, Pagination,Spin, Tag } from "antd";
 import adminInterceptor from "../../Api/adminInterceptor.js";
 import usePermission from '../../Hooks/usePermission.js'
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -182,8 +182,8 @@ const ManageAdmin = () => {
             title: "No", dataIndex: "no", key: "no",
             render: (_, record) => (
                 <>
-                    <span style={{ color: record.status === "active" ? "green" : "red" }}>
-                        {read ? record.key : "_"}
+                    <span >
+                        {read ? record.no : "_"}
                     </span>
                 </>
             )
@@ -192,7 +192,7 @@ const ManageAdmin = () => {
             title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
                 <>
-                    <span style={{ color: record.status === "active" ? "green" : "red" }}>
+                    <span >
                         {read ? record.name : "_"}
                     </span>
                 </>
@@ -201,7 +201,7 @@ const ManageAdmin = () => {
         {
             title: "Email", dataIndex: "email", key: "email",
             render: (_, record) => (
-                <span style={{ color: record.status === "active" ? "green" : "red" }}>
+                <span >
                     {read ? record.email : "_"}
                 </span>
             )
@@ -209,20 +209,18 @@ const ManageAdmin = () => {
         {
             title: "Role", dataIndex: "role", key: "role",
             render: (_, record) => (
-                <span style={{ color: record.status === "active" ? "green" : "red" }}>
+                <span >
                     {read ? record.role : "_"}
                 </span>
             )
         },
         {
             title: "Verified", dataIndex: "isVerified", key: "isVerified",
-            render: (_, record) => (
-                <>
-                    <span style={{ color: record.status === true ? "green" : "red" }}>
-                        {read ? record.isVerified : "_"}
-                    </span>
-                </>
-            )
+            render: (isVerified) => (
+                <Tag color={isVerified ? "green" : "red"}>
+                    {isVerified ? "Verified" : "Not Verified"}
+                </Tag>
+            ),
         },
         {
             title: "Status",
