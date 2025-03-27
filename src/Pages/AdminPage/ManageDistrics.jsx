@@ -260,7 +260,8 @@ const ManageDistrics = () => {
                 <center><h1 style={{ fontSize: 30 }}>Manage Districs</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Districs</Button>
                 <br /><br />
-                <DistrictFilter onFilterChange={(provinceId) => setselectedDivisionId(provinceId)} />
+                {canRead && 
+                <DistrictFilter onFilterChange={(provinceId) => setselectedDivisionId(provinceId)} />}
                 <Table pagination={false} locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={districts} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}

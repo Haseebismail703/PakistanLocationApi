@@ -74,6 +74,7 @@ const AllPayments = () => {
             </center>
 
             {/* ========== Filters Section ========== */}
+            {canRead && 
             <Card  style={{ marginBottom: 20 }}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12} md={8}>
@@ -104,7 +105,7 @@ const AllPayments = () => {
                         </Select>
                     </Col>
                 </Row>
-            </Card>
+            </Card>}
 
             {/* ========== Table Section ========== */}
             {canRead ? (

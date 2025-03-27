@@ -295,21 +295,9 @@ const ManageCity = () => {
                 <center><h1 style={{ fontSize: 30 }}>Manage City</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create City</Button>
                 <br /><br />
+                {canRead && 
                 <CityFilter onareTypeChange={(value)=> setSelectedareaType(value)} onFilterChange={(districtId) => setSelectedDistrictId(districtId)} />
-                    {/* <Select
-                    className="select-dropdown"
-                        placeholder="Select Area Type"
-                        onChange={(value) => {
-                            const filteredCities = allCities.filter(city => city.areaType === value);
-                            setCity(filteredCities);
-                        }}
-                        style={{ width: 200, marginBottom: 20 }}
-                    >
-                        <Option value="Urban">Urban</Option>
-                        <Option value="Rural">Rural</Option>
-                    </Select> */}
-
-
+                   }
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={city} scroll={{ "x": "100%" }} pagination={false} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}

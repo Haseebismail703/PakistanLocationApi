@@ -265,7 +265,8 @@ const ManageArea = () => {
                 <center><h1 style={{ fontSize: 30 }}>Manage Area</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Area</Button>
                 <br /><br />
-                <AreaFilter onFilterChange={(cityId) => setSelectedCityId(cityId)} />
+                {canRead && 
+                <AreaFilter onFilterChange={(cityId) => setSelectedCityId(cityId)} />}
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={area} pagination={false} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}

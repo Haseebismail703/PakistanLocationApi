@@ -256,8 +256,8 @@ const ManageDivision = () => {
             <div style={{ padding: 20 }}>
                 <center><h1 style={{ fontSize: 30 }}>Manage Division</h1></center>
                 <Button disabled={!canCreate} type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>Create Division</Button>
-                <br /><br />
-                <DivisionFilter onFilterChange={(provinceId) => setSelectedProvinceId(provinceId)} />
+                <br /><br /> {canRead && 
+                <DivisionFilter onFilterChange={(provinceId) => setSelectedProvinceId(provinceId)} />}
                 <Table locale={{ emptyText: "No data available" }} loading={tableLoading} columns={columns} dataSource={division} scroll={{ "x": "100%" }} style={{ marginTop: 20 }} />
                 <Pagination
                     current={currentPage}
