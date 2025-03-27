@@ -217,9 +217,12 @@ const ManageAdmin = () => {
         {
             title: "Verified", dataIndex: "isVerified", key: "isVerified",
             render: (isVerified) => (
+                <> 
+                {read ?  
                 <Tag color={isVerified ? "green" : "red"}>
                     {isVerified ? "Verified" : "Not Verified"}
-                </Tag>
+                </Tag> : "_"}
+                </>
             ),
         },
         {
