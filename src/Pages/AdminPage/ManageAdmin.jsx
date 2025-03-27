@@ -82,7 +82,8 @@ const ManageAdmin = () => {
                 email: record.email,
                 role: record.role,
                 status: record.status,
-                permissions: record.permissions || []
+                permissions: record.permissions || [],
+                isVerified : record.isVerified
                 
             }));
 
@@ -177,12 +178,21 @@ const ManageAdmin = () => {
     // console.log(read)
     // Table columns
     const columns = [
-        { title: "No", dataIndex: "no", key: "no" },
+        {
+            title: "No", dataIndex: "no", key: "no",
+            render: (_, record) => (
+                <>
+                    <span style={{ color: record.status === "active" ? "green" : "red" }}>
+                        {read ? record.key : "_"}
+                    </span>
+                </>
+            )
+        },
         {
             title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
                 <>
-                    <span>
+                    <span style={{ color: record.status === "active" ? "green" : "red" }}>
                         {read ? record.name : "_"}
                     </span>
                 </>
@@ -191,7 +201,7 @@ const ManageAdmin = () => {
         {
             title: "Email", dataIndex: "email", key: "email",
             render: (_, record) => (
-                <span>
+                <span style={{ color: record.status === "active" ? "green" : "red" }}>
                     {read ? record.email : "_"}
                 </span>
             )
@@ -199,9 +209,19 @@ const ManageAdmin = () => {
         {
             title: "Role", dataIndex: "role", key: "role",
             render: (_, record) => (
-                <span>
+                <span style={{ color: record.status === "active" ? "green" : "red" }}>
                     {read ? record.role : "_"}
                 </span>
+            )
+        },
+        {
+            title: "Verified", dataIndex: "isVerified", key: "isVerified",
+            render: (_, record) => (
+                <>
+                    <span style={{ color: record.status === true ? "green" : "red" }}>
+                        {read ? record.isVerified : "_"}
+                    </span>
+                </>
             )
         },
         {

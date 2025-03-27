@@ -212,7 +212,15 @@ const ManageDistrics = () => {
     };
 
     const columns = [
-        { title: "No", dataIndex: "key", key: "key" },
+        { title: "No", dataIndex: "key", key: "key",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.key : "_"}
+                    </span>
+                </>
+            )
+         },
         {
             title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
@@ -221,7 +229,15 @@ const ManageDistrics = () => {
                 </>
             )
         },
-        { title: "Division Name", dataIndex: "divisionName", key: "divisionName" },
+        { title: "Division Name", dataIndex: "divisionName", key: "divisionName",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.divisionName : "_"}
+                    </span>
+                </>
+            )
+         },
         {
             title: "Actions",
             key: "action",

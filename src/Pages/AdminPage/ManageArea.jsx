@@ -216,9 +216,33 @@ const ManageArea = () => {
     };
 
     const columns = [
-        { title: "No", dataIndex: "key", key: "key" },
-        { title: "Name", dataIndex: "name", key: "name" },
-        { title: "City Name", dataIndex: "cityName", key: "cityName" },
+        { title: "No", dataIndex: "key", key: "key",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.key : "_"}
+                    </span>
+                </>
+            )
+         },
+        { title: "Name", dataIndex: "name", key: "name",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.name : "_"}
+                    </span>
+                </>
+            )
+         },
+        { title: "City Name", dataIndex: "cityName", key: "cityName",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.cityName : "_"}
+                    </span>
+                </>
+            )
+         },
         {
             title: "Actions",
             key: "action",

@@ -18,7 +18,7 @@ import {
 
 const { Title, Text } = Typography;
 
-const Dashboard = () => {
+const UserDashboard = () => {
   let { user, loading } = useContext(UserContext);
 
   const cardData = [
@@ -131,4 +131,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

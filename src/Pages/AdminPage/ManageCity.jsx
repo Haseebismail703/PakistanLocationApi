@@ -220,7 +220,15 @@ const ManageCity = () => {
     };
 
     const columns = [
-        { title: "No", dataIndex: "key", key: "key" },
+        { title: "No", dataIndex: "key", key: "key" ,
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.key : "_"}
+                    </span>
+                </>
+            )
+        },
         {
             title: "Name", dataIndex: "name", key: "name",
             render: (_, record) => (
@@ -237,7 +245,15 @@ const ManageCity = () => {
                 </>
             )
         },
-        { title: "District Name", dataIndex: "districtName", key: "districtName" },
+        { title: "District Name", dataIndex: "districtName", key: "districtName",
+            render: (_, record) => (
+                <>
+                    <span>
+                        {canRead ? record.districtName : "_"}
+                    </span>
+                </>
+            )
+         },
         {
             title: "Actions",
             key: "action",

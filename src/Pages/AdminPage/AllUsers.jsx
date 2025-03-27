@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, message, Spin } from "antd";
+import { Table, Tag, message, Spin, Empty } from "antd";
 import adminInterceptor from '../../Api/adminInterceptor.js'
+import usePermission from "../../Hooks/usePermission.js";
 
 const AllUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const canRead = usePermission("read-operations");
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await adminInterceptor.get("/admins/get-users?limit=0");
-                let allUser  = response.data.data.users?.map((record, index) => ({
+                let allUser = response.data.data.users?.map((record, index) => ({
                     key: record._id || index.toString(),
                     no: index + 1,
                     name: record.name,
                     email: record.email,
                     role: record.role,
-                    plan: record.plan ,
-                    isVerified : record.isVerified || "N\A",
-                    // createdAt : record.createdAt
+                    plan: record.plan,
+                    isVerified: record.isVerified === true,
                 }));
 
-                setUsers(allUser);  
+                setUsers(allUser);
                 console.log(response.data)
             } catch (error) {
                 message.error("Failed to fetch users.");
@@ -36,9 +37,8 @@ const AllUsers = () => {
     const columns = [
         {
             title: "No",
-            dataIndex: "index",
-            key: "index",
-            render: (_, __, index) => index + 1, 
+            dataIndex: "no",
+            key: "no",
         },
         {
             title: "Name",
@@ -55,17 +55,11 @@ const AllUsers = () => {
             dataIndex: "isVerified",
             key: "isVerified",
             render: (isVerified) => (
-                <Tag color={isVerified === true ? "green" : "red"}>
+                <Tag color={isVerified ? "green" : "red"}>
                     {isVerified ? "Verified" : "Not Verified"}
                 </Tag>
             ),
         },
-        // {
-        //     title: "Created At",
-        //     dataIndex: "createdAt",
-        //     key: "createdAt",
-        //     render: (date) => new Date(date).toLocaleDateString(),
-        // },
         {
             title: "Plan",
             dataIndex: "plan",
@@ -78,22 +72,24 @@ const AllUsers = () => {
     ];
 
     return (
-       <>
-       <br /><br />
-       <center>
-                <h1 style={{ fontSize: "24px" , marginBottom : 30 }}>All users</h1>
+        <>
+            <br /><br />
+            <center>
+                <h1 style={{ fontSize: "24px", marginBottom: 30 }}>All users</h1>
             </center>
-        <Table 
-                loading={loading}
-                    columns={columns} 
-                    dataSource={users} 
-                    scroll={{"x" : "100%"}}
-                    pagination={{ pageSize: 10 }} 
+            {canRead ? (
+                <Table
+                    loading={loading}
+                    columns={columns}
+                    dataSource={users}
+                    scroll={{ x: "100%" }}
+                    pagination={{ pageSize: 10 }}
                     bordered
                 />
-       </>
-               
-  
+            ) : (
+                <Empty description="You don't have permission to view this data" />
+            )}
+        </>
     );
 };
 
