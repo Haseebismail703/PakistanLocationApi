@@ -46,7 +46,7 @@ const LocationTable = () => {
 
     try {
       const response = await axios.get(url);
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
       
       let mappedData = [];
 

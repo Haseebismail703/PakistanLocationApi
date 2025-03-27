@@ -71,7 +71,7 @@ const ManageAdmin = () => {
             const response = await adminInterceptor.get(`/admins/get-admins?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`);
 
             let admins = response.data.data?.admins || [];
-            console.log("Admins: ", admins);
+            // console.log("Admins: ", admins);
             // 🔥 Sirf woh admins rakhna jo logged-in admin na ho
             admins = admins.filter(record => record._id !== getAdmin?._id);
 
@@ -115,13 +115,13 @@ const ManageAdmin = () => {
     // Handle form submission for updating permissions
     const handleUpdateSubmit = async (values) => {
         setLoader(true)
-        console.log("Selected Permissions:", values.permissions);
+        // console.log("Selected Permissions:", values.permissions);
         if (!selectedAdmin) return message.error("No admin selected")
 
         try {
             const response = await adminInterceptor.put(`/admins/update-permissions/${selectedAdmin.key}`,
                 { permissions: values.permissions })
-            console.log("response: ", response);
+            // console.log("response: ", response);
 
             message.success(response?.data?.message);
 

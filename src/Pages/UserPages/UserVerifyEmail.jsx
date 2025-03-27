@@ -26,7 +26,7 @@ const UserVerifyEmail = () => {
 
             try {
                 const response = await axios.get(`${api}/users/verify-email?token=${encodeURIComponent(token)}`);
-                console.log("User API Response:", response.data);
+                // console.log("User API Response:", response.data);
 
                 if (response.data.success) {
                     localStorage.setItem("isVerified", true);

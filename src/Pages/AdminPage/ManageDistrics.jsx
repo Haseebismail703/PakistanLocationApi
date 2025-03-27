@@ -77,7 +77,7 @@ const ManageDistrics = () => {
                 `/admins/districts${selectedDivisionId ? `/get-by-division/${selectedDivisionId}` : ""}?skip=${selectedDivisionId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedDivisionId ? 0 : pageSize}`
             );
 
-            console.log("Response in districts:", response?.data.data.districts);
+            // console.log("Response in districts:", response?.data.data.districts);
 
             const districtsData = response.data?.data?.districts?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,

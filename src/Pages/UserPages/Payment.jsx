@@ -58,7 +58,7 @@ const PaymentPage = () => {
         setPaymentData(res.data.data?.paymentIntentId);
         message.success(res.data.message);
       }
-      console.log('Payment response:', res.data.data?.paymentIntentId);
+      // console.log('Payment response:', res.data.data?.paymentIntentId);
     } catch (error) {
       message.error(error?.response.data?.message || "Payment Error:");
     } finally {
@@ -82,7 +82,7 @@ const PaymentPage = () => {
         setShowConfirmation(false);
         message.success(res.data?.message)
       }
-      console.log("Payment Confirmed:", res.data);
+      // console.log("Payment Confirmed:", res.data);
     } catch (error) {
       setShowConfirmation(false);
       message.error(error?.response.data?.message || "Payment Confirmation Error:");

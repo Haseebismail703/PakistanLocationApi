@@ -64,7 +64,7 @@ const ManageDivision = () => {
                 `/admins/divisions${selectedProvinceId ? `/get-by-province/${selectedProvinceId}` : ""}?skip=${selectedProvinceId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedProvinceId ? 0 : pageSize}`
             );
 
-            console.log("Response in divisions: ", response?.data.data.divisions);
+            // console.log("Response in divisions: ", response?.data.data.divisions);
 
             const divisionsData = response.data?.data?.divisions?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
@@ -93,7 +93,7 @@ const ManageDivision = () => {
     const getProvince = async () => {
         try {
             const response = await adminInterceptor.get(`/admins/provinces`);
-            console.log(response.data?.data);
+            // console.log(response.data?.data);
             setprovince(response.data?.data);
         } catch (error) {
             message.error("Failed to fetch province!");

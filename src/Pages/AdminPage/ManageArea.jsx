@@ -75,7 +75,7 @@ const ManageArea = () => {
                 `/admins/areas${selectedCityId ? `/get-by-city/${selectedCityId}` : ""}?skip=${selectedCityId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedCityId ? 0 : pageSize}`
             );
 
-            console.log("API Response:", response.data); // 🔍 Debugging
+            // console.log("API Response:", response.data); 
 
             const areaData = response.data?.data?.areas?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,

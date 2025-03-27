@@ -26,7 +26,7 @@ const AdminVerifyEmail = () => {
 
             try {
                 const response = await axios.get(`${api}/admins/verify-email?token=${encodeURIComponent(token)}`);
-                console.log("Admin API Response:", response.data);
+                // console.log("Admin API Response:", response.data);
 
                 if (response.data.success) {
                     message.success(response.data.message);

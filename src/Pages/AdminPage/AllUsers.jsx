@@ -23,7 +23,7 @@ const AllUsers = () => {
                 }));
 
                 setUsers(allUser);
-                console.log(response.data)
+                // console.log(response.data)
             } catch (error) {
                 message.error("Failed to fetch users.");
             } finally {

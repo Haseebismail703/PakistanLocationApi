@@ -76,7 +76,7 @@ const ManageCity = () => {
                 `/admins/cities${selectedDistrictId ? `/get-by-district/${selectedDistrictId}` : ""}?skip=${selectedDistrictId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedDistrictId ? 0 : pageSize}`
             );
 
-            console.log("Response in cities:", response?.data.data.cities);
+            // console.log("Response in cities:", response?.data.data.cities);
 
             const citiesData = response.data?.data?.cities?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
@@ -111,7 +111,7 @@ const ManageCity = () => {
         }
     };
     const handleCreate = async (values) => {
-        console.log(values)
+        // console.log(values)
         setLoading(true);
         const formData = new FormData();
 
