@@ -2,17 +2,20 @@ import React from 'react';
 import {  Typography, Divider, Button } from 'antd';
 import {
   GlobalOutlined,
-  SwitcherOutlined,
   FilterOutlined
 } from '@ant-design/icons';
 import ApiEndPoint from '../../Component/ApiDoc/ApiEndPoint';
 import HomeNavbar from '../../Component/PublicCom/HomeNavbar';
+import Footer from '../../Component/PublicCom/Footer'
 const { Title, Text, Paragraph } = Typography;
 
 const PakistanLocationAPI = () => {
 return (
+    <>
+    
+    <HomeNavbar />
     <div className="bg-base-100 text-base-content mt-20">
-        <HomeNavbar />
+        
         <div className="container mx-auto px-4 py-8">
             <div className="prose max-w-none">
                 <Title level={2} className="text-primary text-base-content">
@@ -103,20 +106,13 @@ return (
                         <Paragraph className="text-base-content">
                             For an interactive experience with our API, check out our Swagger documentation:
                         </Paragraph>
-                        <Button 
-                            type="primary" 
-                            icon={<SwitcherOutlined className="text-base-content" />}
-                            size="large"
-                            onClick={() => window.open('/swagger', '_blank')}
-                            className="text-base-content"
-                        >
-                            Open Swagger UI
-                        </Button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <Footer/>
+    </>
 );
 };
 

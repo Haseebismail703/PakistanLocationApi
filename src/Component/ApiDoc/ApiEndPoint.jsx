@@ -54,9 +54,9 @@ const ApiDocumentation = () => {
           response: formatResponse({
             title: 'Province',
             example: {
-              _id: "--",
+              _id: "---",
               name: "Sindh",
-              countryId: "67e3b7435cd678fa071b0390",
+              countryId: "---",
               pictures: ["https://example.com/sindh.jpg"],
               details: "Sindh province of Pakistan",
             }
@@ -80,8 +80,6 @@ const ApiDocumentation = () => {
               provinceId: "---",
               pictures: ["https://example.com/karachi.jpg"],
               details: "Karachi Division",
-              createdAt: "2023-01-01T00:00:00.000Z",
-              updatedAt: "2023-01-01T00:00:00.000Z"
             }
           })
         },
@@ -97,8 +95,6 @@ const ApiDocumentation = () => {
               provinceId: "---",
               pictures: ["https://example.com/karachi.jpg"],
               details: "Karachi Division",
-              createdAt: "2023-01-01T00:00:00.000Z",
-              updatedAt: "2023-01-01T00:00:00.000Z"
             }
           })
         }
@@ -154,7 +150,7 @@ const ApiDocumentation = () => {
             example: {
               _id: "---",
               name: "Karachi",
-              districtId: "67e3b7435cd678fa071b0393",
+              districtId: "---",
               pictures: ["https://example.com/karachi_city.jpg"],
               details: "Karachi City",
             }
@@ -169,7 +165,7 @@ const ApiDocumentation = () => {
             example: {
               _id: "---",
               name: "Karachi",
-              districtId: "67e3b7435cd678fa071b0393",
+              districtId: "---",
               pictures: ["https://example.com/karachi_city.jpg"],
               details: "Karachi City",
             }
@@ -190,16 +186,9 @@ const ApiDocumentation = () => {
             example: {
               _id: "---",
               name: "Clifton",
-              cityId: "67e3b7435cd678fa071b0394",
+              cityId: "---",
               pictures: ["https://example.com/clifton.jpg"],
               details: "Clifton is a major area in South Karachi",
-              city: {
-                _id: "---",
-                name: "Karachi",
-                pictures: ["https://example.com/karachi_city.jpg"],
-                details: "Karachi City",
-                areaType: "Urban"
-              }
             }
           })
         },
@@ -214,13 +203,7 @@ const ApiDocumentation = () => {
               name: "Clifton",
               pictures: ["https://example.com/clifton.jpg"],
               details: "Clifton is a major area in South Karachi",
-              city: {
-                _id: "---",
-                name: "Karachi",
-                pictures: ["https://example.com/karachi_city.jpg"],
-                details: "Karachi City",
-                areaType: "Urban"
-              }
+              cityId: "---"
             }
           })
         }
