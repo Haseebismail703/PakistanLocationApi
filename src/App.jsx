@@ -15,8 +15,7 @@ const AdminForgotPassword = lazy(() => import("./Pages/PublicPages/AdminForgotPa
 const AdminResetPassword = lazy(() => import("./Pages/PublicPages/AdminResetPass"));
 const UserResetPass = lazy(() => import("./Pages/PublicPages/UserResetPass"));
 const UserForgotPass = lazy(() => import("./Pages/PublicPages/UserForgotPass"));
-const UserVerifyEmail = lazy(() => import("./Pages/UserPages/UserVerifyEmail"));
-const AdminVerifyEmail = lazy(() => import("./Pages/AdminPage/AdminVerifyEmail"));
+const ApiDoc = lazy(() => import("./Pages/PublicPages/ApiDoc"));
 
 // Admin Pages
 const AdminSidebar = lazy(() => import("./Component/AdminCom/AdminSidebar"));
@@ -31,7 +30,7 @@ const ManageArea = lazy(() => import("./Pages/AdminPage/ManageArea"));
 const AdminPageNotFound = lazy(() => import("./Pages/AdminPage/AdminPageNotFound"));
 const AllPayments = lazy(() => import("./Pages/AdminPage/AllPayment"));
 const AllUsers = lazy(() => import("./Pages/AdminPage/AllUsers"));
-
+const AdminVerifyEmail = lazy(() => import("./Pages/AdminPage/AdminVerifyEmail"));
 // User Pages
 const UserSidebar = lazy(() => import("./Component/UserComp/UserSidebar"));
 const Profile = lazy(() => import("./Pages/UserPages/Profile"));
@@ -40,6 +39,8 @@ const UserDashboard = lazy(() => import("./Pages/UserPages/UserDashboard"));
 const UserContact = lazy(() => import("./Pages/UserPages/Contact"));
 const Payment = lazy(() => import("./Pages/UserPages/Payment"));
 const UserPageNotFound = lazy(() => import("./Pages/UserPages/UserPageNotFound"));
+const UserVerifyEmail = lazy(() => import("./Pages/UserPages/UserVerifyEmail"));
+
 //context user and admin
 import UserProvider from "./Context/UserContext";
 import AdminProvider from "./Context/AdminContext";
@@ -74,6 +75,7 @@ function App() {
           <Route path="/register" element={<UserRegister />} />
           <Route path="/login" element={<UserLogin />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/api-doc" element={<ApiDoc />} />
           <Route path="*" element={<NotFound />} />
 
           {/* Admin forgot , verify email and reset Route */}

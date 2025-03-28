@@ -18,45 +18,46 @@ import {
 
 const { Title, Text } = Typography;
 
-const UserDashboard = () => {
-  let { user, loading } = useContext(UserContext);
+const Dashboard = () => {
+  const { user, loading } = useContext(UserContext);
 
   const cardData = [
     {
       title: "Daily Requests",
-      value: user.data?.dailyRequest.count,
+      value: user.data?.dailyRequest.count || 0,
       resetTime: user.data?.dailyRequest.lastReset?.substring(0, 10) || "12:00 AM",
       icon: <ClockCircleOutlined style={{ fontSize: "36px", color: "#2563eb" }} />,
       bgColor: "#eff6ff",
     },
     {
       title: "Monthly Requests",
-      value: user.data?.monthlyRequest.count,
+      value: user.data?.monthlyRequest.count || 0,
       resetTime: user.data?.monthlyRequest.lastReset?.substring(0, 10) || "1st of Every Month",
       icon: <CalendarOutlined style={{ fontSize: "36px", color: "#dc2626" }} />,
       bgColor: "#fee2e2",
     },
     {
       title: "Yearly Requests",
-      value: user.data?.yearlyRequest.count,
+      value: user.data?.yearlyRequest.count || 0,
       resetTime: user.data?.yearlyRequest.lastReset?.substring(0, 10) || "Jan 1st",
       icon: <SyncOutlined style={{ fontSize: "36px", color: "#facc15" }} />,
       bgColor: "#fef9c3",
     },
     {
       title: "Plan",
-      value: user.data?.plan,
+      value: user.data?.plan || "Free",
       resetTime: "No Reset",
       icon: <CrownOutlined style={{ fontSize: "36px", color: "#10b981" }} />,
       bgColor: "#d1fae5",
     },
   ];
 
+  // ✅ Exclude "Plan" from the chart data since it's not numeric
   const chartData = cardData
     .filter((item) => item.title !== "Plan")
     .map((item) => ({
       name: item.title,
-      value: item.value,
+      value: item.value || 0,
     }));
 
   return (
@@ -68,6 +69,7 @@ const UserDashboard = () => {
         alignItems: "center",
       }}
     >
+      {/* Cards */}
       <Row gutter={[16, 16]} style={{ maxWidth: "1200px", width: "100%" }}>
         {cardData.map((card, index) => (
           <Col xs={24} sm={12} md={6} key={index}>
@@ -109,7 +111,7 @@ const UserDashboard = () => {
         ))}
       </Row>
 
-      {/* 📊 Bar Chart */}
+      {/* ✅ Bar Chart */}
       <Card loading={loading} style={{ width: "100%", marginTop: "40px" }}>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -131,4 +133,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default Dashboard;

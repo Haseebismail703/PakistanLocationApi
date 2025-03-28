@@ -47,6 +47,7 @@ function HeroSection() {
               {isAdmin ? 'Go to Dashboard' : isUser ? 'Go to Dashboard' : 'Start a free trial'}
             </button>
             <button
+            onClick={()=>navigate('/api-doc')}
               type="button"
               className="bg-transparent hover:bg-gray-800 hover:text-white border border-gray-800 transition-all font-bold text-sm rounded px-6 py-3 max-sm:w-full"
             >

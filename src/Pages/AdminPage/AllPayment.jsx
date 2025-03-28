@@ -29,7 +29,7 @@ const AllPayments = () => {
                 status: record?.status || 'pending',
             }));
             setPayments(paymentData);
-            console.log(paymentData);
+            // console.log(paymentData);
         } catch (error) {
             message.error('Failed to fetch payment data.');
         } finally {
