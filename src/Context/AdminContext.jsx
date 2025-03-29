@@ -11,6 +11,7 @@ const AdminProvider = ({ children }) => {
             try {
                 const response = await adminInterceptor.get(`/admins/profile`);
                 localStorage.setItem("isVerified", response.data?.data?.isVerified);
+                localStorage.setItem("admin", JSON.stringify(response.data?.data));
                 setAdmin(response.data);
                 
                 // console.log(response.data)
