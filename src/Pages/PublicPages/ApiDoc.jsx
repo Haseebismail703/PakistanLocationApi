@@ -95,7 +95,7 @@ return (
                     </div>
                 </div>
 
-                <Divider orientation="left" className="text-base-content">
+                {/* <Divider orientation="left" className="text-base-content">
                     <span className="text-base-content">Swagger Documentation</span>
                 </Divider>
                 <div className="card bg-base-100 shadow-md">
@@ -107,7 +107,7 @@ return (
                             For an interactive experience with our API, check out our Swagger documentation:
                         </Paragraph>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     </div>
