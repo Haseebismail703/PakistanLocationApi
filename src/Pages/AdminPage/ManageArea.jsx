@@ -85,7 +85,7 @@ const ManageArea = () => {
                 pictures: data.pictures,
                 details: data.details,
                 cityId: data.city?._id || null,
-                cityName: data.city?.name || "Unknown"
+                cityName: data.city?.name || "___"
             }));
 
             

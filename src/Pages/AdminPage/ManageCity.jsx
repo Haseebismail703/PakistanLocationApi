@@ -76,7 +76,7 @@ const ManageCity = () => {
                 `/admins/cities${selectedDistrictId ? `/get-by-district/${selectedDistrictId}` : ""}?skip=${selectedDistrictId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedDistrictId ? 0 : pageSize}`
             );
 
-            // console.log("Response in cities:", response?.data.data.cities);
+            // console.log("Response in cities:", response?.data.data);
 
             const citiesData = response.data?.data?.cities?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
@@ -87,12 +87,12 @@ const ManageCity = () => {
                 details: data.details,
                 areaType: data.areaType,
                 districtId: data.district?._id || null,
-                districtName: data.district?.name || null,
+                districtName: data.district?.name || "___",
             }));
 
-            setAllCities(citiesData); // Store full data for filtering
-            setCity(citiesData); // Show in UI
-            setTotalItems(response.data?.data.totalItems || 1000);
+            setAllCities(citiesData);
+            setCity(citiesData); 
+            setTotalItems(response.data?.data?.totalCities || 1000);
         } catch (error) {
             message.error("Failed to fetch cities!");
         } finally {

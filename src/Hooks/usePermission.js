@@ -5,12 +5,8 @@ import { AdminContext } from "../Context/AdminContext";
 const usePermission = (requiredPermissions) => {
   const { admin } = useContext(AdminContext);
 //  console.log(admin)
-  if (!admin) {
-    return false; 
-  }
-
   try {
-    const adminPermissions = admin.data?.permissions || [];
+    const adminPermissions = admin?.data?.permissions || [];
 
     // Check for multiple required permissions
     if (Array.isArray(requiredPermissions)) {

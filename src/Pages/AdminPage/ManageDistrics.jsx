@@ -77,7 +77,7 @@ const ManageDistrics = () => {
                 `/admins/districts${selectedDivisionId ? `/get-by-division/${selectedDivisionId}` : ""}?skip=${selectedDivisionId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedDivisionId ? 0 : pageSize}`
             );
 
-            // console.log("Response in districts:", response?.data.data.districts);
+            // console.log("Response in districts:", response?.data.data);
 
             const districtsData = response.data?.data?.districts?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
@@ -87,12 +87,12 @@ const ManageDistrics = () => {
                 pictures: data.pictures,
                 details: data.details,
                 divisionId: data.division?._id || null, 
-                divisionName: data.division?.name || null, 
+                divisionName: data.division?.name || "___", 
             }));
 
             setallDistrict(districtsData);
             setdistricts(districtsData);
-            setTotalItems(response.data?.data.totalItems || 1000);
+            setTotalItems(response.data?.data?.totalDistricts || 1000);
         } catch (error) {
             message.error("Failed to fetch districts!");
         } finally {

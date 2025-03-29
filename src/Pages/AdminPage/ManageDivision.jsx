@@ -64,7 +64,7 @@ const ManageDivision = () => {
                 `/admins/divisions${selectedProvinceId ? `/get-by-province/${selectedProvinceId}` : ""}?skip=${selectedProvinceId ? 0 : (currentPage - 1) * pageSize}&limit=${selectedProvinceId ? 0 : pageSize}`
             );
 
-            // console.log("Response in divisions: ", response?.data.data.divisions);
+            // console.log("Response in divisions: ", response?.data);
 
             const divisionsData = response.data?.data?.divisions?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
@@ -74,12 +74,12 @@ const ManageDivision = () => {
                 pictures: data.pictures,
                 details: data.details,
                 provinceId: data.province._id || null,
-                provinceName: data.province.name || null,
+                provinceName: data.province.name || "___",
             }));
 
             setAllDivisions(divisionsData);
             setDivisions(divisionsData);
-            setTotalItems(response.data?.data.totalItems || 1000);
+            setTotalItems(response.data?.data?.totalDivisions || 100);
         } catch (error) {
             message.error("Failed to fetch divisions!");
         } finally {
