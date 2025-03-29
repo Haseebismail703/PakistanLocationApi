@@ -86,7 +86,7 @@ return (
                             <span className="text-base-content">Request Limits</span>
                         </Title>
                         <ul className="list-disc pl-5 text-base-content">
-                            <li className="text-base-content">Free tier: 100 requests per Day</li>
+                            <li className="text-base-content">Free tier: 1000 requests per Day</li>
                             <li className="text-base-content">Pro tier: Unlimited requests</li>
                         </ul>
                         <Paragraph className="mt-2 text-base-content">
