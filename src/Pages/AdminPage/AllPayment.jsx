@@ -12,15 +12,15 @@ const AllPayments = () => {
     const canRead = usePermission("read-operations");
 
     useEffect(() => {
-     fetchPayments();
+        fetchPayments();
     }, []);
 
     const fetchPayments = async () => {
         setLoading(true);
         try {
             const res = await adminInterceptor.get(`/payment/all-payments?limit=0`);
-            console.log(res.data);
-            const paymentData = res.data?.data?.map((record, index) => ({
+            // console.log(res.data);
+            const paymentData = res.data?.data?.payments.map((record, index) => ({
                 key: index + 1,
                 userName: record?.user?.name || '__',
                 userId: record?.user?._id || '__',
@@ -44,57 +44,57 @@ const AllPayments = () => {
     );
 
     const columns = [
-        { 
-            title: "No", 
-            dataIndex: "key", 
+        {
+            title: "No",
+            dataIndex: "key",
             key: "key",
             render: (_, record) => (
                 <span>{canRead ? record.key : "_"}</span>
-            ) 
+            )
         },
-        { 
-            title: "User Name", 
-            dataIndex: "userName", 
+        {
+            title: "User Name",
+            dataIndex: "userName",
             key: "userName",
             render: (userName) => (
                 <span>{canRead ? userName : "_"}</span>
-            ) 
+            )
         },
-        { 
-            title: "User ID", 
-            dataIndex: "userId", 
+        {
+            title: "User ID",
+            dataIndex: "userId",
             key: "userId",
             render: (userId) => (
                 <span>{canRead ? userId : "_"}</span>
-            ) 
+            )
         },
-        { 
-            title: "Payment Type", 
-            dataIndex: "paymentType", 
+        {
+            title: "Payment Type",
+            dataIndex: "paymentType",
             key: "paymentType",
             render: (paymentType) => (
                 <span>{canRead ? paymentType : "_"}</span>
-            ) 
+            )
         },
-        { 
-            title: "Date", 
-            dataIndex: "createdAt", 
+        {
+            title: "Date",
+            dataIndex: "createdAt",
             key: "createdAt",
             render: (createdAt) => (
                 <span>{canRead ? createdAt : "_"}</span>
-            ) 
+            )
         },
-        { 
-            title: "Amount", 
-            dataIndex: "amount", 
+        {
+            title: "Amount",
+            dataIndex: "amount",
             key: "amount",
             render: (amount) => (
                 <span>{canRead ? amount : "_"}</span>
-            ) 
+            )
         },
         {
-            title: "Status", 
-            dataIndex: "status", 
+            title: "Status",
+            dataIndex: "status",
             key: "status",
             render: (status) => (
                 canRead ? (
@@ -105,7 +105,7 @@ const AllPayments = () => {
             )
         },
     ];
-    
+
 
     return (
         <div style={{ padding: "20px" }}>
@@ -113,35 +113,35 @@ const AllPayments = () => {
                 <h1 style={{ fontSize: "24px", marginBottom: 20 }}>All Payments</h1>
             </center>
 
-            {canRead && 
-            <Card style={{ marginBottom: 20 }}>
-                <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={12} md={12}>
-                        <Input
-                            placeholder="Search by User Name"
-                            value={userSearch}
-                            onChange={(e) => setUserSearch(e.target.value)}
-                        />
-                    </Col>
-                    <Col xs={24} sm={12} md={12}>
-                        <Input
-                            placeholder="Search by User ID"
-                            value={userIdSearch}
-                            onChange={(e) => setUserIdSearch(e.target.value)}
-                        />
-                    </Col>
-                </Row>
-            </Card>}
+            {canRead &&
+                <Card style={{ marginBottom: 20 }}>
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12} md={12}>
+                            <Input
+                                placeholder="Search by User Name"
+                                value={userSearch}
+                                onChange={(e) => setUserSearch(e.target.value)}
+                            />
+                        </Col>
+                        <Col xs={24} sm={12} md={12}>
+                            <Input
+                                placeholder="Search by User ID"
+                                value={userIdSearch}
+                                onChange={(e) => setUserIdSearch(e.target.value)}
+                            />
+                        </Col>
+                    </Row>
+                </Card>}
 
-                <Table
-                    columns={columns}
-                    dataSource={filteredPayments}
-                    loading={loading}
-                    pagination={{ pageSize: 10 }}
-                    bordered
-                    scroll={{ x: "100%" }}
-                />
-                 </div>
+            <Table
+                columns={columns}
+                dataSource={filteredPayments}
+                loading={loading}
+                pagination={{ pageSize: 10 }}
+                bordered
+                scroll={{ x: "100%" }}
+            />
+        </div>
     );
 };
 
