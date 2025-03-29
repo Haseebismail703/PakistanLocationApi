@@ -64,11 +64,11 @@ return (
                             <span className="text-base-content">Pagination</span>
                         </Title>
                         <Paragraph className="text-base-content">
-                            For paginated results, use the <code>page</code> parameter:
+                            For paginated results, use the <code>skip</code> parameter:
                         </Paragraph>
                         <div className="card bg-base-200 p-4 mb-4">
                             <Text code copyable className="text-lg text-base-content">
-                                {"https://pola-api.vercel.app/api/v1/public/areas?limit=10&page=2&apiKey=YOUR_API_KEY"}
+                                {"https://pola-api.vercel.app/api/v1/public/areas?limit=10&skip=2&apiKey=YOUR_API_KEY"}
                             </Text>
                         </div>
                         <Paragraph className="text-base-content">

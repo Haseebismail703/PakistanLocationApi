@@ -76,7 +76,7 @@ const ManageArea = () => {
             );
 
             // console.log("API Response:", response.data); 
-
+// console.log("Formatted Data:", response.data);
             const areaData = response.data?.data?.areas?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
@@ -88,10 +88,11 @@ const ManageArea = () => {
                 cityName: data.city?.name || "Unknown"
             }));
 
-            // console.log("Formatted Data:", areaData); // ✅ Check if data is correctly formatted
+            
 
             setAllArea(areaData);
             setArea(areaData);
+            // console.log("All Area:", areaData); 
             setTotalItems(response.data?.data?.totalAreas || 1000);
         } catch (error) {
             message.error("Failed to fetch areas!");
