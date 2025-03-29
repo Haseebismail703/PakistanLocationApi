@@ -13,13 +13,14 @@ const AllPayments = () => {
 
     useEffect(() => {
      fetchPayments();
-    }, [canRead]);
+    }, []);
 
     const fetchPayments = async () => {
         setLoading(true);
         try {
-            const { data } = await adminInterceptor.get(`/payment/all-payments?limit=0`);
-            const paymentData = data?.data.map((record, index) => ({
+            const res = await adminInterceptor.get(`/payment/all-payments?limit=0`);
+            console.log(res.data);
+            const paymentData = res.data?.data?.map((record, index) => ({
                 key: index + 1,
                 userName: record?.user?.name || '__',
                 userId: record?.user?._id || '__',
@@ -29,9 +30,9 @@ const AllPayments = () => {
                 status: record?.status || 'pending',
             }));
             setPayments(paymentData);
-            // console.log(paymentData);
         } catch (error) {
             message.error('Failed to fetch payment data.');
+            console.log(error)
         } finally {
             setLoading(false);
         }
@@ -43,21 +44,68 @@ const AllPayments = () => {
     );
 
     const columns = [
-        { title: "No", dataIndex: "key", key: "key" },
-        { title: "User Name", dataIndex: "userName", key: "userName" },
-        { title: "User ID", dataIndex: "userId", key: "userId" },
-        { title: "Payment Type", dataIndex: "paymentType", key: "paymentType" },
-        { title: "Date", dataIndex: "createdAt", key: "createdAt" },
-        { title: "Amount", dataIndex: "amount", key: "amount" },
+        { 
+            title: "No", 
+            dataIndex: "key", 
+            key: "key",
+            render: (_, record) => (
+                <span>{canRead ? record.key : "_"}</span>
+            ) 
+        },
+        { 
+            title: "User Name", 
+            dataIndex: "userName", 
+            key: "userName",
+            render: (userName) => (
+                <span>{canRead ? userName : "_"}</span>
+            ) 
+        },
+        { 
+            title: "User ID", 
+            dataIndex: "userId", 
+            key: "userId",
+            render: (userId) => (
+                <span>{canRead ? userId : "_"}</span>
+            ) 
+        },
+        { 
+            title: "Payment Type", 
+            dataIndex: "paymentType", 
+            key: "paymentType",
+            render: (paymentType) => (
+                <span>{canRead ? paymentType : "_"}</span>
+            ) 
+        },
+        { 
+            title: "Date", 
+            dataIndex: "createdAt", 
+            key: "createdAt",
+            render: (createdAt) => (
+                <span>{canRead ? createdAt : "_"}</span>
+            ) 
+        },
+        { 
+            title: "Amount", 
+            dataIndex: "amount", 
+            key: "amount",
+            render: (amount) => (
+                <span>{canRead ? amount : "_"}</span>
+            ) 
+        },
         {
-            title: "Status", dataIndex: "status", key: "status",
+            title: "Status", 
+            dataIndex: "status", 
+            key: "status",
             render: (status) => (
-                <Tag color={status === 'Complete' ? 'green' : status === 'Incomplete' ? 'red' : 'orange'}>
-                    {status}
-                </Tag>
+                canRead ? (
+                    <Tag color={status === 'Complete' ? 'green' : status === 'Incomplete' ? 'red' : 'orange'}>
+                        {status}
+                    </Tag>
+                ) : "_"
             )
         },
     ];
+    
 
     return (
         <div style={{ padding: "20px" }}>
@@ -65,7 +113,6 @@ const AllPayments = () => {
                 <h1 style={{ fontSize: "24px", marginBottom: 20 }}>All Payments</h1>
             </center>
 
-            {/* ========== Filters Section ========== */}
             {canRead && 
             <Card style={{ marginBottom: 20 }}>
                 <Row gutter={[16, 16]}>
@@ -86,8 +133,6 @@ const AllPayments = () => {
                 </Row>
             </Card>}
 
-            {/* ========== Table Section ========== */}
-            {canRead ? (
                 <Table
                     columns={columns}
                     dataSource={filteredPayments}
@@ -96,10 +141,7 @@ const AllPayments = () => {
                     bordered
                     scroll={{ x: "100%" }}
                 />
-            ) : (
-                <Empty description="You don't have permission to view this data" />
-            )}
-        </div>
+                 </div>
     );
 };
 

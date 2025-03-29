@@ -76,7 +76,7 @@ const ManageArea = () => {
             );
 
             // console.log("API Response:", response.data); 
-// console.log("Formatted Data:", response.data);
+           // console.log("Formatted Data:", response.data);
             const areaData = response.data?.data?.areas?.map((data, index) => ({
                 key: index + 1 + (currentPage - 1) * pageSize,
                 id: data._id,
